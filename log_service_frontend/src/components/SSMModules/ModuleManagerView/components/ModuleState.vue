@@ -1,5 +1,5 @@
 <template>
-  <tr>
+  <tr class="module-state-tr">
     <th v-b-toggle="toggleID">{{moduleInfo.index}}</th>
     <td v-b-toggle="toggleID">{{moduleInfo.ip}}</td>
     <td v-b-toggle="toggleID">{{moduleInfo.port}}</td>
@@ -227,7 +227,10 @@ export default {
   background-color: #c2c2c2;
   letter-spacing: 4px;
 }
-
+.f-table td {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
 .dropdown-menu u:hover {
   cursor: pointer;
 }
@@ -239,5 +242,11 @@ export default {
   font-weight: bold;
   color: white;
   border-radius: 10px;
+}
+
+.module-state-tr .dropdown-item {
+  width: 58px;
+  text-decoration: underline;
+  letter-spacing: 3px;
 }
 </style>

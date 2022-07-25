@@ -50,12 +50,7 @@ app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseWebSockets();
 
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-           Path.Combine(builder.Environment.ContentRootPath, "log_service_frontend/dist")),
-    RequestPath = "/Page"
-});
+
 
 app.UseAuthorization();
 
