@@ -3,18 +3,20 @@
     <el-divider></el-divider>
     <p>System Start Time : {{AppStartTime}}</p>
     <div class="row">
-      <div class="col-lg">
+      <div class="col-lg-4">
         <SysSettingCard></SysSettingCard>
       </div>
-      <div class="col-lg">
-        <TcpIPClientListCard :tcpClientState="app_states.tcpClientState"></TcpIPClientListCard>
+      <div class="col-lg-4">
+        <PCStateCard :pcState="app_states.pcState"></PCStateCard>
+      </div>
+      <div class="col-lg-4">
+        <SSMInfoCard :ssmNumber="21"></SSMInfoCard>
       </div>
     </div>
     <div class="row">
-      <div class="col-lg">
-        <PCStateCard :pcState="app_states.pcState"></PCStateCard>
+      <div class="col-lg-8">
+        <TcpIPClientListCard :tcpClientState="app_states.tcpClientState"></TcpIPClientListCard>
       </div>
-      <div class="col-lg"></div>
     </div>
   </div>
 </template>
@@ -23,10 +25,11 @@ import { GetAppStates } from '../APIHelpers/BackendAPIs.js'
 import SysSettingCard from '../components/Admin/SysSettingCard.vue'
 import TcpIPClientListCard from '../components/Admin/TcpIPClientListCard.vue'
 import PCStateCard from '../components/Admin/PCStateCard.vue'
+import SSMInfoCard from '../components/Admin/SSMInfoCard.vue'
 
 import moment from 'moment';
 export default {
-  components: { SysSettingCard, TcpIPClientListCard, PCStateCard },
+  components: { SysSettingCard, TcpIPClientListCard, SSMInfoCard, PCStateCard },
 
   data() {
     return {

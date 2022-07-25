@@ -10,13 +10,21 @@
             <div>
               <u>RAM</u>
             </div>
-            <el-progress type="circle" :percentage="pcState.ram"></el-progress>
+            <el-progress
+              type="circle"
+              :percentage="pcState.ram"
+              :color="pcState.ram>75?'red': pcState.ram>50? 'orange':'rgb(32, 160, 255)'"
+            ></el-progress>
           </el-col>
           <el-col :span="12">
             <div>
               <u>CPU</u>
             </div>
-            <el-progress type="circle" :percentage="pcState.cpu"></el-progress>
+            <el-progress
+              type="circle"
+              :percentage="pcState.cpu"
+              :color="pcState.cpu>50?'red':'rgb(32, 160, 255)'"
+            ></el-progress>
           </el-col>
         </el-row>
       </div>
