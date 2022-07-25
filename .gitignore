@@ -5,3 +5,5 @@
 /log_service_frontend/dist
 /bin
 /obj
+/ssm
+/system_configs.json
