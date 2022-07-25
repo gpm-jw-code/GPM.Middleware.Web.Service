@@ -7,9 +7,11 @@ import 'element-plus/dist/index.css'
 import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
+import countTo from 'vue3-count-to';
 
 const app = createApp(App)
 app.use(router)
 app.use(BootstrapVue3)
+app.use(countTo)
 app.use(ElementPlus, { size: 'small', zIndex: 3000 })
 app.mount('#app')

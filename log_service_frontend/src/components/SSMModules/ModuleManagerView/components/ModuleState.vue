@@ -36,7 +36,9 @@
       <div class="pt-2">{{DataUpdateTime}}</div>
     </td>
     <td v-b-toggle="toggleID" style="text-align:center">
+      <span v-if="ConnectionState==''" class="placeholder-grow" style="width: 90%;"></span>
       <div
+        v-else
         class="connection-label"
         v-bind:style="{ backgroundColor: ConnectionState=='Connected'?'seagreen':'red'}"
       >{{ConnectionState.toUpperCase()}}</div>

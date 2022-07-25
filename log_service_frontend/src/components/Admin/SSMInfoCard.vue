@@ -6,7 +6,9 @@
       <div class="justify-content-center states-container">
         <div>CONNECTED NUMBER</div>
         <div id="ssm-number">
-          <a href="/">{{ssmNumber}}</a>
+          <a href="/">
+            <count-to :startVal="0" :endVal="ssmNumber" :duration="1100"></count-to>
+          </a>
         </div>
       </div>
     </div>

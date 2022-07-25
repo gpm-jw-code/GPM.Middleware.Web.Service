@@ -17,6 +17,9 @@
       <div class="col-lg-8">
         <TcpIPClientListCard :tcpClientState="app_states.tcpClientState"></TcpIPClientListCard>
       </div>
+      <div class="col-lg-4">
+        <SystemOperation></SystemOperation>
+      </div>
     </div>
   </div>
 </template>
@@ -26,10 +29,11 @@ import SysSettingCard from '../components/Admin/SysSettingCard.vue'
 import TcpIPClientListCard from '../components/Admin/TcpIPClientListCard.vue'
 import PCStateCard from '../components/Admin/PCStateCard.vue'
 import SSMInfoCard from '../components/Admin/SSMInfoCard.vue'
+import SystemOperation from '../components/Admin/SystemOperation.vue'
 
 import moment from 'moment';
 export default {
-  components: { SysSettingCard, TcpIPClientListCard, SSMInfoCard, PCStateCard },
+  components: { SysSettingCard, TcpIPClientListCard, SSMInfoCard, PCStateCard, SystemOperation },
 
   data() {
     return {
