@@ -1,0 +1,243 @@
+<template>
+  <tr>
+    <th v-b-toggle="toggleID">{{moduleInfo.index}}</th>
+    <td v-b-toggle="toggleID">{{moduleInfo.ip}}</td>
+    <td v-b-toggle="toggleID">{{moduleInfo.port}}</td>
+
+    <td>
+      <div v-if="gRangeSetting" class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+
+      <div v-if="!gRangeSetting" class="dropdown">
+        <b-button
+          class="dropdown-toggle"
+          variant="dark"
+          type="button"
+          id="dropdownMenuButton1"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          size="md"
+        >{{gRange}}G</b-button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+          <li v-for="g in [2,4,8,16] " :key="g">
+            <u class="dropdown-item" @click="ModifyGRange(g)">{{g}}G</u>
+          </li>
+        </ul>
+      </div>
+    </td>
+
+    <td v-b-toggle="toggleID">{{DataUpdateTime}}</td>
+    <td v-b-toggle="toggleID" style="text-align:center">
+      <div
+        class="connection-label"
+        v-bind:style="{ backgroundColor: ConnectionState=='Connected'?'seagreen':'red'}"
+      >{{ConnectionState}}</div>
+    </td>
+    <td>
+      <b-button size="sm" variant="light" squared v-b-toggle="toggleID">More</b-button>
+    </td>
+    <td>
+      <b-button size="sm" variant="danger" squared @click="RemoveBtnClickHandle(moduleInfo)">Remove</b-button>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="7">
+      <b-collapse :id="toggleID">
+        <div>特徵值</div>
+        <div class="f-table">
+          <table class="table">
+            <tr class="columns">
+              <th scope="col" class="col-2"></th>
+              <th scope="col" class="col-3">X</th>
+              <th scope="col" class="col-3">Y</th>
+              <th scope="col" class="col-3">Z</th>
+            </tr>
+            <tbody>
+              <tr>
+                <td class="f-name">P2P</td>
+                <td>{{SensingData.Features.AccP2P.X.toFixed(4)}}</td>
+                <td>{{SensingData.Features.AccP2P.Y.toFixed(4)}}</td>
+                <td>{{SensingData.Features.AccP2P.Z.toFixed(4)}}</td>
+              </tr>
+              <tr>
+                <td class="f-name">RMS</td>
+                <td>{{SensingData.Features.AccRMS.X.toFixed(4)}}</td>
+                <td>{{SensingData.Features.AccRMS.Y.toFixed(4)}}</td>
+                <td>{{SensingData.Features.AccRMS.Z.toFixed(4)}}</td>
+              </tr>
+              <tr>
+                <td class="f-name">振動能量</td>
+                <td>{{SensingData.Features.VibrationEnergy.X.toFixed(4)}}</td>
+                <td>{{SensingData.Features.VibrationEnergy.Y.toFixed(4)}}</td>
+                <td>{{SensingData.Features.VibrationEnergy.Z.toFixed(4)}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </b-collapse>
+    </td>
+  </tr>
+</template>
+
+<script setup >
+import { RemoveModule } from '@/APIHelpers/BackendAPIs'
+import { defineEmits } from 'vue';
+const emits = defineEmits(["OnModuleRemove"])
+
+async function RemoveBtnClickHandle(moduleInfo) {
+  var res = await RemoveModule(moduleInfo);
+  if (res) {
+    emits("OnModuleRemove", {});
+  }
+}
+</script>
+
+<script >
+
+import { SetMeasureRange } from '@/APIHelpers/BackendAPIs'
+import moment from 'moment';
+import clsModuleInfo from '@/Classes/clsModuleInfo.js'
+
+export default {
+
+  data() {
+    return {
+      SensingData: {
+        AccData: {
+          X: [],
+          Y: [],
+          Z: [],
+        },
+        FFTData: {
+          X: [],
+          Y: [],
+          Z: [],
+          FreqVec: [],
+          Freq_Resolution: 1
+
+        },
+        Features: {
+          AccP2P: {
+            X: -1,
+            Y: -1,
+            Z: -1,
+          },
+          AccRMS: {
+            X: -1,
+            Y: -1,
+            Z: -1,
+
+          },
+          VibrationEnergy: {
+            X: -1,
+            Y: -1,
+            Z: -1,
+
+          }
+        }
+      },
+      ConnectionState: "",
+      ShowMore: false,
+      gRange: 2,
+      gRangeSetting: false
+    }
+  },
+  computed: {
+    DataUpdateTime() {
+      return moment(this.SensingData.RecieveTime).format('yyyy-MM-DD HH:mm:ss');
+    },
+    toggleID() {
+      return "toggle" + this.moduleInfo.ip.replaceAll('.', '_') + this.moduleInfo.port;
+    }
+  },
+  props: {
+    moduleInfo: {
+      type: clsModuleInfo,
+      default: () => new clsModuleInfo("127.0.0.1", 6969)
+    },
+  },
+  methods: {
+    WsSensingDataHandle(data) {
+      var json = JSON.parse(data);
+      this.SensingData = JSON.parse(json.Message)
+    },
+    WsConnectStateDataHandle(data) {
+      var json = JSON.parse(data);
+      this.ConnectionState = json.Message;
+    },
+
+    MoreBtnClickHandle() {
+      this.ShowMore = !this.ShowMore;
+    },
+    async ModifyGRange(g) {
+      this.gRangeSetting = true;
+      var response = await SetMeasureRange(this.moduleInfo.ip, this.moduleInfo.port, g);
+      console.info(response);
+      if (response.errorCode == 0) {
+        this.gRange = g;
+      }
+      setTimeout(() => {
+        this.gRangeSetting = false;
+      }, 500);
+    }
+  },
+  mounted() {
+    var data_ws = new WebSocket(`wss://localhost:7014/module_data/${this.moduleInfo.endPoint}`);
+    data_ws.onopen = () => { console.info(`${this.moduleInfo.endPoint} data ws 已連接.`) };
+    data_ws.onmessage = (_ws) => { this.WsSensingDataHandle(_ws.data) };
+
+    var connectState_ws = new WebSocket(`wss://localhost:7014/module_state/${this.moduleInfo.endPoint}`);
+    connectState_ws.onopen = () => { console.info(`${this.moduleInfo.endPoint} state ws 已連接.`) };
+    connectState_ws.onmessage = (_ws) => { this.WsConnectStateDataHandle(_ws.data) };
+  },
+}
+</script>
+<style>
+.module-state-view {
+  /* background-color: #515151;
+  color: white;
+  margin: 10px;
+  border-radius: 5px; */
+}
+
+.module-state-view .title {
+  background-color: #313131;
+  border-start-end-radius: 5px;
+  border-start-start-radius: 5px;
+  padding: 5px;
+  text-align: left;
+}
+
+.f-table {
+  background-color: #515151;
+  color: white;
+  margin: auto 240px;
+  padding: 0;
+}
+
+.f-table table {
+  color: white;
+}
+.f-table table .columns {
+  background-color: #111111;
+}
+
+.f-table table .f-name {
+  background-color: #c2c2c2;
+  letter-spacing: 4px;
+}
+
+.dropdown-menu u:hover {
+  cursor: pointer;
+}
+
+.connection-label {
+  margin: auto 74px;
+  padding: 0;
+  letter-spacing: 3px;
+  font-weight: bold;
+  color: white;
+  border-radius: 10px;
+}
+</style>
