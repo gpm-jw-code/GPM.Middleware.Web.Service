@@ -5,7 +5,9 @@
       <el-divider></el-divider>
       <div class="justify-content-center states-container">
         <div>CONNECTED NUMBER</div>
-        <div id="ssm-number">{{ssmNumber}}</div>
+        <div id="ssm-number">
+          <a href="/">{{ssmNumber}}</a>
+        </div>
       </div>
     </div>
   </div>
@@ -25,5 +27,13 @@ export default {
   font-size: 80px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  cursor: pointer;
+}
+#ssm-number a {
+  color: black;
+}
+
+#ssm-number a :hover {
+  color: red;
 }
 </style>

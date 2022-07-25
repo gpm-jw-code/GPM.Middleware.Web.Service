@@ -1,7 +1,7 @@
 <template >
   <div class="col-lg card" style="width:100%;">
     <div class="card-body">
-      <h5 class="card-title">TCP/IP Clients ({{tcpClientState.length}})</h5>
+      <h5 class="card-title">TCP/IP CLIENT ({{tcpClientState.length}})</h5>
       <el-divider></el-divider>
       <div class="justify-content-center">
         <el-table :data="tcpClientState" height="300px" empty-text="NO  CONNECTED">

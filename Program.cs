@@ -15,7 +15,7 @@ void SysStateChangeInvoke_SystemStateOnChanged(object? sender, EventArgs e)
 }
 
 StaUtility.Methods.LoadSysParams();
-GPM.Middleware.Core.Models.System.PCStatesHelper.StartFetch(new TimeSpan(0, 0, 5));
+GPM.Middleware.Core.Models.System.PCStatesHelper.StartFetch(new TimeSpan(0, 0, 1));
 Logger.Initialize();
 GPM.Middleware.Core.Models.SSM.EmulatorHepler.CreateSSMEmulators(new List<int>() { 231, 232 });
 GPM.Middleware.Core.Models.SSM.SSMModuleManager.InitializeAsync();
@@ -49,8 +49,6 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseHttpsRedirection();
 app.UseWebSockets();
-
-
 
 app.UseAuthorization();
 

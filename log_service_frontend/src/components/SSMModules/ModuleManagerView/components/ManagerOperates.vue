@@ -22,6 +22,8 @@
 
 <script>
 import { AddModule } from '@/APIHelpers/BackendAPIs'
+import { ElMessage } from 'element-plus';
+
 export default {
   data() {
     return {
@@ -32,6 +34,7 @@ export default {
     async AddBtnHandle() {
       await AddModule(this.ip, this.port);
       this.$emit("OnModuleAdd", {});
+      ElMessage({ showClose: true, type: 'success', message: '新增完成' })
     },
     async PingBtnHandle() {
 

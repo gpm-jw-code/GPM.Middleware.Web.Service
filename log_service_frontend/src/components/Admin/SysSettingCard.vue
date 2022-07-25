@@ -9,7 +9,7 @@
       <el-row :gutter="10">
         <el-col :span="9">AUTO KICK OUT CLIENT</el-col>
         <el-col :span="4" class="input-item-col">
-          <el-checkbox v-model="settings.tcpClient.autoKickOutClient" size></el-checkbox>
+          <el-switch v-model="settings.tcpClient.autoKickOutClient" size></el-switch>
         </el-col>
       </el-row>
       <el-row :gutter="10">

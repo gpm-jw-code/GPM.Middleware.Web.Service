@@ -16,9 +16,9 @@
           <th scope="col" width="5%">#</th>
           <th scope="col">IP</th>
           <th scope="col">PORT</th>
-          <th scope="col" width="10%">Range</th>
-          <th scope="col" width="20%">Update Time</th>
-          <th scope="col" width="20%">Connection</th>
+          <th scope="col" width="10%">量測範圍</th>
+          <th scope="col" width="20%">更新時間</th>
+          <th scope="col" width="20%">連線狀態</th>
           <th scope="col" width="5%"></th>
           <th scope="col" width="5%"></th>
         </tr>

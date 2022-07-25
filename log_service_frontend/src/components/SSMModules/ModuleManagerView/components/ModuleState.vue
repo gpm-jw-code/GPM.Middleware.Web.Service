@@ -1,9 +1,14 @@
 <template>
   <tr class="module-state-tr">
-    <th v-b-toggle="toggleID">{{moduleInfo.index}}</th>
-    <td v-b-toggle="toggleID">{{moduleInfo.ip}}</td>
-    <td v-b-toggle="toggleID">{{moduleInfo.port}}</td>
-
+    <th v-b-toggle="toggleID">
+      <div>{{moduleInfo.index}}</div>
+    </th>
+    <td v-b-toggle="toggleID">
+      <div class="pt-2">{{moduleInfo.ip}}</div>
+    </td>
+    <td v-b-toggle="toggleID">
+      <div class="pt-2">{{moduleInfo.port}}</div>
+    </td>
     <td>
       <div v-if="gRangeSetting" class="spinner-border" role="status">
         <span class="visually-hidden">Loading...</span>
@@ -12,7 +17,7 @@
       <div v-if="!gRangeSetting" class="dropdown">
         <b-button
           class="dropdown-toggle"
-          variant="dark"
+          variant="light"
           type="button"
           id="dropdownMenuButton1"
           data-bs-toggle="dropdown"
@@ -27,12 +32,14 @@
       </div>
     </td>
 
-    <td v-b-toggle="toggleID">{{DataUpdateTime}}</td>
+    <td v-b-toggle="toggleID">
+      <div class="pt-2">{{DataUpdateTime}}</div>
+    </td>
     <td v-b-toggle="toggleID" style="text-align:center">
       <div
         class="connection-label"
         v-bind:style="{ backgroundColor: ConnectionState=='Connected'?'seagreen':'red'}"
-      >{{ConnectionState}}</div>
+      >{{ConnectionState.toUpperCase()}}</div>
     </td>
     <td>
       <b-button size="sm" variant="light" squared v-b-toggle="toggleID">More</b-button>
@@ -83,13 +90,21 @@
 <script setup >
 import { RemoveModule } from '@/APIHelpers/BackendAPIs'
 import { defineEmits } from 'vue';
+import { ElMessageBox, ElMessage } from 'element-plus';
 const emits = defineEmits(["OnModuleRemove"])
 
 async function RemoveBtnClickHandle(moduleInfo) {
-  var res = await RemoveModule(moduleInfo);
-  if (res) {
-    emits("OnModuleRemove", {});
-  }
+  ElMessageBox.confirm(`確定要移除 ${moduleInfo.endPoint}?`, 'Warning', {
+    confirmButtonText: '確定',
+    cancelButtonText: '取消'
+  }).then(async () => {
+
+    var res = await RemoveModule(moduleInfo);
+    if (res) {
+      emits("OnModuleRemove", {});
+      ElMessage({ type: 'info', message: `${moduleInfo.endPoint} 刪除成功` })
+    }
+  })
 }
 </script>
 
@@ -98,7 +113,6 @@ async function RemoveBtnClickHandle(moduleInfo) {
 import { SetMeasureRange } from '@/APIHelpers/BackendAPIs'
 import moment from 'moment';
 import clsModuleInfo from '@/Classes/clsModuleInfo.js'
-
 export default {
 
   data() {
@@ -237,11 +251,11 @@ export default {
 
 .connection-label {
   margin: auto 74px;
-  padding: 0;
-  letter-spacing: 3px;
+  padding: 6px;
   font-weight: bold;
   color: white;
-  border-radius: 10px;
+  border-radius: 3px;
+  font-size: 15px;
 }
 
 .module-state-tr .dropdown-item {
