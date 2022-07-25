@@ -3,12 +3,13 @@
     <div class="card-body">
       <h5 class="card-title">TCP/IP Clients ({{tcpClientState.length}})</h5>
       <el-divider></el-divider>
-      <div class="d-flex justify-content-center">
+      <div class="justify-content-center">
         <el-table :data="tcpClientState" height="300px" empty-text="NO  CONNECTED">
           <el-table-column prop="endPoint" label="EndPoint"></el-table-column>
           <el-table-column prop="connectedTime" label="Connect Time"></el-table-column>
           <el-table-column prop="lastRequestTime" label="Last Request Time"></el-table-column>
           <el-table-column prop="lastRequestCmd" label="Last Request"></el-table-column>
+          <el-table-column prop="lastRequestCmd" label="Last Response"></el-table-column>
           <el-table-column fixed="right">
             <template #default="scope">
               <div>
@@ -49,6 +50,10 @@ export default {
   methods: {
     async RemoveBtnHandle(e) {
       await KickTcpClinetOut(e);
+    },
+    req_res_text_format(cellValue = "", index = 0) {
+      console.info(cellValue, index);
+      return cellValue;
     }
   }
 }

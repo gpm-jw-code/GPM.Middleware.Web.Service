@@ -7,5 +7,7 @@ namespace web.service.Models.APPState
         public DateTime startupTime { get; set; }
         public List<clsTcpClientState> tcpClientState { get; set; } = new List<clsTcpClientState>();
         public clsPCState pcState { get; set; } = new clsPCState();
+
+        public int ssmNumber { get; set; } = 0;
     }
 }

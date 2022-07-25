@@ -10,6 +10,7 @@ namespace web.service.Models.APPState
             clsAppStates appStates = new clsAppStates();
             appStates.startupTime = SystemStates.StartupTime;
             appStates.pcState = GPM.Middleware.Core.Models.System.PCStatesHelper.pcState;
+            appStates.ssmNumber = GPM.Middleware.Core.Models.SSM.SSMModuleManager.ModuleList.Count;
 
             foreach (GPM.Middleware.Core.Models.Communication.clsServer.Client client in ar)
                 appStates.tcpClientState.Add(new clsTcpClientState

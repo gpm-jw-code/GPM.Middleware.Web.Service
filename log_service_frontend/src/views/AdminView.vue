@@ -10,7 +10,7 @@
         <PCStateCard :pcState="app_states.pcState"></PCStateCard>
       </div>
       <div class="col-lg-4">
-        <SSMInfoCard :ssmNumber="21"></SSMInfoCard>
+        <SSMInfoCard :ssmNumber="app_states.ssmNumber"></SSMInfoCard>
       </div>
     </div>
     <div class="row">
@@ -66,6 +66,6 @@ export default {
 </script>
 <style >
 .row {
-  margin-top: 10px;
+  margin: 3px;
 }
 </style>
