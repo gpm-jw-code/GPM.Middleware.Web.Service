@@ -32,6 +32,7 @@ import SSMInfoCard from '../components/Admin/SSMInfoCard.vue'
 import SystemOperation from '../components/Admin/SystemOperation.vue'
 
 import moment from 'moment';
+import { configs } from '@/config.js'
 export default {
   components: { SysSettingCard, TcpIPClientListCard, SSMInfoCard, PCStateCard, SystemOperation },
 
@@ -51,7 +52,7 @@ export default {
       this.app_states = await GetAppStates();
     },
     async WebsocketConnect() {
-      var ws = new WebSocket(`wss://localhost:7014/app_states`);
+      var ws = new WebSocket(`${configs.websocket_host}/app_states`);
       ws.onopen = () => { console.info('ws opend..') };
       ws.onclose = () => { console.info('ws closed..') };
       ws.onmessage = (_ws) => this.HandleWSMessage(_ws);

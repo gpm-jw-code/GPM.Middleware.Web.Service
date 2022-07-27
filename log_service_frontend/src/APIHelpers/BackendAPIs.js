@@ -1,5 +1,7 @@
 import axios from 'axios'
-axios.defaults.baseURL = 'https://localhost:7014/'
+import { configs } from '../config'
+
+axios.defaults.baseURL = configs.host
 
 export async function GetModuleList() {
   var hres = await axios.get('api/ModuleManager/ModuleList')

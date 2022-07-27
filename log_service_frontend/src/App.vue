@@ -16,9 +16,9 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarID">
           <div class="navbar-nav">
-            <a class="nav-link active" aria-current="page" href="/Admin">ADMIN</a>
-            <a class="nav-link active" aria-current="page" href="/">SSM</a>
-            <a class="nav-link active" aria-current="page" href="/log">LOG</a>
+            <router-link to="/Admin">ADMIN</router-link>
+            <router-link to="/">SSM</router-link>
+            <router-link to="/log">LOG</router-link>
           </div>
         </div>
       </div>
@@ -65,6 +65,19 @@ nav a.router-link-exact-active {
   color: #42b983;
 }
 
-#breadcrumb {
+.navbar-brand {
+  font-size: 2rem;
+}
+
+nav a.router-link-exact-active {
+  color: white;
+  font-size: large;
+  padding-top: 13px;
+}
+nav a {
+  color: rgb(214, 214, 214);
+  margin-right: 10px;
+  text-decoration: none;
+  padding-top: 15px;
 }
 </style>

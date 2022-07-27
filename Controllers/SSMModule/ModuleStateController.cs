@@ -64,7 +64,7 @@ namespace web.service.Controllers.SSMModule
                         byte[] buffer = new byte[1024];
                         try
                         {
-                            var receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                            WebSocketReceiveResult? receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                         }
                         catch (Exception ex)
                         {

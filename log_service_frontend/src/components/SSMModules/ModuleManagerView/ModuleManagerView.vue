@@ -1,26 +1,18 @@
 <template>
   <div>
     <ManagerOperatesVue @OnModuleAdd="ModuleAddingHandle"></ManagerOperatesVue>
-    <!-- {{TotalModuleNum}} -->
-    <!-- <ModuleState
-      v-for="info in ModuleList"
-      :key="info.endPoint"
-      :moduleInfo="info"
-      @OnModuleRemove="ModuleRemovedHandle"
-    ></ModuleState>-->
-
     <el-divider></el-divider>
     <table class="table my_table">
       <thead>
         <tr>
-          <th scope="col" width="5%">#</th>
-          <th scope="col">IP</th>
-          <th scope="col">PORT</th>
-          <th scope="col" width="10%">量測範圍</th>
-          <th scope="col" width="20%">更新時間</th>
-          <th scope="col" width="20%">連線狀態</th>
-          <th scope="col" width="5%"></th>
-          <th scope="col" width="5%"></th>
+          <th class="alway-show-col" scope="col" width="5%">#</th>
+          <th class="alway-show-col" scope="col">IP</th>
+          <th class="alway-show-col" scope="col">PORT</th>
+          <th class="alway-show-col" scope="col" width="10%">量測範圍</th>
+          <th class="alway-show-col" scope="col" width="20%">更新時間</th>
+          <th class="alway-show-col" scope="col" width="20%">狀態</th>
+          <th class="opt-region-div" scope="col" width="5%"></th>
+          <th class="opt-region-div" scope="col" width="5%"></th>
         </tr>
       </thead>
       <tbody>
@@ -45,7 +37,7 @@ import { GetModuleList } from '@/APIHelpers/BackendAPIs.js'
 export default {
   data() {
     return {
-      ModuleList: []
+      ModuleList: [],
     }
   },
   components: {

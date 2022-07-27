@@ -12,23 +12,32 @@
 
           <template #append>
             <b-button @click="AddBtnHandle">新增</b-button>
-            <b-button variant="primary" @click="PingBtnHandle">PING</b-button>
+            <b-button variant="primary" @click="PingBtnHandle">PING 工具</b-button>
           </template>
         </b-input-group>
       </div>
     </b-card>
+
+    <el-drawer v-model="showPingTool" direction="btt" title="Ping Tool" size="50%">
+      <PingTool></PingTool>
+    </el-drawer>
   </div>
 </template>
 
 <script>
 import { AddModule } from '@/APIHelpers/BackendAPIs'
 import { ElMessage } from 'element-plus';
+import PingTool from "./PingTool.vue"
 
 export default {
+  components: {
+    PingTool,
+  },
   data() {
     return {
       ip: "127.0.0.1",
-      port: 5000
+      port: 5000,
+      showPingTool: false
     }
   }, methods: {
     async AddBtnHandle() {
@@ -37,7 +46,7 @@ export default {
       ElMessage({ showClose: true, type: 'success', message: '新增完成' })
     },
     async PingBtnHandle() {
-
+      this.showPingTool = true;
     }
   }
 }

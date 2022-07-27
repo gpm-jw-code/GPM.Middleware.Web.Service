@@ -3,56 +3,76 @@
     <th v-b-toggle="toggleID">
       <div>{{moduleInfo.index}}</div>
     </th>
+    <!--IP-->
     <td v-b-toggle="toggleID">
       <div class="pt-2">{{moduleInfo.ip}}</div>
     </td>
+    <!--Port-->
     <td v-b-toggle="toggleID">
       <div class="pt-2">{{moduleInfo.port}}</div>
     </td>
-    <td>
-      <div v-if="gRangeSetting" class="spinner-border" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
 
-      <div v-if="!gRangeSetting" class="dropdown">
-        <b-button
-          class="dropdown-toggle"
-          variant="light"
-          type="button"
-          id="dropdownMenuButton1"
-          data-bs-toggle="dropdown"
-          aria-expanded="false"
-          size="md"
-        >{{gRange}}G</b-button>
-        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-          <li v-for="g in [2,4,8,16] " :key="g">
-            <u class="dropdown-item" @click="ModifyGRange(g)">{{g}}G</u>
-          </li>
-        </ul>
+    <!--量測範圍-->
+    <td>
+      <div v-if="gRangeSetting | SensingData.measureRange==''" class="spinner-border" role="status">
+        <span class="visually-hidden"></span>
       </div>
+      <transition name="el-zoom-in-bottom">
+        <div v-show="!(gRangeSetting | SensingData.measureRange=='')" class="dropdown">
+          <b-button
+            class="dropdown-toggle measure-range-button"
+            variant="dark"
+            type="button"
+            id="dropdownMenuButton1"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            size="md"
+          >{{SensingData.measureRange}}</b-button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li v-for="g in [2,4,8,16] " :key="g">
+              <u class="dropdown-item" @click="ModifyGRange(g)">{{g}}G</u>
+            </li>
+          </ul>
+        </div>
+      </transition>
     </td>
 
+    <!--更新時間-->
     <td v-b-toggle="toggleID">
-      <div class="pt-2">{{DataUpdateTime}}</div>
+      <div v-show="SensingData.RecieveTime==''" class="spinner-border" role="status">
+        <span class="visually-hidden"></span>
+      </div>
+      <transition name="el-zoom-in-bottom">
+        <div v-show="SensingData.RecieveTime!=''" class="pt-2">{{DataUpdateTime}}</div>
+      </transition>
     </td>
+
+    <!--狀態-->
     <td v-b-toggle="toggleID" style="text-align:center">
-      <span v-if="ConnectionState==''" class="placeholder-grow" style="width: 90%;"></span>
-      <div
-        v-else
-        class="connection-label"
-        v-bind:style="{ backgroundColor: ConnectionState=='Connected'?'seagreen':'red'}"
-      >{{ConnectionState.toUpperCase()}}</div>
+      <div v-show="SensingData.ErrorCode==-1" class="spinner-border" role="status">
+        <span class="visually-hidden"></span>
+      </div>
+      <transition name="el-zoom-in-bottom">
+        <div
+          v-show="SensingData.ErrorCode!=-1"
+          class="connection-label"
+          v-bind:style="{ backgroundColor: SensingData.ErrorCode==0?'seagreen':'red'}"
+        >{{ SensingData.ErrorCode==0? 'CONNECTED':SensingData.ErrorCode }}</div>
+      </transition>
     </td>
-    <td>
+
+    <!--操作-->
+    <td class="opt-region-div">
       <b-button size="sm" variant="light" squared v-b-toggle="toggleID">More</b-button>
     </td>
-    <td>
+    <td class="opt-region-div">
       <b-button size="sm" variant="danger" squared @click="RemoveBtnClickHandle(moduleInfo)">Remove</b-button>
     </td>
   </tr>
+
   <tr>
-    <td colspan="7">
-      <b-collapse :id="toggleID">
+    <td colspan="8">
+      <b-collapse ref="collapse" class="more-info-collapse" :id="toggleID">
         <div>特徵值</div>
         <div class="f-table">
           <table class="table">
@@ -115,6 +135,8 @@ async function RemoveBtnClickHandle(moduleInfo) {
 import { SetMeasureRange } from '@/APIHelpers/BackendAPIs'
 import moment from 'moment';
 import clsModuleInfo from '@/Classes/clsModuleInfo.js'
+import { configs } from '@/config.js';
+
 export default {
 
   data() {
@@ -151,7 +173,10 @@ export default {
             Z: -1,
 
           }
-        }
+        },
+        measureRange: '',
+        ErrorCode: -1,
+        RecieveTime: ''
       },
       ConnectionState: "",
       ShowMore: false,
@@ -199,11 +224,12 @@ export default {
     }
   },
   mounted() {
-    var data_ws = new WebSocket(`wss://localhost:7014/module_data/${this.moduleInfo.endPoint}`);
+
+    var data_ws = new WebSocket(`${configs.websocket_host}/module_data/${this.moduleInfo.endPoint}`);
     data_ws.onopen = () => { console.info(`${this.moduleInfo.endPoint} data ws 已連接.`) };
     data_ws.onmessage = (_ws) => { this.WsSensingDataHandle(_ws.data) };
 
-    var connectState_ws = new WebSocket(`wss://localhost:7014/module_state/${this.moduleInfo.endPoint}`);
+    var connectState_ws = new WebSocket(`${configs.websocket_host}/module_state/${this.moduleInfo.endPoint}`);
     connectState_ws.onopen = () => { console.info(`${this.moduleInfo.endPoint} state ws 已連接.`) };
     connectState_ws.onmessage = (_ws) => { this.WsConnectStateDataHandle(_ws.data) };
   },
@@ -259,10 +285,25 @@ export default {
   border-radius: 3px;
   font-size: 15px;
 }
-
+.module-state-tr {
+  font-size: medium;
+}
 .module-state-tr .dropdown-item {
   width: 58px;
   text-decoration: underline;
   letter-spacing: 3px;
+}
+.more-info-collapse {
+  background-color: #f1f1f1;
+  padding: 10px;
+}
+.measure-range-button {
+  width: 120px;
+}
+
+@media screen and (max-width: 800px) {
+  .opt-region-div {
+    visibility: hidden;
+  }
 }
 </style>
