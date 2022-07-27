@@ -181,7 +181,9 @@ export default {
       ConnectionState: "",
       ShowMore: false,
       gRange: 2,
-      gRangeSetting: false
+      gRangeSetting: false,
+      connectState_ws: null,
+      data_ws: null
     }
   },
   computed: {
@@ -225,14 +227,18 @@ export default {
   },
   mounted() {
 
-    var data_ws = new WebSocket(`${configs.websocket_host}/module_data/${this.moduleInfo.endPoint}`);
-    data_ws.onopen = () => { console.info(`${this.moduleInfo.endPoint} data ws 已連接.`) };
-    data_ws.onmessage = (_ws) => { this.WsSensingDataHandle(_ws.data) };
+    this.data_ws = new WebSocket(`${configs.websocket_host}/module_data/${this.moduleInfo.endPoint}`);
+    this.data_ws.onopen = () => { console.info(`${this.moduleInfo.endPoint} data ws 已連接.`) };
+    this.data_ws.onmessage = (_ws) => { this.WsSensingDataHandle(_ws.data) };
 
-    var connectState_ws = new WebSocket(`${configs.websocket_host}/module_state/${this.moduleInfo.endPoint}`);
-    connectState_ws.onopen = () => { console.info(`${this.moduleInfo.endPoint} state ws 已連接.`) };
-    connectState_ws.onmessage = (_ws) => { this.WsConnectStateDataHandle(_ws.data) };
+    this.connectState_ws = new WebSocket(`${configs.websocket_host}/module_state/${this.moduleInfo.endPoint}`);
+    this.connectState_ws.onopen = () => { console.info(`${this.moduleInfo.endPoint} state ws 已連接.`) };
+    this.connectState_ws.onmessage = (_ws) => { this.WsConnectStateDataHandle(_ws.data) };
   },
+  unmounted() {
+    this.data_ws.close();
+    this.connectState_ws.close();
+  }
 }
 </script>
 <style>

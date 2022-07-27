@@ -19,12 +19,15 @@
             <router-link to="/Admin">ADMIN</router-link>
             <router-link to="/">SSM</router-link>
             <router-link to="/log">LOG</router-link>
+            <router-link to="/idms">IDMS</router-link>
           </div>
         </div>
       </div>
     </nav>
   </div>
-  <router-view />
+  <keep-alive>
+    <router-view />
+  </keep-alive>
 </template>
 
 <script>

@@ -2,7 +2,7 @@ var configs = {
   get host() {
     return process.env.NODE_ENV === 'production'
       ? window.location.protocol + '//' + window.location.host
-      : 'https://localhost:7014'
+      : 'https://192.168.0.201:7014'
   },
   get websocket_host() {
     return this.host.replace('http', 'ws')

@@ -39,7 +39,7 @@ export default {
   data() {
     return {
       app_states: {},
-
+      ws: null
     }
   },
   computed: {
@@ -52,10 +52,10 @@ export default {
       this.app_states = await GetAppStates();
     },
     async WebsocketConnect() {
-      var ws = new WebSocket(`${configs.websocket_host}/app_states`);
-      ws.onopen = () => { console.info('ws opend..') };
-      ws.onclose = () => { console.info('ws closed..') };
-      ws.onmessage = (_ws) => this.HandleWSMessage(_ws);
+      this.ws = new WebSocket(`${configs.websocket_host}/app_states`);
+      this.ws.onopen = () => { console.info('ws opend..') };
+      this.ws.onclose = () => { console.info('ws closed..') };
+      this.ws.onmessage = (_ws) => this.HandleWSMessage(_ws);
     },
     HandleWSMessage(ws = WebSocket) {
       console.info(ws.data);
@@ -66,6 +66,10 @@ export default {
   mounted() {
     this.FetchAppState();
     this.WebsocketConnect();
+  },
+  unmounted() {
+    console.info('des');
+    this.ws.close();
   },
 }
 </script>
