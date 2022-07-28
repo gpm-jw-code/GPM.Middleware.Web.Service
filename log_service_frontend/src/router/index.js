@@ -1,8 +1,9 @@
-import { createRouter, createMemoryHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LogView from '../components/LogView.vue'
 import AdminView from '../views/AdminView.vue'
 import IDMS from '@/components/IDMS/MainPage.vue'
+import ModuleStatesListViewVue from '@/components/IDMS/ModuleStatesListView.vue'
 
 const routes = [
   {
@@ -26,6 +27,11 @@ const routes = [
     component: IDMS,
   },
   {
+    path: '/idms/module-states',
+    name: 'module-states',
+    component: ModuleStatesListViewVue,
+  },
+  {
     path: '/about',
     name: 'about',
     component: () =>
@@ -34,7 +40,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createMemoryHistory(),
+  history: createWebHistory(),
   routes,
 })
 

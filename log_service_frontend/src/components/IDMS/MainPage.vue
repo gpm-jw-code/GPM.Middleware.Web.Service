@@ -7,6 +7,7 @@
         <el-radio-button label="CHART"></el-radio-button>
       </el-radio-group>
     </div>
+    <el-divider></el-divider>
     <DignoseDataListView v-show="display_mode=='LIST'"></DignoseDataListView>
     <DignoseDataChartView :pause="display_mode!='CHART'" v-show="display_mode=='CHART'">??</DignoseDataChartView>
   </div>

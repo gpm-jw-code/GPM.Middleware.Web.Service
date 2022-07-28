@@ -20,14 +20,20 @@
             <router-link to="/">SSM</router-link>
             <router-link to="/log">LOG</router-link>
             <router-link to="/idms">IDMS</router-link>
+            <router-link to="/idms/module-states">IDMS</router-link>
           </div>
         </div>
       </div>
     </nav>
   </div>
-  <keep-alive>
-    <router-view />
-  </keep-alive>
+  <!-- <router-view /> -->
+  <router-view v-slot="{ Component }">
+    <!-- <transition name="el-fade-in"> -->
+    <keep-alive>
+      <component :is="Component" />
+    </keep-alive>
+    <!-- </transition> -->
+  </router-view>
 </template>
 
 <script>

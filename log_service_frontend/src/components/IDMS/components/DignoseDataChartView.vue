@@ -35,6 +35,7 @@
 
 <script>
 import GPMChart from '@/components/Charting/GPMChart';
+import { configs } from '@/config';
 // import moment from 'moment';
 export default {
   props: {
@@ -48,7 +49,7 @@ export default {
       ws: null,
       loading: true,
       DignoseDatas: [],
-      MaxHSDisplayNum: 180,
+      MaxHSDisplayNum: 50,
       settinglock: true
 
     }
@@ -73,7 +74,7 @@ export default {
       });
     },
     WsConnect() {
-      this.ws = new WebSocket(`ws://192.168.0.201:44332/Dignose?type=chart&number=${this.MaxHSDisplayNum}`);
+      this.ws = new WebSocket(`${configs.idms_websocket_host}/Dignose?type=chart&number=${this.MaxHSDisplayNum}`);
       this.ws.onopen = () => {
         this.loading = false;
       }
@@ -106,21 +107,20 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-$bg-color: #ffffff;
-$chart-height: 220px;
-
+<style  scoped>
 #dignose-chart-view {
-  background-color: $bg-color;
+  background-color: #ffffff;
   margin-top: 5px;
 }
 .charting-options {
   border: 1px dashed black;
-  span {
-    margin-right: 12px;
-  }
 }
+
+.charting-options span {
+  margin-right: 12px;
+}
+
 .chart-h {
-  height: $chart-height;
+  height: 220px;
 }
 </style>

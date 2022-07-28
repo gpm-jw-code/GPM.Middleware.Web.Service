@@ -7,7 +7,22 @@ var configs = {
   get websocket_host() {
     return this.host.replace('http', 'ws')
   },
+  get idms_websocket_host() {
+    return process.env.NODE_ENV === 'production'
+      ? window.location.protocol.replace('http', 'ws') +
+          '//' +
+          window.location.hostname +
+          ':44332'
+      : 'ws://127.0.0.1:44332'
+  },
 }
+console.info(
+  window.location.protocol.replace('http', 'ws') +
+    '//' +
+    window.location.hostname +
+    ':44332',
+)
 console.info(configs.host)
-console.info(configs.websocket_host)
+console.info('websocket_host', configs.websocket_host)
+console.info('idms_websocket_host', configs.idms_websocket_host)
 export { configs }

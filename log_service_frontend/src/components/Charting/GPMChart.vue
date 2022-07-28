@@ -76,7 +76,7 @@ export default {
           xAxes: [{
             type: 'time',
             time: {
-              unit: 'second'
+              // unit: 'second'
             },
             gridLines: {
               color: '#313131'
