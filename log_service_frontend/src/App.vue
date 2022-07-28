@@ -16,11 +16,11 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarID">
           <div class="navbar-nav">
-            <router-link to="/Admin">ADMIN</router-link>
+            <!-- <router-link to="/Admin">ADMIN</router-link>
             <router-link to="/">SSM</router-link>
-            <router-link to="/log">LOG</router-link>
-            <router-link to="/idms">IDMS</router-link>
-            <router-link to="/idms/module-states">IDMS</router-link>
+            <router-link to="/log">LOG</router-link>-->
+            <router-link to="/idms">診斷頁面</router-link>
+            <router-link to="/idms/module-states">感測器狀態</router-link>
           </div>
         </div>
       </div>

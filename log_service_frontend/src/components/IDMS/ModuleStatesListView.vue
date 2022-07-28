@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-table :data="ModuleStatesData">
-      <el-table-column width="44">
+      <el-table-column width="44" fixed>
         <template #default="scope">
           <el-icon
             v-show=" (!scope.row.ControllerAbnormal && scope.row.SensorAbnormal) | (scope.row.ControllerAbnormal && !scope.row.SensorAbnormal)"

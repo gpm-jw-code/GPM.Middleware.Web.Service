@@ -1,15 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+// import HomeView from '../views/HomeView.vue'
 import LogView from '../components/LogView.vue'
 import AdminView from '../views/AdminView.vue'
 import IDMS from '@/components/IDMS/MainPage.vue'
 import ModuleStatesListViewVue from '@/components/IDMS/ModuleStatesListView.vue'
 
 const routes = [
+  // {
+  //   path: '/',
+  //   name: 'home',
+  //   component: HomeView,
+  // },
   {
     path: '/',
     name: 'home',
-    component: HomeView,
+    component: IDMS,
   },
   {
     path: '/admin',

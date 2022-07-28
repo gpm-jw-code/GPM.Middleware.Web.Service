@@ -9,6 +9,19 @@
       @row-click="TableRowClickHandle"
       :row-class-name="tableRowClassName"
     >
+      <el-table-column width="30">
+        <template #default="scope">
+          <div class="py-1">
+            <el-icon
+              :size="20"
+              color="rgb(64, 158, 255)"
+              v-show="scope.row.IP==selectedDiagnoseData.IP"
+            >
+              <CaretRight />
+            </el-icon>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column sortable prop="IP" label="IP"></el-table-column>
       <el-table-column sortable prop="EqName" label="EQ Name"></el-table-column>
       <el-table-column sortable prop="UnitName" label="Unit Name"></el-table-column>
@@ -48,7 +61,11 @@
             </div>
           </div>
         </div>
-        <div class="col-lg-11" v-loading="chart_loading">
+        <div
+          class="col-lg-11"
+          v-loading="chart_loading"
+          element-loading-background="rgba(122, 122, 122, 0.8)"
+        >
           <GPMChartVue
             class="share-chart"
             id="share-chart"
@@ -168,7 +185,7 @@ export default {
   },
 
   mounted() {
-    this.ws = new WebSocket("ws://192.168.0.102:44332/Dignose?type=list");
+    this.ws = new WebSocket(`${configs.idms_websocket_host}/Dignose?type=list`);
     this.ws.onopen = () => { }
     this.ws.onmessage = (_ws) => {
       this.loading = false;

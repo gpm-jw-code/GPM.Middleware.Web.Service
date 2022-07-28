@@ -1,6 +1,6 @@
 <template>
   <div v-bind:style="chart_style" v-loading="loading">
-    <canvas :id="id"></canvas>
+    <canvas @click="ClickChartHandel" :id="id"></canvas>
   </div>
 </template>
 <script>
@@ -116,6 +116,8 @@ export default {
     }
   },
   methods: {
+    ClickChartHandel() {
+    },
     ChartInit() {
       const ctx = document.getElementById(this.id);
       this.chartInstance = new Chart(ctx, {
