@@ -1,6 +1,8 @@
 <template>
   <div id="dignose-chart-view" v-loading="loading">
-    <div class="charting-options py-1 px-3 d-flex">
+    <el-backtop :right="30" :bottom="50" />
+
+    <div class="charting-options py-1 px-1 mx-2 d-flex">
       <div class="d-flex justify-content-start w-100">
         <!-- <span>顯示</span> -->
         <el-radio-group v-model="display_mode" @change="RenderCharts">
@@ -43,7 +45,7 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row g-0">
       <div class="empty-result" v-if="DignoseDatas_Show.length==0">
         <el-empty description="未包含任何圖表項目" :image-size="200" />
       </div>
@@ -53,16 +55,17 @@
         v-for="data in DignoseDatas_Show"
         :key="data.IP"
       >
-        <span :id="data.IP" @click="ZoomClickHandle(data.IP)">
+        <span class="zoom-icon" :id="data.IP" @click="ZoomClickHandle(data.IP)">
           <el-icon :size="20">
             <ZoomIn />
           </el-icon>
         </span>
+        <span class="value-show">{{data.HealthScore}}</span>
         <GPMChart
           @click="ZoomClickHandle(data.IP)"
           :ref="'health-chart-'+data.IP"
           class="chart-h"
-          :id="data.IP+'-HealthScore'"
+          :chart_id="data.IP+'-HealthScore'"
           :title="`${data.EqName}-${data.UnitName}(${data.IP})`"
           :yAxisLabel="ylabel"
           :key="ylabel+ColsNumber"
@@ -70,12 +73,12 @@
       </div>
     </div>
 
-    <el-drawer v-model="zooming" direction="btt" size="100%">
+    <el-drawer v-model="zooming" direction="btt" size="90%">
       <GPMChart
         ref="zoom-chart"
         @click="zooming=false"
         class="chart-zoom"
-        id="zoom-chart"
+        chart_id="zoom-chart"
         :title="`${zoom_data.EqName}-${zoom_data.UnitName}(${zoom_data.IP})`"
         :yAxisLabel="ylabel"
         :key="zoom_data.IP"
@@ -176,29 +179,30 @@ export default {
       });
     },
     GenChartData(data, display_mode) {
-      var _chartData;
+      var chartData;
       var borderColor = 'gold';
 
       if (display_mode == 'Health Score') {
-        _chartData = data.chartDatas.healthScoreList;
+        chartData = data.chartDatas.healthScoreList;
         borderColor = 'rgb(21, 237, 201)';
       }
 
       if (display_mode == 'Alert Index(day)')
-        _chartData = data.chartDatas.alertIndex_by_Day_List;
+        chartData = data.chartDatas.alertIndex_by_Day_List;
 
       if (display_mode == 'Alert Index(Hour)')
-        _chartData = data.chartDatas.alertIndex_by_Hour_List;
+        chartData = data.chartDatas.alertIndex_by_Hour_List;
 
-      if (_chartData.length == 0) {
+      if (chartData.length == 0) {
         return;
       }
 
-      var timeList = Object.keys(_chartData);
-      var scoreList = Object.values(_chartData);
+      var timeList = chartData.timeList;
+      var scoreList = chartData.valueList;
+
       var datasets = [
         {
-          label: display_mode,
+          label: display_mode.toString(),
           data: scoreList,
           borderColor: borderColor
         }
@@ -222,7 +226,8 @@ export default {
         this.WsConnect();
       }
 
-    }, HSDisplayNumChangedHandel() {
+    },
+    HSDisplayNumChangedHandel() {
       console.info(this.MaxHSDisplayNum);
       this.ws.onmessage = null;
       this.ws.close();
@@ -245,7 +250,8 @@ export default {
   margin-top: 5px;
 }
 .charting-options {
-  border: 1px dashed black;
+  border: 1px solid grey;
+  border-radius: 0.4rem;
 }
 
 .charting-options span {
@@ -270,12 +276,24 @@ export default {
 .charting-region {
   position: relative;
 }
-.charting-region span {
-  position: absolute;
+
+.charting-region .zoom-icon {
   right: 20px;
   top: 10px;
-  color: white;
   cursor: pointer;
+}
+
+.charting-region .value-show {
+  left: 20px;
+  bottom: 6px;
+  font-size: 30px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.charting-region span {
+  position: absolute;
+  color: white;
 }
 
 .el-drawer__body {

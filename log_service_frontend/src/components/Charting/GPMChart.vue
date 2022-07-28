@@ -1,6 +1,6 @@
 <template>
   <div v-bind:style="chart_style" v-loading="loading">
-    <canvas @click="ClickChartHandel" :id="id"></canvas>
+    <canvas @click="ClickChartHandel" :id="chart_id"></canvas>
   </div>
 </template>
 <script>
@@ -8,7 +8,7 @@
 import Chart from 'chart.js'
 export default {
   props: {
-    id: {
+    chart_id: {
       type: String,
       default: 'dchart'
     },
@@ -51,7 +51,7 @@ export default {
         title: {
           display: true,
           text: this.title,
-          fontSize: 20,
+          fontSize: 14,
           fontColor: 'white'
         },
         scales: {
@@ -62,8 +62,10 @@ export default {
               },
               ticks: {
                 beginAtZero: true,
-                padding: 25,
-                fontColor: 'white'
+                padding: 20,
+                fontColor: 'white',
+                autoskip: true,
+                maxTicksLimit: 10
               },
               scaleLabel: {
                 display: true,
@@ -119,7 +121,7 @@ export default {
     ClickChartHandel() {
     },
     ChartInit() {
-      const ctx = document.getElementById(this.id);
+      const ctx = document.getElementById(this.chart_id);
       this.chartInstance = new Chart(ctx, {
         type: 'line',
         data: {

@@ -1,6 +1,6 @@
 <template>
-  <div id="breadcrumb">
-    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+  <div id="breadcrumb" sticky>
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark sticky">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">GPM</a>
         <button
@@ -60,7 +60,11 @@ export default {
   text-align: center;
   color: #2c3e50;
 }
-
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
 nav {
   padding: 30px;
 }
@@ -88,5 +92,11 @@ nav a {
   margin-right: 10px;
   text-decoration: none;
   padding-top: 15px;
+}
+
+#breadcrumb {
+  position: fixed;
+  width: 100%;
+  z-index: 23444;
 }
 </style>

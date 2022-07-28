@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <el-table :data="ModuleStatesData">
+  <div style="padding-top:75px">
+    <el-table stripe :data="ModuleStatesData">
       <el-table-column width="44" fixed>
         <template #default="scope">
           <el-icon

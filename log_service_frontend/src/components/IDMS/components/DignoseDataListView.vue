@@ -2,6 +2,7 @@
   <div class="dignose-list-view px-2">
     <!-- 表格 -->
     <el-table
+      stripe
       :default-sort="{ prop: 'IP', order: 'descending' }"
       height="360"
       :data="DignoseDatas"
@@ -22,6 +23,8 @@
           </div>
         </template>
       </el-table-column>
+
+      <el-table-column type="expand"></el-table-column>
       <el-table-column sortable prop="IP" label="IP"></el-table-column>
       <el-table-column sortable prop="EqName" label="EQ Name"></el-table-column>
       <el-table-column sortable prop="UnitName" label="Unit Name"></el-table-column>
@@ -30,7 +33,7 @@
     </el-table>
 
     <!-- 底部圖表區域 -->
-    <div class="share-chart-container">
+    <div class="share-chart-container" v-loading="loading">
       <!-- <h4>Share use chart there</h4> -->
       <div class="row">
         <div class="col-lg-1">
@@ -68,9 +71,10 @@
         >
           <GPMChartVue
             class="share-chart"
-            id="share-chart"
+            chart_id="share-chart"
             :key="selectedDiagnoseData.IP+chart_display_mode"
             :title="ChartTitle"
+            :yAxisLabel="ylabel"
             ref="trendChart"
           ></GPMChartVue>
         </div>
@@ -115,8 +119,6 @@ export default {
 
     },
     RTChartWebsocketIni(ip) {
-      if (!ip)
-        return;
       if (this.trendchart_ws)
         this.trendchart_ws.close();
       this.trendchart_ws = new WebSocket(`${configs.idms_websocket_host}/Dignose?type=chart&number=180&ip=${ip}`);
@@ -135,28 +137,28 @@ export default {
     },
     RenderTrendChart(data) {
       this.renderingDiagnoseData = data[0];
-      var _chartData;
+      var chartData;
       var timeList = [];
       var datasets = [];
       var borderColor = 'gold';
 
       if (this.chart_display_mode == 'health') {
-        _chartData = this.renderingDiagnoseData.chartDatas.healthScoreList;
+        chartData = this.renderingDiagnoseData.chartDatas.healthScoreList;
         borderColor = 'rgb(21, 237, 201)';
       }
 
       if (this.chart_display_mode == 'alert_index_hour')
-        _chartData = this.renderingDiagnoseData.chartDatas.alertIndex_by_Hour_List;
+        chartData = this.renderingDiagnoseData.chartDatas.alertIndex_by_Hour_List;
 
       if (this.chart_display_mode == 'alert_index_day')
-        _chartData = this.renderingDiagnoseData.chartDatas.alertIndex_by_Day_List;
+        chartData = this.renderingDiagnoseData.chartDatas.alertIndex_by_Day_List;
 
-      if (_chartData.length == 0) {
+      if (chartData.length == 0) {
         return;
       }
 
-      timeList = Object.keys(_chartData);
-      var scoreList = Object.values(_chartData);
+      timeList = chartData.timeList;
+      var scoreList = chartData.valueList;
       datasets.push({
         label: "Health Score",
         data: scoreList,
@@ -180,6 +182,13 @@ export default {
       if (this.chart_display_mode == 'alert_index_day')
         return "劣化指標(天)"
       return "";
+    }, ylabel() {
+      if (this.chart_display_mode == 'health')
+        return 'Score';
+      if (this.chart_display_mode == 'alert_index_hour' | this.chart_display_mode == 'alert_index_day')
+        return 'Index';
+      return "";
+
     }
 
   },
@@ -204,11 +213,13 @@ export default {
   color: gold;
   height: 320px;
   position: absolute;
-  width: 99%;
+  width: 100%;
   bottom: 0;
-  margin: 10px;
+  /* margin: 10px; */
+  /* box-shadow: 12px 2px 32px 10px black; */
   padding: 10px 20px;
   border-radius: 8px;
+  border: black 1px solid;
 }
 .share-chart {
   height: 280px;

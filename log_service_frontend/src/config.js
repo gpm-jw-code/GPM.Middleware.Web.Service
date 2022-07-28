@@ -13,7 +13,7 @@ var configs = {
           '//' +
           window.location.hostname +
           ':44332'
-      : 'ws://192.168.0.123:44332'
+      : 'ws://192.168.0.201:44332'
   },
 }
 console.info(
