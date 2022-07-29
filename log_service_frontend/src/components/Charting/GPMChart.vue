@@ -139,14 +139,15 @@ export default {
           this.loading = true;
 
         console.info('before render');
-        this.xlabels = timeList;
+        this.xlabels = Object.values(timeList);
         this.datasets = [];
 
         for (let index = 0; index < dataSetsInput.length; index++) {
           const dataObj = dataSetsInput[index];
+          console.info(dataObj);
           this.datasets.push({
             label: dataObj.label,
-            data: dataObj.data,
+            data: Object.values(dataObj.data),
             borderColor: dataObj.borderColor != undefined ? dataObj.borderColor : this.colors[index],
             borderWidth: dataObj.borderWidth != undefined ? dataObj.borderWidth : 1,
             fill: false,
