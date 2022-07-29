@@ -15,9 +15,9 @@ export function GenDiagnoseChartData(data = { chartDatas: {} }, display_mode) {
   if (display_mode == 'AID') chartData = data.chartDatas.alertIndex_by_Day_List
 
   if (display_mode == 'AIH') chartData = data.chartDatas.alertIndex_by_Hour_List
-
+  if (chartData == undefined) return { timeLs: [], datasets: [] }
   if (chartData.length == 0) {
-    return
+    return { timeLs: [], datasets: [] }
   }
 
   var timeList = chartData.timeList
