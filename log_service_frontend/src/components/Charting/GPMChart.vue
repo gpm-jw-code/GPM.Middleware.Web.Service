@@ -132,7 +132,7 @@ export default {
       });
       this.chartInstance.options.animation = false;
     },
-    UpdateChart(timeList = [], dataSetsInput = [{ label: '', data: [], borderColor: 'blue', borderWidth: 1 }], showLoading = false) {
+    UpdateChart(timeList = [], dataSetsInput = [{ label: '', data: [0], borderColor: 'blue', borderWidth: 1 }], showLoading = false) {
       try {
 
         if (showLoading)
@@ -141,20 +141,21 @@ export default {
         console.info('before render');
         this.xlabels = timeList;
         this.datasets = [];
-        var i = 0;
-        dataSetsInput.forEach(dataObj => {
+
+        for (let index = 0; index < dataSetsInput.length; index++) {
+          const dataObj = dataSetsInput[index];
           this.datasets.push({
             label: dataObj.label,
             data: dataObj.data,
-            borderColor: dataObj.borderColor != undefined ? dataObj.borderColor : this.colors[i],
+            borderColor: dataObj.borderColor != undefined ? dataObj.borderColor : this.colors[index],
             borderWidth: dataObj.borderWidth != undefined ? dataObj.borderWidth : 1,
             fill: false,
             pointStyle: 'none',
             pointRadius: 0,
             lineTension: 0,
           });
-          i += 1;
-        })
+        }
+
 
         this.loading = false;
         this.RenderData();
