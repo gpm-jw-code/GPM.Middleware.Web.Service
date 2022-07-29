@@ -153,7 +153,7 @@ export default {
       var timeList = chartingObj.timeLs;
       var datasets = chartingObj.datasets;
       setTimeout(() => {
-        this.$refs["zoom-chart"].Update(timeList, datasets);
+        this.$refs["zoom-chart"].UpdateChart(timeList, datasets);
       }, 200);
       this.zoomingIP = ip;
     },
@@ -167,13 +167,13 @@ export default {
 
         var chart_ref = this.$refs[`health-chart-${data.IP}`]
         if (chart_ref && chart_ref[0])
-          chart_ref[0].Update(timeList, datasets);
+          chart_ref[0].UpdateChart(timeList, datasets);
 
         //render zoom data 
         if (this.zooming && data.IP == this.zoomingIP) {
 
           this.zoom_data = data;
-          this.$refs["zoom-chart"].Update(timeList, datasets);
+          this.$refs["zoom-chart"].UpdateChart(timeList, datasets);
         }
 
       });
@@ -214,9 +214,9 @@ export default {
       this.ws.onopen = () => {
         this.loading = false;
       }
-      this.ws.onmessage = (_ws) => {
+      this.ws.onmessage = (evt) => {
         this.loading = false;
-        this.DignoseDatas = JSON.parse(_ws.data);
+        this.DignoseDatas = JSON.parse(evt.data);
         this.RenderCharts();
       }
       this.ws.onclose = () => {

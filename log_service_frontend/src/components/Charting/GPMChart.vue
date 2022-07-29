@@ -132,32 +132,38 @@ export default {
       });
       this.chartInstance.options.animation = false;
     },
-    Update(timeList, dataSetsInput, showLoading = false) {
-      if (showLoading)
-        this.loading = true;
+    UpdateChart(timeList = [], dataSetsInput = [{ label: '', data: [], borderColor: 'blue', borderWidth: 1 }], showLoading = false) {
+      try {
 
-      this.xlabels = timeList;
-      this.datasets = [];
-      var i = 0;
-      dataSetsInput.forEach(dataObj => {
-        this.datasets.push({
-          label: dataObj.label,
-          data: dataObj.data,
-          backgroundColor: "",
-          borderColor: dataObj.borderColor ? dataObj.borderColor : this.colors[i],
-          borderWidth: dataObj.borderWidth ? dataObj.borderWidth : 1,
-          fill: false,
-          pointStyle: 'none',
-          pointRadius: 0, lineTension: 0,
-        });
-        i += 1;
-      })
+        if (showLoading)
+          this.loading = true;
 
-      this.loading = false;
-      this.RenderData();
+        console.info('before render');
+        this.xlabels = timeList;
+        this.datasets = [];
+        var i = 0;
+        dataSetsInput.forEach(dataObj => {
+          this.datasets.push({
+            label: dataObj.label,
+            data: dataObj.data,
+            borderColor: dataObj.borderColor != undefined ? dataObj.borderColor : this.colors[i],
+            borderWidth: dataObj.borderWidth != undefined ? dataObj.borderWidth : 1,
+            fill: false,
+            pointStyle: 'none',
+            pointRadius: 0,
+            lineTension: 0,
+          });
+          i += 1;
+        })
+
+        this.loading = false;
+        this.RenderData();
+      } catch (error) {
+        console.info(error);
+      }
     },
 
-    FeedData(time, dataSets) {
+    FeedData(time = [], dataSets = [{ label: '', data: -1, borderColor: 'blue', borderWidth: 1 }]) {
       if (dataSets.length == 0)
         return;
       if (time == undefined)

@@ -129,43 +129,49 @@ export default {
         console.info('ws opened')
       }
       this.trendchart_ws.onclose = () => { console.info('ws clsoed') }
-      this.trendchart_ws.onmessage = (ws) => {
-        var data = JSON.parse(ws.data);
-        this.RenderTrendChart(data);
+      this.trendchart_ws.onmessage = (evt) => {
+        var data = JSON.parse(evt.data);
+        this.RenderTrendChart(data[0]);
 
       }
     },
     RenderTrendChart(data) {
-      this.renderingDiagnoseData = data[0];
-      var chartData;
-      var timeList = [];
-      var datasets = [];
-      var borderColor = 'gold';
 
-      if (this.chart_display_mode == 'health') {
-        chartData = this.renderingDiagnoseData.chartDatas.healthScoreList;
-        borderColor = 'rgb(21, 237, 201)';
+      try {
+        this.renderingDiagnoseData = data;
+        var chartData;
+        var timeList = [];
+        var datasets = [];
+        var borderColor = 'gold';
+
+        if (this.chart_display_mode == 'health') {
+          chartData = this.renderingDiagnoseData.chartDatas.healthScoreList;
+          borderColor = 'rgb(21, 237, 201)';
+        }
+
+        if (this.chart_display_mode == 'alert_index_hour')
+          chartData = this.renderingDiagnoseData.chartDatas.alertIndex_by_Hour_List;
+
+        if (this.chart_display_mode == 'alert_index_day')
+          chartData = this.renderingDiagnoseData.chartDatas.alertIndex_by_Day_List;
+
+        if (chartData.length == 0) {
+          return;
+        }
+
+        timeList = chartData.timeList;
+        var scoreList = chartData.valueList;
+        datasets.push({
+          label: "Health Score",
+          data: scoreList,
+          borderColor: borderColor
+        });
+        if (this.$refs.trendChart)
+          this.$refs.trendChart.UpdateChart(timeList, datasets);
+      } catch (error) {
+        console.info(error)
       }
 
-      if (this.chart_display_mode == 'alert_index_hour')
-        chartData = this.renderingDiagnoseData.chartDatas.alertIndex_by_Hour_List;
-
-      if (this.chart_display_mode == 'alert_index_day')
-        chartData = this.renderingDiagnoseData.chartDatas.alertIndex_by_Day_List;
-
-      if (chartData.length == 0) {
-        return;
-      }
-
-      timeList = chartData.timeList;
-      var scoreList = chartData.valueList;
-      datasets.push({
-        label: "Health Score",
-        data: scoreList,
-        borderColor: borderColor
-      });
-      if (this.$refs.trendChart)
-        this.$refs.trendChart.Update(timeList, datasets);
     }
   },
   computed: {
