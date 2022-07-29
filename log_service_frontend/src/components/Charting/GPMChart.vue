@@ -28,13 +28,20 @@ export default {
   data() {
     return {
       loading: false,
+      Rendering: false,
       chart_style: {
         backgroundColor: '#202020',
         border: '1px solid grey',
         margin: '3px',
         borderRadius: '4px'
       },
-      chartInstance: {},
+      chartInstance: {
+        data: {
+          labels: [],
+          datasets: []
+        },
+        update: () => { }
+      },
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -132,19 +139,18 @@ export default {
       });
       this.chartInstance.options.animation = false;
     },
+
     UpdateChart(timeList = [], dataSetsInput = [{ label: '', data: [0], borderColor: 'blue', borderWidth: 1 }], showLoading = false) {
       try {
-
+        this.Clear();
         if (showLoading)
           this.loading = true;
 
-        console.info('before render');
         this.xlabels = Object.values(timeList);
         this.datasets = [];
 
         for (let index = 0; index < dataSetsInput.length; index++) {
           const dataObj = dataSetsInput[index];
-          console.info(dataObj);
           this.datasets.push({
             label: dataObj.label,
             data: Object.values(dataObj.data),
@@ -156,12 +162,10 @@ export default {
             lineTension: 0,
           });
         }
-
-
         this.loading = false;
         this.RenderData();
       } catch (error) {
-        console.info(error);
+        return "err";
       }
     },
 
@@ -197,10 +201,36 @@ export default {
       this.datasets = [];
       this.RenderData();
     },
-    RenderData() {
-      this.chartInstance.data.labels = this.xlabels;
-      this.chartInstance.data.datasets = this.datasets;
-      this.chartInstance.update();
+
+    async RenderData() {
+      if (this.Rendering)
+        return;
+
+      this.Rendering = true;
+      new Promise((resolve, reject) => {
+
+        try {
+
+          this.chartInstance.data.datasets = [];
+          this.chartInstance.data.labels = [];
+          this.xlabels.forEach(time => {
+            this.chartInstance.data.labels.push(time);
+          })
+
+          this.datasets.forEach(dataset => {
+            this.chartInstance.data.datasets.push(dataset);
+          })
+          this.chartInstance.update();
+          this.Rendering = false;
+          resolve();
+
+
+        } catch (error) {
+          this.Rendering = false;
+          reject(error)
+        }
+
+      });
     },
     DataFIFO() {
       if (this.xlabels.length > 50) {

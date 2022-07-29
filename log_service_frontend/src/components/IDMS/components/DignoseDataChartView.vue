@@ -6,7 +6,7 @@
       <div class="d-flex justify-content-start w-100">
         <!-- <span>顯示</span> -->
         <el-radio-group v-model="display_mode" @change="RenderCharts">
-          <el-radio-button v-for="mode in display_modes" :key="mode" :label="mode"></el-radio-button>
+          <el-radio-button v-for="mode in display_modes" :key="mode.value" :label="mode.label"></el-radio-button>
         </el-radio-group>
       </div>
 
@@ -90,6 +90,7 @@
 <script>
 import GPMChart from '@/components/Charting/GPMChart';
 import { configs } from '@/config';
+import { GenDiagnoseChartData, display_modes } from '../Helpers';
 // import moment from 'moment';
 export default {
   props: {
@@ -111,7 +112,7 @@ export default {
       MaxHSDisplayNum: 50,
       settinglock: true,
       display_mode: 'Health Score',
-      display_modes: ['Health Score', 'Alert Index(day)', 'Alert Index(Hour)'],
+      display_modes: display_modes,
       search_str: '',
       ColsNumber: 2,
       zooming: false,
@@ -141,15 +142,19 @@ export default {
         return 'Index';
       return "";
 
-    }, colsNumReuslt() {
+    },
+    colsNumReuslt() {
       return 12 / this.ColsNumber;
+    },
+    selected_display_mode_value() {
+      return this.display_modes.find(mod => mod.label == this.display_mode).value;
     }
   },
   methods: {
     ZoomClickHandle(ip) {
       this.zooming = true;
       this.zoom_data = this.DignoseDatas.find(i => i.IP == ip);
-      var chartingObj = this.GenChartData(this.zoom_data, this.display_mode);
+      var chartingObj = GenDiagnoseChartData(this.zoom_data, this.selected_display_mode_value);
       var timeList = chartingObj.timeLs;
       var datasets = chartingObj.datasets;
       setTimeout(() => {
@@ -161,7 +166,7 @@ export default {
       if (this.pause)
         return;
       this.DignoseDatas.forEach(data => {
-        var chartingObj = this.GenChartData(data, this.display_mode);
+        var chartingObj = GenDiagnoseChartData(data, this.selected_display_mode_value);
         var timeList = chartingObj.timeLs;
         var datasets = chartingObj.datasets;
 
@@ -178,37 +183,7 @@ export default {
 
       });
     },
-    GenChartData(data, display_mode) {
-      var chartData;
-      var borderColor = 'gold';
 
-      if (display_mode == 'Health Score') {
-        chartData = data.chartDatas.healthScoreList;
-        borderColor = 'rgb(21, 237, 201)';
-      }
-
-      if (display_mode == 'Alert Index(day)')
-        chartData = data.chartDatas.alertIndex_by_Day_List;
-
-      if (display_mode == 'Alert Index(Hour)')
-        chartData = data.chartDatas.alertIndex_by_Hour_List;
-
-      if (chartData.length == 0) {
-        return;
-      }
-
-      var timeList = chartData.timeList;
-      var scoreList = chartData.valueList;
-
-      var datasets = [
-        {
-          label: display_mode.toString(),
-          data: scoreList,
-          borderColor: borderColor
-        }
-      ];
-      return { timeLs: timeList, datasets: datasets }
-    },
     WsConnect() {
       this.ws = new WebSocket(`${configs.idms_websocket_host}/Dignose?type=chart&number=${this.MaxHSDisplayNum}`);
       this.ws.onopen = () => {

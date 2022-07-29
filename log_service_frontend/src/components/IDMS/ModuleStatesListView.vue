@@ -29,6 +29,7 @@
       <el-table-column prop="ControllerAbnormal" label="控制器狀態">
         <template #default="scope">
           <el-tag
+            style="width:100px"
             :type="scope.row.ControllerAbnormal ? 'danger' : 'success'"
             disable-transitions
             effect="dark"
@@ -38,6 +39,7 @@
       <el-table-column prop="SensorAbnormal" label="感測器狀態">
         <template #default="scope">
           <el-tag
+            style="width:100px"
             :type="scope.row.SensorAbnormal ? 'danger' : 'success'"
             disable-transitions
             effect="dark"
