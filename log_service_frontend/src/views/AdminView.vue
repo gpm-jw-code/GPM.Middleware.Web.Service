@@ -1,6 +1,5 @@
 <template >
-  <div>
-    <el-divider></el-divider>
+  <div class="py-5 admin-view">
     <p>System Start Time : {{AppStartTime}}</p>
     <div class="row">
       <div class="col-lg-4">
@@ -58,7 +57,6 @@ export default {
       this.ws.onmessage = (_ws) => this.HandleWSMessage(_ws);
     },
     HandleWSMessage(ws = WebSocket) {
-      console.info(ws.data);
       this.app_states = JSON.parse(ws.data);
     }
 
@@ -76,5 +74,9 @@ export default {
 <style >
 .row {
   margin: 3px;
+}
+.admin-view .card {
+  margin: 10px;
+  box-shadow: 3px 3px 8px 1px rgb(160, 160, 160);
 }
 </style>

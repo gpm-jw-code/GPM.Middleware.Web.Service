@@ -73,36 +73,50 @@
   <tr>
     <td colspan="8">
       <b-collapse ref="collapse" class="more-info-collapse" :id="toggleID">
-        <div>特徵值</div>
-        <div class="f-table">
-          <table class="table">
-            <tr class="columns">
-              <th scope="col" class="col-2"></th>
-              <th scope="col" class="col-3">X</th>
-              <th scope="col" class="col-3">Y</th>
-              <th scope="col" class="col-3">Z</th>
-            </tr>
-            <tbody>
-              <tr>
-                <td class="f-name">P2P</td>
-                <td>{{SensingData.Features.AccP2P.X.toFixed(4)}}</td>
-                <td>{{SensingData.Features.AccP2P.Y.toFixed(4)}}</td>
-                <td>{{SensingData.Features.AccP2P.Z.toFixed(4)}}</td>
+        <div class="row g-1">
+          <div class="col-lg-6 f-table">
+            <div class="title">特徵值</div>
+            <table class="table">
+              <tr class="columns">
+                <th scope="col" class="col-2"></th>
+                <th scope="col" class="col-3">X</th>
+                <th scope="col" class="col-3">Y</th>
+                <th scope="col" class="col-3">Z</th>
               </tr>
-              <tr>
-                <td class="f-name">RMS</td>
-                <td>{{SensingData.Features.AccRMS.X.toFixed(4)}}</td>
-                <td>{{SensingData.Features.AccRMS.Y.toFixed(4)}}</td>
-                <td>{{SensingData.Features.AccRMS.Z.toFixed(4)}}</td>
-              </tr>
-              <tr>
-                <td class="f-name">振動能量</td>
-                <td>{{SensingData.Features.VibrationEnergy.X.toFixed(4)}}</td>
-                <td>{{SensingData.Features.VibrationEnergy.Y.toFixed(4)}}</td>
-                <td>{{SensingData.Features.VibrationEnergy.Z.toFixed(4)}}</td>
-              </tr>
-            </tbody>
-          </table>
+              <tbody>
+                <tr>
+                  <td class="f-name">P2P</td>
+                  <td>{{SensingData.Features.AccP2P.X.toFixed(4)}}</td>
+                  <td>{{SensingData.Features.AccP2P.Y.toFixed(4)}}</td>
+                  <td>{{SensingData.Features.AccP2P.Z.toFixed(4)}}</td>
+                </tr>
+                <tr>
+                  <td class="f-name">RMS</td>
+                  <td>{{SensingData.Features.AccRMS.X.toFixed(4)}}</td>
+                  <td>{{SensingData.Features.AccRMS.Y.toFixed(4)}}</td>
+                  <td>{{SensingData.Features.AccRMS.Z.toFixed(4)}}</td>
+                </tr>
+                <tr>
+                  <td class="f-name">振動能量</td>
+                  <td>{{SensingData.Features.VibrationEnergy.X.toFixed(4)}}</td>
+                  <td>{{SensingData.Features.VibrationEnergy.Y.toFixed(4)}}</td>
+                  <td>{{SensingData.Features.VibrationEnergy.Z.toFixed(4)}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-lg-6">
+            <div class="title">Raw Data</div>
+            <GPMChart
+              :ref="moduleInfo.ip"
+              style="height:250px"
+              :id="moduleInfo.ip"
+              :xlabelUseTimeFormat="false"
+              :title="'Raw Data-'+moduleInfo.ip"
+              yAxisLabel="G"
+              xAxisLabel="Index"
+            ></GPMChart>
+          </div>
         </div>
       </b-collapse>
     </td>
@@ -136,9 +150,12 @@ import { SetMeasureRange } from '@/APIHelpers/BackendAPIs'
 import moment from 'moment';
 import clsModuleInfo from '@/Classes/clsModuleInfo.js'
 import { configs } from '@/config.js';
+import GPMChart from '@/components/Charting/GPMChart.vue';
 
 export default {
-
+  components: {
+    GPMChart,
+  },
   data() {
     return {
       SensingData: {
@@ -192,6 +209,9 @@ export default {
     },
     toggleID() {
       return "toggle" + this.moduleInfo.ip.replaceAll('.', '_') + this.moduleInfo.port;
+    },
+    chart() {
+      return this.$refs[this.moduleInfo.ip];
     }
   },
   props: {
@@ -204,6 +224,27 @@ export default {
     WsSensingDataHandle(data) {
       var json = JSON.parse(data);
       this.SensingData = JSON.parse(json.Message)
+
+      var axisDatas = [
+        { label: 'X', data: this.SensingData.AccData.X, borderColor: 'rgb(26, 123, 255)' },
+        { label: 'Y', data: this.SensingData.AccData.Y, borderColor: 'rgb(87, 185, 120)' },
+        { label: 'Z', data: this.SensingData.AccData.Z, borderColor: 'rgb(217, 94, 94)' }
+      ]
+
+      var dataNum = axisDatas[0].data.length;
+      var xls = [];
+      for (let index = 0; index < dataNum; index++) {
+        xls.push(index + 1);
+      }
+
+      this.chart.UpdateChart(xls, axisDatas, false, false);
+      // console.info(this.chart)
+
+    },
+    CreateChartingData() {
+
+
+
     },
     WsConnectStateDataHandle(data) {
       var json = JSON.parse(data);
@@ -260,8 +301,13 @@ export default {
 .f-table {
   background-color: #515151;
   color: white;
-  margin: auto 240px;
+  /* margin: auto 240px; */
   padding: 0;
+}
+
+.more-info-collapse .title {
+  background-color: rgb(61, 61, 61);
+  color: white;
 }
 
 .f-table table {
@@ -272,7 +318,7 @@ export default {
 }
 
 .f-table table .f-name {
-  background-color: #c2c2c2;
+  background-color: #363636;
   letter-spacing: 4px;
 }
 .f-table td {
@@ -300,7 +346,7 @@ export default {
   letter-spacing: 3px;
 }
 .more-info-collapse {
-  background-color: #f1f1f1;
+  background-color: #dbdbdb;
   padding: 10px;
 }
 .measure-range-button {

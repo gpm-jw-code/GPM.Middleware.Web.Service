@@ -19,7 +19,7 @@ GPM.Middleware.Core.Models.System.PCStatesHelper.StartFetch(new TimeSpan(0, 0, 1
 Logger.Initialize();
 GPM.Middleware.Core.Models.SSM.EmulatorHepler.CreateSSMEmulators(new List<int>() { 231, 232, 233, 234, 235, 236, 237, 238, 239, 240 });
 GPM.Middleware.Core.Models.SSM.SSMModuleManager.InitializeAsync();
-StaUtility.SSMserver.StartService();
+StaUtility.SSMserver.StartService(port: StaUtility.SysParams.TCPServerPort);
 SystemStates.StartupTime = DateTime.Now;
 
 #endregion

@@ -2,7 +2,7 @@ var configs = {
   get host() {
     return process.env.NODE_ENV === 'production'
       ? window.location.protocol + '//' + window.location.host
-      : 'https://192.168.0.201:7014'
+      : 'http://192.168.0.138:7000'
   },
   get websocket_host() {
     return this.host.replace('http', 'ws')
@@ -15,6 +15,7 @@ var configs = {
           ':44332'
       : 'ws://192.168.0.123:44332'
   },
+  mode: 'gmm',
 }
 console.info(
   window.location.protocol.replace('http', 'ws') +

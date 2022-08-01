@@ -1,5 +1,5 @@
 <template>
-  <div id="LOG-VIEW">
+  <div id="LOG-VIEW" style="padding-top:80px">
     <h1>LOG</h1>
     <div>
       <div class="head-row">

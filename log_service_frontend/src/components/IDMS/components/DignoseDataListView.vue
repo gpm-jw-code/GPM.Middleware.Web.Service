@@ -1,15 +1,20 @@
 <template>
   <div class="dignose-list-view px-2">
+    <div class="d-flex justify-content-end">
+      <el-button @click="TableExpandHandle">{{ this.expandAll?'全部收合' :'全部展開'}}</el-button>
+    </div>
     <!-- 表格 -->
     <el-table
-      stripe
       :default-sort="{ prop: 'IP', order: 'descending' }"
-      height="360"
+      :height="table_height"
       :data="DignoseDatas"
       v-loading="loading"
+      highlight-current-row
       @row-click="TableRowClickHandle"
+      @expand-change="ExpandHandle"
       :row-class-name="tableRowClassName"
       row-key="IP"
+      ref="table"
     >
       <el-table-column width="30">
         <template #default="scope">
@@ -25,7 +30,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column sortable prop="IP" label="IP"></el-table-column>
+      <el-table-column sortable fixed="left" prop="IP" label="IP"></el-table-column>
       <el-table-column sortable prop="EqName" label="EQ Name"></el-table-column>
       <el-table-column sortable prop="UnitName" label="Unit Name"></el-table-column>
       <el-table-column sortable prop="HealthScore" label="Health Score"></el-table-column>
@@ -43,14 +48,47 @@
 
       <el-table-column type="expand">
         <template #default="props">
-          <div class="dignose-detail-info">
-            <div class="d-flex">
-              <div class="item-name">是否超出SPC</div>
-              <div>{{props.row.DignoseDetailData.isOutoutSPC}}</div>
+          <div class="dignose-detail-info d-flex">
+            <div>
+              <div class="d-flex">
+                <div class="item-name">當前模型</div>
+                <div>{{props.row.DignoseDetailData.currentModelName}}</div>
+              </div>
+              <div class="d-flex">
+                <div class="item-name">Warning Threshold</div>
+                <div>
+                  <el-input-number
+                    :max="100"
+                    :min="0"
+                    :step="0.1"
+                    size="small"
+                    v-model="GetTreshodlVal(props.row).warningThreshold"
+                    @change="SetWarningThreshold(props.row.IP)"
+                  ></el-input-number>
+                </div>
+              </div>
+              <div class="d-flex">
+                <div class="item-name">Alarm Threshold</div>
+                <div>
+                  <el-input-number
+                    :max="100"
+                    :min="0"
+                    :step="0.1"
+                    size="small"
+                    v-model="GetTreshodlVal(props.row).alarmThreshold"
+                    @change="SetAlarmThreshold(props.row.IP)"
+                  ></el-input-number>
+                </div>
+              </div>
+              <!-- <div class="d-flex">
+                <div class="item-name">是否超出SPC</div>
+                <div>{{props.row.DignoseDetailData.isOutoutSPC}}</div>
+              </div>-->
             </div>
-            <div class="d-flex">
-              <div class="item-name">當前模型</div>
-              <div>{{props.row.DignoseDetailData.currentModelName}}</div>
+            <div class="mx-3" d-flex>
+              <el-button @click="ShowModelList(props.row.IP)">模型列表</el-button>
+              <el-button>事件列表</el-button>
+              <el-button>Raw Data</el-button>
             </div>
           </div>
         </template>
@@ -58,109 +96,202 @@
     </el-table>
 
     <!-- 底部圖表區域 -->
-    <div class="share-chart-container" v-loading="loading">
-      <!-- <h4>Share use chart there</h4> -->
-      <div class="row">
-        <div class="col-lg-1">
-          <div class="d-flex type-button-container">
-            <div class="py-1 bt-container" v-for="mode in display_modes" :key="mode.value">
-              <b-button
-                size="sm"
-                class="w-100"
-                @click="chart_display_mode=mode.value"
-                :variant=" chart_display_mode==mode.value?'primary' :'light'"
-              >{{mode.label}}</b-button>
+    <div class="d-flex" v-bind:class=" ['showing-down-arrow','fixed-in-bottom'] ">
+      <b-button
+        class="btn-share-chart-show"
+        :variant=" share_chart_show? 'light': 'primary' "
+        @click="share_chart_show=!share_chart_show"
+      >
+        <el-icon class="mx-2">
+          <ArrowDownBold v-if="share_chart_show"></ArrowDownBold>
+          <ArrowUpBold v-else></ArrowUpBold>
+        </el-icon>REAL-TIME CHART
+      </b-button>
+    </div>
+    <transition name="el-zoom-in-bottom">
+      <div
+        v-show="share_chart_show"
+        class="share-chart-container fixed-in-bottom"
+        v-bind:style="current_share_chart_style"
+        v-loading="loading"
+      >
+        <!-- <h4>Share use chart there</h4> -->
+        <div class="row">
+          <div class="col-lg-1">
+            <div class="d-flex type-button-container">
+              <div class="py-1 bt-container" v-for="mode in display_modes" :key="mode.value">
+                <b-button
+                  size="sm"
+                  class="w-100"
+                  @click="chart_display_mode=mode.value"
+                  :variant=" chart_display_mode==mode.value?'primary' :'light'"
+                >{{mode.label}}</b-button>
+              </div>
             </div>
           </div>
-        </div>
-        <div
-          class="col-lg-11"
-          v-loading="chart_loading"
-          element-loading-background="rgba(122, 122, 122, 0.8)"
-        >
-          <GPMChartVue
-            class="share-chart"
-            chart_id="share-chart"
-            :key="selectedDiagnoseData.IP+chart_display_mode"
-            :title="ChartTitle"
-            :yAxisLabel="ylabel"
-            ref="trendChart"
-          ></GPMChartVue>
+          <div
+            class="col-lg-11"
+            v-loading="chart_loading"
+            element-loading-background="rgba(122, 122, 122, 0.8)"
+          >
+            <GPMChartVue
+              class="share-chart"
+              chart_id="share-chart"
+              :key="selectedDiagnoseData.IP+chart_display_mode"
+              :title="ChartTitle"
+              :yAxisLabel="ylabel"
+              ref="trendChart"
+            ></GPMChartVue>
+          </div>
         </div>
       </div>
-    </div>
+    </transition>
+    <ModelListView ref="modelListView"></ModelListView>
   </div>
 </template>
 
 <script>
 import GPMChartVue from '@/components/Charting/GPMChart.vue';
-import { configs } from '@/config';
 import { GenDiagnoseChartData, display_modes } from '../Helpers';
+import ModelListView from './ModelListView.vue';
+import { GetDignoseDataListWsInstance, GetDignoseThresholdVal, GetTrendchartWsInstance, SetDignoseWarningThreshold, SetDignoseAlarmThreshold } from '@/APIHelpers/IDMSAPIs.js';
+class clsTresholdSetting {
+  warningThreshold = 69;
+  alarmThreshold = 87;
+}
 
 export default {
   components: {
-    GPMChartVue,
+    GPMChartVue, ModelListView
   },
   data() {
     return {
       ws: {
         type: WebSocket
       },
+      share_chart_show: false,
       trendchart_ws: null,
       loading: true,
       chart_loading: false,
+      expandAll: false,
       display_modes: display_modes,
       DignoseDatas: [],
       chart_display_mode: 'HS',
       selectedDiagnoseData: { IP: '???' },
       renderingDiagnoseData: [],
-      tableRowClassName: "TEST"
+      ThresholdSettings: {
+        'ip': new clsTresholdSetting()
+      },
+      current_share_chart_style: {
+        backgroundColor: '#313131', border: '1px solid black'
+      },
+      share_chart_styles: {
+        normal: { backgroundColor: '#313131', border: '1px solid black' },
+        warning: { backgroundColor: '#e5bc41', border: '1px solid white' },
+        danger: { backgroundColor: 'rgb(217, 94, 94)', border: '1px solid white' }
+      },
+
+
     }
   },
   methods: {
-    TableRowClickHandle(row) {
+    TableExpandHandle() {
+      this.expandAll = !this.expandAll;
+      this.DignoseDatas.forEach(row => {
+        this.$refs.table.toggleRowExpansion(row, this.expandAll);
+      })
+    },
+    tableRowClassName({ row }) {
+      return row.DignoseDetailData.dignoseResult;
+    },
+
+    async TableRowClickHandle(row) {
       if (this.selectedDiagnoseData.IP != row.IP) {
 
         this.chart_loading = true;
         console.info('to create ws', row.IP);
         this.RTChartWebsocketIni(row.IP);
       }
-
       this.selectedDiagnoseData = row;
 
+      var ret = await GetDignoseThresholdVal(this.selectedDiagnoseData.IP);
+      if (ret.success) {
+        this.ThresholdSettings[this.selectedDiagnoseData.IP] = ret.data;
+      }
+
     },
-    RTChartWebsocketIni(ip) {
+    async RTChartWebsocketIni(ip) {
       if (this.trendchart_ws)
         this.trendchart_ws.close();
 
-      this.trendchart_ws = new WebSocket(`${configs.idms_websocket_host}/Dignose?type=chart&number=90&ip=${ip}`);
-      this.trendchart_ws.onopen = () => {
-        setTimeout(() => {
-          this.chart_loading = false;
-        }, 200);
-        console.info('ws opened')
-      }
-      this.trendchart_ws.onclose = () => { console.info('ws clsoed') }
-      this.trendchart_ws.onmessage = (evt) => {
-        var data = JSON.parse(evt.data);
-        this.RenderTrendChart(data[0]);
+      this.trendchart_ws = await GetTrendchartWsInstance(ip);
+      this.chart_loading = this.trendchart_ws == null;
+      if (this.trendchart_ws != null) {
 
+        this.trendchart_ws.onmessage = (evt) => {
+          var data = JSON.parse(evt.data);
+          this.RenderTrendChart(data[0]);
+
+        }
+      } else {
+        await this.RTChartWebsocketIni(ip);
       }
     },
     RenderTrendChart(data) {
-
       try {
         this.renderingDiagnoseData = data;
-        var chartingObj = GenDiagnoseChartData(data, this.chart_display_mode);
+
+        //TODO 閥值線物件
+        var thresObjs = undefined;
+
+        if (this.chart_display_mode === 'HS') {
+          var warnThres = data.DignoseDetailData.WarningThreshold;
+          var alarmThres = data.DignoseDetailData.AlarmThreshold;
+          thresObjs = [{ name: 'Warning', value: warnThres, color: 'gold' },
+          { name: 'alarm', value: alarmThres, color: 'red' }]
+        }
+
+        var chartingObj = GenDiagnoseChartData(data, this.chart_display_mode, thresObjs);
+
+
         if (this.$refs.trendChart)
           var ret = this.$refs.trendChart.UpdateChart(chartingObj.timeLs, chartingObj.datasets);
         if (ret == "err") {
           this.RTChartWebsocketIni(this.selectedDiagnoseData.IP);
         }
+
+        var dignoseState = data.DignoseDetailData.dignoseResult;
+        this.current_share_chart_style = this.share_chart_styles[dignoseState];
+
       } catch (error) {
         console.info(error)
       }
 
+    },
+    GetTreshodlVal(rowData) {
+      if (this.ThresholdSettings[rowData.IP] == undefined) {
+        return new clsTresholdSetting();
+      }
+      return this.ThresholdSettings[rowData.IP];
+    },
+    async ExpandHandle(rowData, rows = []) {
+      if (rows.length == 0)
+        return;
+      var ip = rowData.IP;
+      var ret = await GetDignoseThresholdVal(ip);
+      if (ret.success) {
+        this.ThresholdSettings[ip] = ret.data;
+      }
+    },
+    async SetWarningThreshold(ip) {
+      await SetDignoseWarningThreshold(ip, this.ThresholdSettings[ip].warningThreshold);
+    },
+    async SetAlarmThreshold(ip) {
+      await SetDignoseAlarmThreshold(ip, this.ThresholdSettings[ip].alarmThreshold);
+    },
+    ShowModelList(ip) {
+      this.$refs.modelListView.UpdateModuleInfos();
+      this.$refs.modelListView.ShowModelList(ip);
     }
   },
   computed: {
@@ -185,13 +316,17 @@ export default {
         return 'Index';
       return "";
 
+    },
+    table_height() {
+      console.info(window.innerHeight);
+      return this.share_chart_show ? window.innerHeight * 0.35 : window.innerHeight - 220;
     }
 
   },
 
-  mounted() {
-    this.ws = new WebSocket(`${configs.idms_websocket_host}/Dignose?type=list`);
-    this.ws.onopen = () => { }
+  async mounted() {
+    this.ws = await GetDignoseDataListWsInstance();
+    console.info('s', this.ws);
     this.ws.onmessage = (ws) => {
       this.loading = false;
       this.DignoseDatas = JSON.parse(ws.data);
@@ -205,18 +340,21 @@ export default {
 </script>
 
 <style>
+.fixed-in-bottom {
+  position: fixed;
+  width: 99%;
+  bottom: 0;
+}
 .share-chart-container {
   background-color: #313131;
   color: gold;
   height: 320px;
-  position: absolute;
-  width: 100%;
-  bottom: 0;
   /* margin: 10px; */
   /* box-shadow: 12px 2px 32px 10px black; */
   padding: 10px 20px;
   border-radius: 8px;
   border: black 1px solid;
+  z-index: 5000;
 }
 .share-chart {
   height: 280px;
@@ -239,14 +377,41 @@ export default {
   }
 }
 
-.TEST {
-  background-color: "red";
+.el-table .warning,
+.el-table .danger {
+  font-weight: bold;
+}
+.el-table .warning {
+  background-color: rgb(245, 228, 130);
+}
+
+.el-table .danger {
+  background-color: rgb(243, 152, 152);
 }
 
 .dignose-detail-info {
+  background-color: rgb(241, 241, 241);
+  padding: 10px 40px;
+  font-weight: bold;
+}
+
+.dignose-detail-info .d-flex {
+  margin: 8px;
 }
 
 .dignose-detail-info .item-name {
-  width: 100px;
+  width: 140px;
+}
+
+.btn-share-chart-show {
+  height: 32px;
+  width: 100%;
+  position: relative;
+  top: -13px;
+}
+.showing-down-arrow {
+  bottom: -10px;
+  z-index: 5001;
+  width: 100%;
 }
 </style>

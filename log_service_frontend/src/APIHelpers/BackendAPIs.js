@@ -3,6 +3,20 @@ import { configs } from '../config'
 
 axios.defaults.baseURL = configs.host
 
+export async function GetSystemSettings() {
+  var hres = await axios.get('api/SystemSettings')
+  if (hres.status == 200) {
+    return hres.data
+  } else return {}
+}
+
+export async function SetSystemSettings(settings) {
+  var hres = await axios.post('api/SystemSettings', settings)
+  if (hres.status == 200) {
+    return hres.data
+  } else return {}
+}
+
 export async function GetModuleList() {
   var hres = await axios.get('api/ModuleManager/ModuleList')
   if (hres.status == 200) {

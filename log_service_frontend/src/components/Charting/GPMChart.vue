@@ -1,5 +1,49 @@
 <template>
-  <div v-bind:style="chart_style" v-loading="loading">
+  <div class="gpm-chart" v-bind:style="chart_style" v-loading="loading">
+    <div class="setting-region d-flex">
+      <el-icon
+        v-show="!isDark"
+        @click="ThemeChange"
+        class="light-icon"
+        :color="currentTheme!='dark'? 'black':'white'"
+      >
+        <Sunny />
+      </el-icon>
+      <el-switch
+        active-color="rgb(19, 19, 19)"
+        inactive-color="rgb(226, 226, 226)"
+        v-model="isDark"
+        @change="ThemeChange"
+      />
+      <el-icon
+        v-show="isDark"
+        @click="ThemeChange"
+        class="dark-icon"
+        :color=" currentTheme!='dark'? 'white':'black'"
+      >
+        <Moon />
+      </el-icon>
+      <!-- <button @click="ThemeChange">⊕</button> -->
+    </div>
+
+    <div class="my-legend d-flex">
+      <div
+        class="d-flex px-1"
+        v-for="item in datasetsVisible"
+        :key="item.label"
+        @click="item.visible=!item.visible"
+      >
+        <span
+          v-bind:style="item.visible? { color: currentTheme=='dark'?'white':'black' } : {color:'grey',textDecoration:'line-through'}"
+          v-text="item.label"
+        ></span>
+        <div
+          class="color-dis"
+          v-bind:style=" !item.visible? {  opacity: 0.5 , backgroundColor:item.color} : {backgroundColor:item.color}"
+        ></div>
+      </div>
+    </div>
+
     <canvas @click="ClickChartHandel" :id="chart_id"></canvas>
   </div>
 </template>
@@ -23,6 +67,10 @@ export default {
     yAxisLabel: {
       type: String,
       default: "YLabel"
+    },
+    xlabelUseTimeFormat: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -52,7 +100,8 @@ export default {
         },
         layout: {
           padding: {
-            bottom: 20
+            bottom: 10,
+            top: 10,
           },
         },
         title: {
@@ -117,17 +166,42 @@ export default {
             borderColor: 'red'
           }]
         },
-
+        legend: { display: false }
       },
       xlabels: [],
       datasets: [],
+      datasetsVisible: [],
+      isDark: true,
+      currentTheme: 'dark',
       colors: ['blue', 'green', 'red', 'orange', 'pink', 'grey', 'black', 'seagreen']
     }
   },
   methods: {
+    test() {
+      this.chartInstance.setDatasetVisibility(1, false); // hides dataset at index 1
+      this.chartInstance.update(); // chart now renders with dataset hidden
+
+    },
+    ThemeChange() {
+      this.currentTheme = this.currentTheme == 'dark' ? 'light' : 'dark';
+      this.chart_style.backgroundColor = this.currentTheme == 'dark' ? "#202020" : "white";
+      this.chart_style.border = this.currentTheme == 'dark' ? "1px solid grey" : "1px solid white";
+      this.isDark = this.currentTheme == 'dark';
+      this.chartInstance.options.title.fontColor =
+        this.chartInstance.options.scales.xAxes[0].ticks.fontColor =
+        this.chartInstance.options.scales.xAxes[0].scaleLabel.fontColor =
+        this.chartInstance.options.scales.yAxes[0].ticks.fontColor =
+        this.chartInstance.options.scales.yAxes[0].scaleLabel.fontColor = this.currentTheme == 'dark' ? 'white' : 'black';
+      this.chartInstance.update();
+    },
     ClickChartHandel() {
     },
     ChartInit() {
+
+      if (!this.xlabelUseTimeFormat) {
+        this.options.scales.xAxes[0].type = "category";
+      }
+
       const ctx = document.getElementById(this.chart_id);
       this.chartInstance = new Chart(ctx, {
         type: 'line',
@@ -140,18 +214,25 @@ export default {
       this.chartInstance.options.animation = false;
     },
 
-    UpdateChart(timeList = [], dataSetsInput = [{ label: '', data: [0], borderColor: 'blue', borderWidth: 1 }], showLoading = false) {
+    async UpdateChart(timeList = [], dataSetsInput = [{ label: '', data: [0], borderColor: 'blue', borderWidth: 1 }], showLoading = false) {
       try {
-        this.Clear();
+        // this.Clear();
         if (showLoading)
           this.loading = true;
 
-        this.xlabels = Object.values(timeList);
-        this.datasets = [];
+        var xlabels = Object.values(timeList);
+        var datasets = [];
 
         for (let index = 0; index < dataSetsInput.length; index++) {
           const dataObj = dataSetsInput[index];
-          this.datasets.push({
+
+          if (this.datasetsVisible.find(i => i.label == dataObj.label) == undefined) {
+            this.datasetsVisible.push({ label: dataObj.label, visible: true, color: dataObj.borderColor })
+          }
+
+          if (!this.datasetsVisible.find(i => i.label == dataObj.label).visible)
+            continue;
+          datasets.push({
             label: dataObj.label,
             data: Object.values(dataObj.data),
             borderColor: dataObj.borderColor != undefined ? dataObj.borderColor : this.colors[index],
@@ -163,7 +244,7 @@ export default {
           });
         }
         this.loading = false;
-        this.RenderData();
+        await this.RenderData(xlabels, datasets);
       } catch (error) {
         return "err";
       }
@@ -197,36 +278,19 @@ export default {
       this.RenderData();
     },
     Clear() {
-      this.xlabels = [];
-      this.datasets = [];
-      this.RenderData();
+      this.chartInstance.clear();
     },
 
-    async RenderData() {
-      if (this.Rendering)
-        return;
-
-      this.Rendering = true;
-      new Promise((resolve, reject) => {
-
+    async RenderData(xlabels, datasets) {
+      await new Promise((resolve, reject) => {
         try {
-
-          this.chartInstance.data.datasets = [];
-          this.chartInstance.data.labels = [];
-          this.xlabels.forEach(time => {
-            this.chartInstance.data.labels.push(time);
-          })
-
-          this.datasets.forEach(dataset => {
-            this.chartInstance.data.datasets.push(dataset);
-          })
+          this.chartInstance.data.datasets = datasets;
+          this.chartInstance.data.labels = xlabels;
           this.chartInstance.update();
-          this.Rendering = false;
           resolve();
-
-
         } catch (error) {
-          this.Rendering = false;
+          console.error(error);
+          this.ChartInit();
           reject(error)
         }
 
@@ -262,4 +326,49 @@ export default {
 }
 </script>
 <style >
+.gpm-chart {
+  position: relative;
+}
+.my-legend,
+.setting-region {
+  position: absolute;
+  top: 16px;
+}
+
+.setting-region {
+  top: 5px;
+  right: 8px;
+}
+
+.setting-region .el-icon {
+  position: absolute;
+  padding-top: 15px;
+  cursor: pointer;
+  z-index: 5100;
+}
+
+.setting-region .light-icon {
+  left: 1px;
+}
+.setting-region .dark-icon {
+  right: 1px;
+}
+
+.setting-region button {
+  border-radius: 30px;
+}
+
+.setting-region:hover {
+  opacity: 1;
+}
+.my-legend {
+  left: 79px;
+  cursor: pointer;
+}
+.color-dis {
+  width: 20px;
+  height: 12px;
+  margin-top: 5px;
+  margin-left: 5px;
+}
 </style>

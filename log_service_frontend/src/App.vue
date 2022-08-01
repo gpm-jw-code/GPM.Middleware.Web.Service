@@ -3,22 +3,16 @@
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark sticky">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">GPM</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarID"
-          aria-controls="navbarID"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
+        <button class="navbar-toggler" type="button" v-b-toggle="'navbar'">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarID">
-          <div class="navbar-nav">
-            <!-- <router-link to="/Admin">ADMIN</router-link>
+        <div class="collapse navbar-collapse" id="navbar">
+          <div v-if="mode=='gmm'" class="navbar-nav">
+            <router-link to="/Admin">ADMIN</router-link>
             <router-link to="/">SSM</router-link>
-            <router-link to="/log">LOG</router-link>-->
+            <router-link to="/log">LOG</router-link>
+          </div>
+          <div v-else class="navbar-nav">
             <router-link to="/idms">診斷頁面</router-link>
             <router-link to="/idms/module-states">感測器狀態</router-link>
           </div>
@@ -37,7 +31,7 @@
 </template>
 
 <script>
-
+import { configs } from '@/config'
 export default {
   data() {
     return {
@@ -45,6 +39,11 @@ export default {
         { text: 'SSM', href: '/' },
         { text: 'Log', href: '/log' },
         { text: 'Library' },]
+    }
+  },
+  computed: {
+    mode() {
+      return configs.mode
     }
   },
 }
@@ -97,6 +96,6 @@ nav a {
 #breadcrumb {
   position: fixed;
   width: 100%;
-  z-index: 23444;
+  z-index: 3000;
 }
 </style>

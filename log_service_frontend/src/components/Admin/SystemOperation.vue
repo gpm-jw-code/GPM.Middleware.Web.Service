@@ -4,8 +4,14 @@
       <div class="card-body">
         <h5 class="card-title">SYSTEM OPERATION</h5>
         <el-divider></el-divider>
-        <div class="d-flex justify-content-center">
-          <count-to :startVal="0" :endVal="2017" :duration="4000"></count-to>
+        <div>
+          <!-- <count-to :startVal="0" :endVal="2017" :duration="4000"></count-to> -->
+          <div class="btn">
+            <b-button class="w-100 my-1 bg-primary">Restart</b-button>
+          </div>
+          <div class="btn">
+            <b-button class="w-100 my-1 bg-danger">Shut Down</b-button>
+          </div>
         </div>
       </div>
     </div>
@@ -13,10 +19,8 @@
 </template>
 
 <script >
-import { CountTo } from "vue3-count-to";
 export default {
   components: {
-    CountTo,
   },
   data() {
     return {
@@ -26,4 +30,7 @@ export default {
 </script>
 
 <style scoped>
+.btn {
+  width: 220px;
+}
 </style>
