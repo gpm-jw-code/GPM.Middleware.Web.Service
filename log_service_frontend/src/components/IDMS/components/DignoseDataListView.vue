@@ -5,7 +5,7 @@
     </div>
     <!-- 表格 -->
     <el-table
-      :default-sort="{ prop: 'IP', order: 'descending' }"
+      :default-sort="{ prop: 'EqName', order: 'ascending' }"
       :height="table_height"
       :data="DignoseDatas"
       v-loading="loading"
@@ -16,7 +16,7 @@
       row-key="IP"
       ref="table"
     >
-      <el-table-column width="30">
+      <el-table-column fixed="'left'" width="40">
         <template #default="scope">
           <div class="py-1">
             <el-icon
@@ -30,7 +30,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column sortable fixed="left" prop="IP" label="IP"></el-table-column>
+      <el-table-column sortable fixed="left" prop="IP" label="IP" width="140"></el-table-column>
       <el-table-column sortable prop="EqName" label="EQ Name"></el-table-column>
       <el-table-column sortable prop="UnitName" label="Unit Name"></el-table-column>
       <el-table-column sortable prop="HealthScore" label="Health Score"></el-table-column>
@@ -410,7 +410,7 @@ export default {
   top: -13px;
 }
 .showing-down-arrow {
-  bottom: -10px;
+  bottom: -13px;
   z-index: 5001;
   width: 100%;
 }

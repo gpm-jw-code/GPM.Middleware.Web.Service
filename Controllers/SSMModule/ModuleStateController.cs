@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
 using System.Text;
 using GPM.Middleware.Core.Models.SSM;
+using gpm_vibration_module_api;
 
 namespace web.service.Controllers.SSMModule
 {
@@ -58,6 +59,7 @@ namespace web.service.Controllers.SSMModule
                 if (moduleState.Value != null)
                 {
                     moduleState.Value.ssmInterface.SensingDataUseWebsocketMiddleware.Push(webSocket);
+                    moduleState.Value.ssmInterface.BrocastCurrentState();
                     while (true)
                     {
                         await Task.Delay(1);

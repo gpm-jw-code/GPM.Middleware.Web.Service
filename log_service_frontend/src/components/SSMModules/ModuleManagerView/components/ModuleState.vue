@@ -14,20 +14,21 @@
 
     <!--量測範圍-->
     <td>
-      <div v-if="gRangeSetting | SensingData.measureRange==''" class="spinner-border" role="status">
+      <div v-if="gRangeSetting" class="spinner-border" role="status">
         <span class="visually-hidden"></span>
       </div>
       <transition name="el-zoom-in-bottom">
-        <div v-show="!(gRangeSetting | SensingData.measureRange=='')" class="dropdown">
+        <div v-show="!(gRangeSetting | moduleInfo.measureRange=='')" class="dropdown">
           <b-button
             class="dropdown-toggle measure-range-button"
+            v-bind:class="SensingData.ErrorCode==603 ? 'disabled' :''"
             variant="dark"
             type="button"
             id="dropdownMenuButton1"
             data-bs-toggle="dropdown"
             aria-expanded="false"
             size="md"
-          >{{SensingData.measureRange}}</b-button>
+          >{{gRange}}G</b-button>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
             <li v-for="g in [2,4,8,16] " :key="g">
               <u class="dropdown-item" @click="ModifyGRange(g)">{{g}}G</u>
@@ -224,7 +225,7 @@ export default {
     WsSensingDataHandle(data) {
       var json = JSON.parse(data);
       this.SensingData = JSON.parse(json.Message)
-
+      this.gRange = this.SensingData.measureRange.replace("G", "");
       var axisDatas = [
         { label: 'X', data: this.SensingData.AccData.X, borderColor: 'rgb(26, 123, 255)' },
         { label: 'Y', data: this.SensingData.AccData.Y, borderColor: 'rgb(87, 185, 120)' },
@@ -259,7 +260,7 @@ export default {
       var response = await SetMeasureRange(this.moduleInfo.ip, this.moduleInfo.port, g);
       console.info(response);
       if (response.errorCode == 0) {
-        this.gRange = g;
+        //this.gRange = g;
       }
       setTimeout(() => {
         this.gRangeSetting = false;
@@ -267,6 +268,7 @@ export default {
     }
   },
   mounted() {
+    this.gRange = this.moduleInfo.measureRage;
 
     this.data_ws = new WebSocket(`${configs.websocket_host}/module_data/${this.moduleInfo.endPoint}`);
     this.data_ws.onopen = () => { console.info(`${this.moduleInfo.endPoint} data ws 已連接.`) };

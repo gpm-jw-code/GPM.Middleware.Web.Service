@@ -1,4 +1,5 @@
 ﻿using GPM.Middleware.Core.Models.SSM;
+using gpm_vibration_module_api;
 using Microsoft.AspNetCore.Mvc;
 using web.service.Models;
 using web.service.Models.SSM;
@@ -63,15 +64,22 @@ namespace web.service.Controllers.SSMModule
             var ssmInterface = SSMModuleManager.GetSSMInterfaceByEndPoint(req.endpoint);
             if (ssmInterface != null)
             {
-                int errorCOde = await ssmInterface.SetMeasureReage(req.Range);
                 clsRangeSettingResponse response = new clsRangeSettingResponse()
                 {
-                    errorCode = errorCOde,
-                    errorMessage = errorCOde == 404 ? "量測範圍設定值有誤" : "ERR",
                     Range = req.Range,
                     ip = req.ip,
                     port = req.port,
                 };
+                if (!ssmInterface.connected)
+                {
+                    response.errorCode = (int)clsErrorCode.Error.NoConnection;
+                    response.errorMessage ="模組尚未連線成功";
+                    return Ok(response);
+                }
+                int errorCOde = await ssmInterface.SetMeasureReage(req.Range);
+
+                response.errorCode = errorCOde;
+                response.errorMessage = errorCOde == 404 ? "量測範圍設定值有誤" : "ERR";
                 return Ok(response);
             }
             else

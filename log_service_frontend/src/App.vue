@@ -7,14 +7,8 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbar">
-          <div v-if="mode=='gmm'" class="navbar-nav">
-            <router-link to="/Admin">ADMIN</router-link>
-            <router-link to="/">SSM</router-link>
-            <router-link to="/log">LOG</router-link>
-          </div>
-          <div v-else class="navbar-nav">
-            <router-link to="/idms">診斷頁面</router-link>
-            <router-link to="/idms/module-states">感測器狀態</router-link>
+          <div class="navbar-nav">
+            <router-link v-for="rout in routes" :key="rout.path" :to="rout.path">{{rout.name}}</router-link>
           </div>
         </div>
       </div>
@@ -32,6 +26,7 @@
 
 <script>
 import { configs } from '@/config'
+import { GetRouters } from '@/router/index.js';
 export default {
   data() {
     return {
@@ -44,6 +39,9 @@ export default {
   computed: {
     mode() {
       return configs.mode
+    },
+    routes() {
+      return GetRouters();
     }
   },
 }

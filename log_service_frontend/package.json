@@ -1,5 +1,5 @@
 {
-  "name": "log_service_frontend",
+  "name": "gpm-admin",
   "version": "0.1.0",
   "private": true,
   "scripts": {

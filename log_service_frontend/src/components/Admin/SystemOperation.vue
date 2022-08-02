@@ -7,10 +7,10 @@
         <div>
           <!-- <count-to :startVal="0" :endVal="2017" :duration="4000"></count-to> -->
           <div class="btn">
-            <b-button class="w-100 my-1 bg-primary">Restart</b-button>
+            <b-button aria-disabled class="disabled w-100 my-1 bg-primary">Restart</b-button>
           </div>
           <div class="btn">
-            <b-button class="w-100 my-1 bg-danger">Shut Down</b-button>
+            <b-button class="disabled w-100 my-1 bg-danger">Shut Down</b-button>
           </div>
         </div>
       </div>

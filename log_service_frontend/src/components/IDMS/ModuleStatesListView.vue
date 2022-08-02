@@ -1,7 +1,7 @@
 <template>
   <div style="padding-top:75px">
     <el-table stripe :data="ModuleStatesData" row-key="IP">
-      <el-table-column width="44" fixed>
+      <el-table-column width="44" fixed="left">
         <template #default="scope">
           <el-icon
             v-show=" (!scope.row.ControllerAbnormal && scope.row.SensorAbnormal) | (scope.row.ControllerAbnormal && !scope.row.SensorAbnormal)"
@@ -19,7 +19,7 @@
           </el-icon>
         </template>
       </el-table-column>
-      <el-table-column prop="IP" label="IP" sortable fixed>
+      <el-table-column prop="IP" label="IP" sortable fixed="left">
         <template #default="scope">
           <a :href="'http://'+scope.row.IP" target="popup">{{scope.row.IP}}</a>
         </template>
