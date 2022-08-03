@@ -31,7 +31,7 @@
         class="d-flex px-1"
         v-for="item in datasetsVisible"
         :key="item.label"
-        @click="item.visible=!item.visible"
+        @click="{item.visible=!item.visible ; chartInstance.update();}"
       >
         <span
           v-bind:style="item.visible? { color: currentTheme=='dark'?'white':'black' } : {color:'grey',textDecoration:'line-through'}"
@@ -278,7 +278,8 @@ export default {
       this.RenderData();
     },
     Clear() {
-      this.chartInstance.clear();
+      this.datasetsVisible = [];
+      this.RenderData([], []);
     },
 
     async RenderData(xlabels, datasets) {
@@ -344,7 +345,7 @@ export default {
   position: absolute;
   padding-top: 15px;
   cursor: pointer;
-  z-index: 5100;
+  z-index: 3014;
 }
 
 .setting-region .light-icon {

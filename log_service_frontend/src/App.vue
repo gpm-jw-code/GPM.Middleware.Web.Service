@@ -56,11 +56,13 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  height: 100%;
 }
 html,
 body {
   margin: 0;
   padding: 0;
+  height: 100%;
 }
 nav {
   padding: 30px;

@@ -4,6 +4,7 @@ import HomeView from '../views/HomeView.vue'
 import AdminView from '../views/AdminView.vue'
 import IDMS from '@/components/IDMS/MainPage.vue'
 import ModuleStatesListViewVue from '@/components/IDMS/ModuleStatesListView.vue'
+import QueryPage from '@/components/IDMS/QueryPage.vue'
 import { configs } from '@/config'
 
 var gmm_mode_routes = [
@@ -21,7 +22,7 @@ var gmm_mode_routes = [
 
 var gpm_mode_routes = [
   {
-    path: '/idms',
+    path: '/',
     name: '診斷頁面',
     component: IDMS,
   },
@@ -29,6 +30,11 @@ var gpm_mode_routes = [
     path: '/idms/module-states',
     name: '感測器狀態',
     component: ModuleStatesListViewVue,
+  },
+  {
+    path: '/idms/query',
+    name: 'Query',
+    component: QueryPage,
   },
 ]
 
@@ -52,6 +58,11 @@ var dev_mode_routes = [
     path: '/idms/module-states',
     name: '感測器狀態',
     component: ModuleStatesListViewVue,
+  },
+  {
+    path: '/idms/query',
+    name: 'Query',
+    component: QueryPage,
   },
 ]
 
