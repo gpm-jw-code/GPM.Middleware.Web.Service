@@ -2,6 +2,6 @@ const { defineConfig } = require('@vue/cli-service')
 
 module.exports = defineConfig({
   transpileDependencies: true,
-  outputDir: '../wwwroot',
+  outputDir: '/demo/wwwroot',
   // outputDir: '../gmm/wwwroot',
 })

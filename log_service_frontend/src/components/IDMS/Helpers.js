@@ -53,6 +53,24 @@ export function GenDiagnoseChartData(
   return { timeLs: timeList, datasets: datasets }
 }
 
+export function DemoData() {
+  var timeLs = []
+  var valueLs = []
+  for (let index = 0; index < 60; index++) {
+    timeLs.push(`2022/08/03 12:01:${index}`)
+    valueLs.push(Math.random() * 10.2)
+  }
+
+  var dataset = [
+    {
+      label: 'demo',
+      data: valueLs,
+      borderColor: 'blue',
+    },
+  ]
+  return { timeLs: timeLs, datasets: dataset }
+}
+
 /**顯示模式  */
 export const display_modes = [
   { label: 'Health Score', value: 'HS' },

@@ -55,7 +55,12 @@ import { configs } from '@/config';
 export default {
   data() {
     return {
-      ModuleStatesData: [],
+      ModuleStatesData: [
+        { IP: '12.123.123.1', EqName: 'demo1', UnitName: 'Demo1', SensorAbnormal: false, ControllerAbnormal: false },
+        { IP: '12.123.123.2', EqName: 'demo1', UnitName: 'Demo2', SensorAbnormal: false, ControllerAbnormal: false },
+        { IP: '12.123.123.3', EqName: 'demo1', UnitName: 'Demo3', SensorAbnormal: false, ControllerAbnormal: false }
+
+      ],
       ws: null //websocket to do data handshake...
     }
   },

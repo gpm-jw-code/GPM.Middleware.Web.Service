@@ -8,7 +8,6 @@
       :default-sort="{ prop: 'EqName', order: 'ascending' }"
       :height="table_height"
       :data="DignoseDatas"
-      v-loading="loading"
       highlight-current-row
       @row-click="TableRowClickHandle"
       @expand-change="ExpandHandle"
@@ -113,7 +112,6 @@
         v-show="share_chart_show"
         class="share-chart-container fixed-in-bottom"
         v-bind:style="current_share_chart_style"
-        v-loading="loading"
       >
         <!-- <h4>Share use chart there</h4> -->
         <div class="row">
@@ -129,11 +127,7 @@
               </div>
             </div>
           </div>
-          <div
-            class="col-lg-11"
-            v-loading="chart_loading"
-            element-loading-background="rgba(122, 122, 122, 0.8)"
-          >
+          <div class="col-lg-11" element-loading-background="rgba(122, 122, 122, 0.8)">
             <GPMChartVue
               class="share-chart"
               chart_id="share-chart"
@@ -152,7 +146,7 @@
 
 <script>
 import GPMChartVue from '@/components/Charting/GPMChart.vue';
-import { GenDiagnoseChartData, display_modes } from '../Helpers';
+import { GenDiagnoseChartData, display_modes, DemoData } from '../Helpers';
 import ModelListView from './ModelListView.vue';
 import { GetDignoseDataListWsInstance, GetDignoseThresholdVal, GetTrendchartWsInstance, SetDignoseWarningThreshold, SetDignoseAlarmThreshold } from '@/APIHelpers/IDMSAPIs.js';
 class clsTresholdSetting {
@@ -175,7 +169,11 @@ export default {
       chart_loading: false,
       expandAll: false,
       display_modes: display_modes,
-      DignoseDatas: [],
+      DignoseDatas: [
+        { IP: '12.123.123.1', EqName: 'demo1', UnitName: 'Demo1', HealthScore: 99.3, AlertIndex: 0.3, ModuleAbnormal: false, DignoseDetailData: {} },
+        { IP: '12.123.123.2', EqName: 'demo1', UnitName: 'Demo2', HealthScore: 9.3, AlertIndex: 0.9, ModuleAbnormal: false, DignoseDetailData: {} },
+        { IP: '12.123.123.3', EqName: 'demo1', UnitName: 'Demo3', HealthScore: 9.3, AlertIndex: 0.8, ModuleAbnormal: true, DignoseDetailData: {} }
+      ],
       chart_display_mode: 'HS',
       selectedDiagnoseData: { IP: '???' },
       renderingDiagnoseData: [],
@@ -250,10 +248,7 @@ export default {
           thresObjs = [{ name: 'Warning', value: warnThres, color: 'gold' },
           { name: 'alarm', value: alarmThres, color: 'red' }]
         }
-
         var chartingObj = GenDiagnoseChartData(data, this.chart_display_mode, thresObjs);
-
-
         if (this.$refs.trendChart)
           var ret = this.$refs.trendChart.UpdateChart(chartingObj.timeLs, chartingObj.datasets);
         if (ret == "err") {
@@ -325,6 +320,13 @@ export default {
   },
 
   async mounted() {
+    setInterval(() => {
+      console.log('demo');
+      var chartingObj = DemoData();
+      this.$refs.trendChart.UpdateChart(chartingObj.timeLs, chartingObj.datasets);
+
+    }, 1000);
+
     this.ws = await GetDignoseDataListWsInstance();
     console.info('s', this.ws);
     this.ws.onmessage = (ws) => {
@@ -332,6 +334,7 @@ export default {
       this.DignoseDatas = JSON.parse(ws.data);
 
     }
+
   },
   unmounted() {
     this.ws.close();

@@ -90,7 +90,10 @@ export default {
   data() {
     return {
 
-      ModuleList: [],
+      ModuleList: [
+        { EQ: "Demo", UNIT: "Demo1", IP: "123.123.123.1" },
+        { EQ: "Demo", UNIT: "Demo2", IP: "123.123.123.2" },
+        { EQ: "Demo", UNIT: "Demo3", IP: "123.123.123.3" }],
       QueryOptions: {
         SelectedEQ: '',
         SelectedUNIT: '',
@@ -146,6 +149,7 @@ export default {
     async QueryHandle() {
       this.SaveQueryOptionsToLocalStorage();
       this.loading = true;
+
       new Promise(() => {
 
         this.$refs.query_chart.Clear();
