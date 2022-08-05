@@ -1,8 +1,6 @@
 <template>
   <div class="gpm-chart" v-bind:style="chart_style" v-loading="loading">
-    <GPMPreviewChart ref="preview_chart"></GPMPreviewChart>
-
-    <div class="setting-region d-flex">
+    <!-- <div class="d-flex theme">
       <el-icon
         v-show="!isDark"
         @click="ThemeChange"
@@ -25,72 +23,15 @@
       >
         <Moon />
       </el-icon>
-      <!-- <button @click="ThemeChange">⊕</button> -->
     </div>
-
-    <div class="my-legend d-flex">
-      <div
-        class="d-flex px-1"
-        v-for="item in datasetsVisible"
-        :key="item.label"
-        @click="{item.visible=!item.visible ; chartInstance.update();}"
-      >
-        <span
-          v-bind:style="item.visible? { color: currentTheme=='dark'?'white':'black' } : {color:'grey',textDecoration:'line-through'}"
-          v-text="item.label"
-        ></span>
-        <div
-          class="color-dis"
-          v-bind:style=" !item.visible? {  opacity: 0.5 , backgroundColor:item.color} : {backgroundColor:item.color}"
-        ></div>
-      </div>
-    </div>
-
-    <canvas @click="ClickChartHandel" :id="chart_id"></canvas>
+    -->
+    <canvas class="h-100" @click="ClickChartHandel" :id="chart_id"></canvas>
   </div>
 </template>
 <script>
-var gradientLinePlugin = {
-  // Called at start of update.
-  beforeUpdate: function (chartInstance) {
-    if (chartInstance.options.linearGradientLine) {
-      // The context, needed for the creation of the linear gradient.
-      var ctx = chartInstance.chart.ctx;
-      // The first (and, assuming, only) dataset.
-      var dataset = chartInstance.data.datasets[0];
-      // Calculate min and max values of the dataset.
-      var minValue = Number.MAX_VALUE;
-      var maxValue = Number.MIN_VALUE;
-      for (var i = 0; i < dataset.data.length; ++i) {
-        if (minValue > dataset.data[i].y)
-          minValue = dataset.data[i].y;
-        if (maxValue < dataset.data[i].y)
-          maxValue = dataset.data[i].y;
-      }
-      // Calculate Y pixels for min and max values.
-      var yAxis = chartInstance.scales['y-axis-0'];
-      var minValueYPixel = yAxis.getPixelForValue(minValue);
-      var maxValueYPixel = yAxis.getPixelForValue(maxValue);
-      // Create the gradient.
-      var gradient = ctx.createLinearGradient(0, minValueYPixel, 0, maxValueYPixel);
-      // A kind of red for min.
-      gradient.addColorStop(0, 'rgba(231, 18, 143, 1.0)');
-      // A kind of blue for max.
-      gradient.addColorStop(1, 'rgba(0, 173, 238, 1.0)');
-      // Assign the gradient to the dataset's border color.
-      dataset.borderColor = gradient;
-      // Uncomment this for some effects, especially together with commenting the `fill: false` option below.
-      // dataset.backgroundColor = gradient;
-    }
-  }
-};
-
-import GPMPreviewChart from './GPMPreviewChart.vue'
 import Chart from 'chart.js'
-Chart.pluginService.register(gradientLinePlugin);
 export default {
   components: {
-    GPMPreviewChart,
   },
   props: {
     chart_id: {
@@ -162,7 +103,9 @@ export default {
                 padding: 20,
                 fontColor: 'white',
                 autoskip: true,
-                maxTicksLimit: 10
+                maxTicksLimit: 10,
+                min: 0,
+                max: 100
               },
               scaleLabel: {
                 display: true,
@@ -175,10 +118,11 @@ export default {
           xAxes: [{
             type: 'time',
             time: {
-              unit: 'hour',
+              unit: 'second',
               displayFormats: {
                 day: 'YYYY-MM-DD HH:mm:ss',
-                hour: 'YYYY-MM-DD HH:mm:ss'
+                hour: 'YYYY-MM-DD HH:mm:ss',
+                second: 'YY/MM/DD HH:mm'
               }
             },
             gridLines: {
@@ -214,7 +158,7 @@ export default {
             borderColor: 'red'
           }]
         },
-        legend: { display: false }
+        legend: { display: true }
       },
       xlabels: [],
       datasets: [],
@@ -294,8 +238,10 @@ export default {
             lineTension: 0,
           });
         }
-        this.loading = false;
         await this.RenderData(xlabels, datasets);
+        setTimeout(() => {
+          this.loading = false;
+        }, 100);
       } catch (error) {
         return "err";
       }
@@ -391,18 +337,6 @@ export default {
 }
 </script>
 <style >
-.my-legend,
-.setting-region {
-  position: absolute;
-  top: 16px;
-}
-
-.setting-region {
-  top: 5px;
-  right: 8px;
-  z-index: 40000000;
-}
-
 .setting-region .el-icon {
   position: absolute;
   padding-top: 15px;
@@ -423,10 +357,6 @@ export default {
 
 .setting-region:hover {
   opacity: 1;
-}
-.my-legend {
-  left: 79px;
-  cursor: pointer;
 }
 .color-dis {
   width: 20px;

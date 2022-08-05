@@ -7,6 +7,16 @@ export async function QueryTest() {
   return await GetRequest('/WeatherForecast?id=123')
 }
 
+/**從Server中撈取Database列表 */
+export async function GetDatabaseList() {
+  return await GetRequest('/api/PostgrelDB/Databases')
+}
+
+/**從資料庫中撈取儲存的模組資訊 */
+export async function GetModuleInfoStoredInDB() {
+  return await GetRequest('/api/Query/ModuleInfos')
+}
+
 export async function QueryHealthScore(ip, startT, endT) {
   return await GetRequest(
     `/api/Query/HealthScore?ip=${ip}&from=${startT}&to=${endT}`,
@@ -17,6 +27,14 @@ export async function QueryAlertIndex(ip, startT, endT) {
     `/api/Query/AlertIndex?ip=${ip}&from=${startT}&to=${endT}`,
   )
 }
+
+/**根據querID 查詢切片資料 */
+export async function QueryHealthScoreSplice(queryID, from, to) {
+  return await GetRequest(
+    `/api/Query/HealthScoreSplice?queryID=${queryID}&from=${from}&to=${to}`,
+  )
+}
+
 // async function PostRequest(api = '', data = {}) {
 //   return new Promise((resolve) => {
 //     axios

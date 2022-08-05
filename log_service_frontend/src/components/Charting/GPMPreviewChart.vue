@@ -1,64 +1,27 @@
 <template>
-  <div
-    v-show="PreviewShow"
-    class="gpm-preview-chart"
-    v-bind:style="chart_style"
-    v-loading="loading"
-  >
-    <div class="d-flex">
-      <el-button
-        size="small"
-        @click="{isAdjustWindowSizeMode=!isAdjustWindowSizeMode ; isRightBoundClickDown=false} "
-      >調整窗大小</el-button>
-    </div>
-    <div class="preview-region" id="preview-region" style="height:180px">
-      <div class="d-flex preview h-100" id="time-window" v-bind:style="time_window_style">
-        <div v-show="isAdjustWindowSizeMode" id="left-bound" class="bound-opt b-l bg-info h-100"></div>
-        <div v-show="isAdjustWindowSizeMode" id="right-bound" class="bound-opt b-r bg-info h-100"></div>
+  <div class="gpm-preview-chart" v-bind:style="chart_style" v-loading="loading">
+    <div v-show="PreviewShow">
+      <div class="d-flex">
+        <el-button
+          plain
+          :type="isAdjustWindowSizeMode?'danger':'info'"
+          size="small"
+          @click="{isAdjustWindowSizeMode=!isAdjustWindowSizeMode ; isRightBoundClickDown=false} "
+        >{{isAdjustWindowSizeMode?'結束調整':'調整窗大小'}}</el-button>
       </div>
-      <canvas class="preview" :id="'preview_chart_'+chart_id"></canvas>
+      <div class="preview-region" id="preview-region" style="height:180px">
+        <div class="d-flex preview h-100" id="time-window" v-bind:style="time_window_style">
+          <div v-show="isAdjustWindowSizeMode" id="left-bound" class="bound-opt b-l bg-info h-100"></div>
+          <div v-show="isAdjustWindowSizeMode" id="right-bound" class="bound-opt b-r bg-info h-100"></div>
+        </div>
+        <canvas class="preview" :id="'preview_chart_'+chart_id"></canvas>
+      </div>
     </div>
   </div>
 </template>
 <script>
-var gradientLinePlugin = {
-  // Called at start of update.
-  beforeUpdate: function (chartInstance) {
-    if (chartInstance.options.linearGradientLine) {
-      // The context, needed for the creation of the linear gradient.
-      var ctx = chartInstance.chart.ctx;
-      // The first (and, assuming, only) dataset.
-      var dataset = chartInstance.data.datasets[0];
-      // Calculate min and max values of the dataset.
-      var minValue = Number.MAX_VALUE;
-      var maxValue = Number.MIN_VALUE;
-      for (var i = 0; i < dataset.data.length; ++i) {
-        if (minValue > dataset.data[i].y)
-          minValue = dataset.data[i].y;
-        if (maxValue < dataset.data[i].y)
-          maxValue = dataset.data[i].y;
-      }
-      // Calculate Y pixels for min and max values.
-      var yAxis = chartInstance.scales['y-axis-0'];
-      var minValueYPixel = yAxis.getPixelForValue(minValue);
-      var maxValueYPixel = yAxis.getPixelForValue(maxValue);
-      // Create the gradient.
-      var gradient = ctx.createLinearGradient(0, minValueYPixel, 0, maxValueYPixel);
-      // A kind of red for min.
-      gradient.addColorStop(0, 'rgba(231, 18, 143, 1.0)');
-      // A kind of blue for max.
-      gradient.addColorStop(1, 'rgba(0, 173, 238, 1.0)');
-      // Assign the gradient to the dataset's border color.
-      dataset.borderColor = gradient;
-      // Uncomment this for some effects, especially together with commenting the `fill: false` option below.
-      // dataset.backgroundColor = gradient;
-    }
-  }
-};
-
 import Chart from 'chart.js'
-Chart.pluginService.register(gradientLinePlugin);
-// import moment from 'moment';
+import moment from 'moment';
 export default {
   props: {
     chart_id: {
@@ -86,7 +49,7 @@ export default {
     return {
       loading: false,
       Rendering: false,
-      PreviewShow: false,
+      PreviewShow: true,
       chart_style: {
         backgroundColor: '#202020',
         border: '1px solid grey',
@@ -110,8 +73,7 @@ export default {
         },
         layout: {
           padding: {
-            bottom: 10,
-            top: 10,
+            top: 1,
           },
         },
         title: {
@@ -131,7 +93,9 @@ export default {
                 padding: 20,
                 fontColor: 'white',
                 autoskip: true,
-                maxTicksLimit: 10
+                maxTicksLimit: 10,
+                min: 0,
+                max: 100
               },
               scaleLabel: {
                 display: true,
@@ -281,8 +245,8 @@ export default {
       this.preview_chartInstance.data.datasets = [{
         label: 'preview',
         data: Object.values(valueList),
-        borderColor: 'red',
-        backgroundColor: 'red',
+        borderColor: 'white',
+        backgroundColor: 'rgb(27, 90, 181)',
         borderWidth: 1,
         fill: 'end',
         pointStyle: 'none',
@@ -328,12 +292,15 @@ export default {
       this.lastOffsetOFTimeWindow = e.offsetX;
       this.time_window_style.backgroundColor = 'red';
     },
-    TimeWindowMouseUp(e) {
+    TimeWindowMouseUp() {
       this.isTimeWindowClickDown = false;
       this.time_window_style.backgroundColor = 'white';
 
-      console.info('from', this.preview_chartInstance.scales['x-axis-0'].getValueForPixel(e.x).toString());
-      console.info('to', this.preview_chartInstance.scales['x-axis-0'].getValueForPixel(e.x + this.time_window_width).toString());
+      if (!this.isAdjustWindowSizeMode) {
+        var _from = moment(this.preview_chartInstance.scales['x-axis-0'].getValueForPixel(this.time_window_left_property).toString()).format('yyyy/MM/DD HH:mm:ss');
+        var _to = moment(this.preview_chartInstance.scales['x-axis-0'].getValueForPixel(this.time_window_left_property + this.time_window_width).toString()).format('yyyy/MM/DD HH:mm:ss');
+        this.$emit("DateTimeIntervalOnchanged", { from: _from, to: _to });
+      }
     },
     TimeWindowMouseMove(e) {
       if (this.isAdjustWindowSizeMode)
@@ -369,13 +336,13 @@ export default {
 }
 #time-window {
   opacity: 0.1;
-  z-index: 55500;
+  z-index: 2999;
   cursor: move;
 }
 .bound-opt {
   width: 7px;
   position: absolute;
-  z-index: 55520;
+  z-index: 2999;
 }
 .bound-opt:hover {
   cursor: grab;

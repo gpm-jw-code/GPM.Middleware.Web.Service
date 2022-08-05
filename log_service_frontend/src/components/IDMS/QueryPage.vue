@@ -1,8 +1,8 @@
 <template>
-  <div class="px-3 h-100" style="padding-top:80px">
-    <div class="h-100">
+  <div class="h-100" style="padding-top:80px">
+    <div class="d-flex flex-column" style=";height:100%">
       <!-- 選擇項目與時間 -->
-      <div class="row settings">
+      <div class="d-flex flex-row row settings">
         <div class="col-lg-2 d-flex py-1">
           <b>EQ</b>
           <el-select
@@ -55,41 +55,61 @@
             type="datetime"
           />
         </div>
-        <div class="col-lg-2 d-flex">
+        <div class="col-lg-2 flex-fill">
           <b-button class="w-100 bg-primary" @click="QueryHandle">查詢</b-button>
         </div>
       </div>
       <!-- 結果與圖表 -->
-      <div class="col-md-8 flex-1 result w-100 h-100">
-        <div class="py-2 px-1 my-3 h-100" v-loading="loading">
-          <div class="d-flex result-message font-red">{{ServerResponseData.message}}</div>
-          <div class="d-flex" style="font-size:9px">ID:{{ServerResponseData.queryID}}</div>
-          <GPMChart
-            class="query-chart"
-            chart_id="query-chart"
-            ref="query_chart"
-            :title="`${QueryOptions.SelectedQueryItem}:${QueryOptions.SelectedEQ}/${QueryOptions.SelectedUNIT}`"
-            :key="chart_key"
-            :yAxisLabel="Ylabel"
-          ></GPMChart>
+      <div class="result d-flex flex-column flex-fill w-100 my-1">
+        <div class="d-flex result-message font-red">{{ServerResponseData.message}}</div>
+        <GPMPreviewChart
+          ref="preview_chart"
+          title="Preview"
+          :yAxisLabel="Ylabel"
+          xAxisLabel
+          @DateTimeIntervalOnchanged="GetSliceDataHandle"
+        ></GPMPreviewChart>
+        <GPMChart
+          v-loading="chart_loading"
+          class="query-chart flex-fill"
+          chart_id="query-chart"
+          ref="query_chart"
+          :title="`${QueryOptions.SelectedQueryItem}:${QueryOptions.SelectedEQ}/${QueryOptions.SelectedUNIT}`"
+          :key="chart_key"
+          :yAxisLabel="Ylabel"
+        ></GPMChart>
+      </div>
+      <div class="d-flex flex-row shadow-sm px-2" style="height:25px">
+        <div class="flex-fill text-left" style="font-size:9px">{{ServerResponseData.QueryID}}</div>
+        <div style="font-size:16px">
+          <el-icon style="cursor:pointer" @click="showSettingPnl=!showSettingPnl">
+            <setting></setting>
+          </el-icon>
         </div>
       </div>
     </div>
+    <el-drawer v-model="showSettingPnl" title="SETTING" size="50%">
+      <DatabaseSetting></DatabaseSetting>
+    </el-drawer>
   </div>
 </template>
 <script>
 import { GetModuleInfos } from '@/APIHelpers/IDMSAPIs'
 import GPMChart from '@/components/Charting/GPMChart.vue'
+import GPMPreviewChart from '@/components/Charting/GPMPreviewChart.vue'
+import DatabaseSetting from './components/DatabaseSetting'
 import moment from 'moment';
-import { QueryHealthScore, QueryAlertIndex } from '@/APIHelpers/DatabaseServerAPI';
+// import { QueryHealthScore, QueryAlertIndex } from '@/APIHelpers/DatabaseServerAPI';
+import { GetModuleInfoStoredInDB, QueryHealthScore, QueryAlertIndex, QueryHealthScoreSplice, GetDatabaseList } from '@/APIHelpers/DatabaseServerAPI';
 
 export default {
   components: {
-    GPMChart,
+    GPMChart, GPMPreviewChart, DatabaseSetting
   },
   data() {
     return {
 
+      DatabaseList: [],
       ModuleList: [],
       QueryOptions: {
         SelectedEQ: '',
@@ -98,8 +118,9 @@ export default {
         TimeRange: []
       },
       QueryItems: ['Raw Data', 'Health Score', 'Alert Index'],
-
       loading: false,
+      chart_loading: false,
+      showSettingPnl: false,
       chart_key: '',
       ServerResponseData: {
         count: 0,
@@ -107,7 +128,7 @@ export default {
         message: "",
         timeList: [],
         valueList: [],
-        queryID: '-'
+        QueryID: '-'
       }
     }
   },
@@ -142,7 +163,14 @@ export default {
   },
   methods: {
     async FetchModuleList() {
-      this.ModuleList = await GetModuleInfos();
+
+      this.ModuleList = await GetModuleInfos().catch(async (er) => {
+        console.info('IDMS websocket連接失敗,從資料庫調取模組資訊', er);
+        var _ModuleList = await GetModuleInfoStoredInDB(); //從IDMS拿不到資訊就從資料庫拿
+
+        return _ModuleList;
+      });
+      console.info(this.ModuleList);
     },
     async QueryHandle() {
       this.SaveQueryOptionsToLocalStorage();
@@ -153,9 +181,10 @@ export default {
 
         if (this.QueryOptions.SelectedQueryItem == 'Health Score')
           QueryHealthScore(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
-        if (this.QueryOptions.SelectedQueryItem == 'Alert Index')
+        else if (this.QueryOptions.SelectedQueryItem == 'Alert Index')
           QueryAlertIndex(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
-
+        else
+          this.loading = false;
       })
 
     },
@@ -168,44 +197,60 @@ export default {
         this.QueryOptions = JSON.parse(jsonStr);
       }
     },
-
     async RenderChart(data) {
       this.ServerResponseData = data;
       if (data.preview != null) {
-        this.$refs.query_chart.UpdatePreviewChart(data.preview.timeLs, data.preview.dataLs);
-        this.$refs.query_chart.ShowPreviewChart();
-
+        this.RenderPreviewChart(data.preview);
       }
       else {
-        this.$refs.query_chart.HidePreviewChart();
-        await new Promise((resolve) => {
-          var dataset = [];
-          data.valueList.forEach(dataInfo => {
-            dataset.push({
-              label: dataInfo.labelName,
-              data: dataInfo.valueList,
-              borderColor: dataInfo.displayColor
-            });
-          })
-
-          this.$refs.query_chart.UpdateChart(data.timeList, dataset, false);
-
-          resolve();
-        })
+        this.$refs.preview_chart.HidePreviewChart();
+        this.RenderFullChart(data);
       }
       this.loading = false;
-    }
+    },
+    async GetSliceDataHandle(datetimeInterval = {}) {
+      this.chart_loading = true;
+      var data_ret = await QueryHealthScoreSplice(this.ServerResponseData.QueryID, datetimeInterval.from, datetimeInterval.to);
+      await this.RenderFullChart(data_ret);
+
+      this.chart_loading = false;
+    },
+    async RenderFullChart(data, showloading = false) {
+      await new Promise((resolve) => {
+        var dataset = [];
+        data.valueList.forEach(dataInfo => {
+          dataset.push({
+            label: dataInfo.labelName,
+            data: dataInfo.valueList,
+            borderColor: dataInfo.displayColor
+          });
+        })
+
+        this.$refs.query_chart.UpdateChart(data.timeList, dataset, showloading);
+
+        resolve();
+      })
+    },
+
+    async RenderPreviewChart(previewData) {
+      await new Promise((resolve) => {
+        this.$refs.preview_chart.UpdatePreviewChart(previewData.TimeLs, previewData.DataLs);
+        this.$refs.preview_chart.ShowPreviewChart();
+        resolve();
+      })
+    },
   },
-  mounted() {
+  async mounted() {
     this.FetchModuleList().then(() => {
       this.ReadQueryOptionsFromLocalStorage();
     });
-
+    this.DatabaseList = await GetDatabaseList();
   }
 }
 </script>
 <style>
 .settings b {
+  font-size: small;
   width: 96px;
   text-align: left;
   text-decoration: underline;
@@ -215,19 +260,17 @@ export default {
 }
 
 .result {
-  border: 1px solid black;
-  border-radius: 5px;
+  /* border: 1px solid black;
+   */
+  color: white;
+  border-radius: 2px;
+  background-color: rgb(39, 39, 39);
   margin-top: 20px;
-  background-color: rgb(240, 240, 240);
 }
 .query-chart {
-  height: 90%;
 }
 
 @media screen and (max-width: 900px) {
-  .query-chart {
-    height: 70%;
-  }
 }
 .result-message {
   color: red;

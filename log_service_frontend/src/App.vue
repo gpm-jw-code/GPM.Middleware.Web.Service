@@ -2,7 +2,7 @@
   <div id="breadcrumb" sticky>
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark sticky">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">GPM</a>
+        <a class="navbar-brand" style="position:relative;left:-30px">GPM</a>
         <button class="navbar-toggler" type="button" v-b-toggle="'navbar'">
           <span class="navbar-toggler-icon"></span>
         </button>
