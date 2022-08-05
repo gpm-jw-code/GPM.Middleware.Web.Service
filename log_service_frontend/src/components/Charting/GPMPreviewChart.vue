@@ -1,52 +1,23 @@
 <template>
-  <div class="gpm-chart" v-bind:style="chart_style" v-loading="loading">
-    <GPMPreviewChart ref="preview_chart"></GPMPreviewChart>
-
-    <div class="setting-region d-flex">
-      <el-icon
-        v-show="!isDark"
-        @click="ThemeChange"
-        class="light-icon"
-        :color="currentTheme!='dark'? 'black':'white'"
-      >
-        <Sunny />
-      </el-icon>
-      <el-switch
-        active-color="rgb(19, 19, 19)"
-        inactive-color="rgb(226, 226, 226)"
-        v-model="isDark"
-        @change="ThemeChange"
-      />
-      <el-icon
-        v-show="isDark"
-        @click="ThemeChange"
-        class="dark-icon"
-        :color=" currentTheme!='dark'? 'white':'black'"
-      >
-        <Moon />
-      </el-icon>
-      <!-- <button @click="ThemeChange">⊕</button> -->
+  <div
+    v-show="PreviewShow"
+    class="gpm-preview-chart"
+    v-bind:style="chart_style"
+    v-loading="loading"
+  >
+    <div class="d-flex">
+      <el-button
+        size="small"
+        @click="{isAdjustWindowSizeMode=!isAdjustWindowSizeMode ; isRightBoundClickDown=false} "
+      >調整窗大小</el-button>
     </div>
-
-    <div class="my-legend d-flex">
-      <div
-        class="d-flex px-1"
-        v-for="item in datasetsVisible"
-        :key="item.label"
-        @click="{item.visible=!item.visible ; chartInstance.update();}"
-      >
-        <span
-          v-bind:style="item.visible? { color: currentTheme=='dark'?'white':'black' } : {color:'grey',textDecoration:'line-through'}"
-          v-text="item.label"
-        ></span>
-        <div
-          class="color-dis"
-          v-bind:style=" !item.visible? {  opacity: 0.5 , backgroundColor:item.color} : {backgroundColor:item.color}"
-        ></div>
+    <div class="preview-region" id="preview-region" style="height:180px">
+      <div class="d-flex preview h-100" id="time-window" v-bind:style="time_window_style">
+        <div v-show="isAdjustWindowSizeMode" id="left-bound" class="bound-opt b-l bg-info h-100"></div>
+        <div v-show="isAdjustWindowSizeMode" id="right-bound" class="bound-opt b-r bg-info h-100"></div>
       </div>
+      <canvas class="preview" :id="'preview_chart_'+chart_id"></canvas>
     </div>
-
-    <canvas @click="ClickChartHandel" :id="chart_id"></canvas>
   </div>
 </template>
 <script>
@@ -85,17 +56,14 @@ var gradientLinePlugin = {
   }
 };
 
-import GPMPreviewChart from './GPMPreviewChart.vue'
 import Chart from 'chart.js'
 Chart.pluginService.register(gradientLinePlugin);
+// import moment from 'moment';
 export default {
-  components: {
-    GPMPreviewChart,
-  },
   props: {
     chart_id: {
       type: String,
-      default: 'dchart'
+      default: 'preview-chart'
     },
     title: {
       type: String,
@@ -118,13 +86,14 @@ export default {
     return {
       loading: false,
       Rendering: false,
+      PreviewShow: false,
       chart_style: {
         backgroundColor: '#202020',
         border: '1px solid grey',
         margin: '3px',
         borderRadius: '4px'
       },
-      chartInstance: {
+      preview_chartInstance: {
         data: {
           labels: [],
           datasets: []
@@ -218,18 +187,22 @@ export default {
       },
       xlabels: [],
       datasets: [],
-      datasetsVisible: [],
       isDark: true,
       currentTheme: 'dark',
-      colors: ['blue', 'green', 'red', 'orange', 'pink', 'grey', 'black', 'seagreen']
+      colors: ['blue', 'green', 'red', 'orange', 'pink', 'grey', 'black', 'seagreen'],
+      time_window_style: { width: '100px', left: '100px', backgroundColor: 'white' },
+      time_window_left_property: 100,
+      time_window_width: 100,
+      ori_time_window_width: 100,
+      lastOffsetOFTimeWindow: 0,
+      isTimeWindowClickDown: false,
+      isRightBoundClickDown: false,
+      isAdjustWindowSizeMode: false,
+      bound_ori_mouse_x: -1
     }
   },
   methods: {
-    test() {
-      this.chartInstance.setDatasetVisibility(1, false); // hides dataset at index 1
-      this.chartInstance.update(); // chart now renders with dataset hidden
 
-    },
     ThemeChange() {
       this.currentTheme = this.currentTheme == 'dark' ? 'light' : 'dark';
       this.chart_style.backgroundColor = this.currentTheme == 'dark' ? "#202020" : "white";
@@ -242,16 +215,13 @@ export default {
         this.chartInstance.options.scales.yAxes[0].scaleLabel.fontColor = this.currentTheme == 'dark' ? 'white' : 'black';
       this.chartInstance.update();
     },
-    ClickChartHandel() {
-    },
     ChartInit() {
-
       if (!this.xlabelUseTimeFormat) {
         this.options.scales.xAxes[0].type = "category";
       }
-
-      const ctx = document.getElementById(this.chart_id);
-      this.chartInstance = new Chart(ctx, {
+      //preview
+      const ctx_preview = document.getElementById('preview_chart_' + this.chart_id);
+      this.preview_chartInstance = new Chart(ctx_preview, {
         type: 'line',
         data: {
           labels: [],
@@ -259,87 +229,83 @@ export default {
         },
         options: this.options,
       });
-      this.chartInstance.options.animation = false;
+      this.preview_chartInstance.options.animation = false;
     },
-    async UpdatePreviewChart(timeList = [], valueList = []) {
-      this.$refs['preview_chart'].UpdatePreviewChart(timeList, valueList);
-    },
-    async UpdateChart(timeList = [], dataSetsInput = [{ label: '', data: [0], borderColor: 'blue', borderWidth: 1 }], showLoading = false) {
-      try {
-        console.info('開始渲染');
-        // this.Clear();
-        if (showLoading)
-          this.loading = true;
+    PreviewChartEventRegist() {
+      this.TimeWindowDom.addEventListener('mousedown', (e) => this.TimeWindowMouseDown(e))
+      this.TimeWindowDom.addEventListener('mouseup', (e) => this.TimeWindowMouseUp(e))
+      this.TimeWindowDom.addEventListener('mousemove', (e) => this.TimeWindowMouseMove(e))
 
-        var xlabels = Object.values(timeList);
-        var datasets = [];
 
-        for (let index = 0; index < dataSetsInput.length; index++) {
-          const dataObj = dataSetsInput[index];
+      document.getElementById('preview_chart_' + this.chart_id).addEventListener('mouseup', (e) => this.TimeWindowMouseUp(e))
+      document.getElementById('preview_chart_' + this.chart_id).addEventListener('mousemove', (e) => this.TimeWindowMouseMove(e))
+      document.getElementById('preview_chart_' + this.chart_id).addEventListener('mousedown', (e) => {
+        if (this.isAdjustWindowSizeMode)
+          return;
+        var leftMin = this.preview_chartInstance.scales['x-axis-0'].left
+        this.time_window_left_property = e.x - 50 <= leftMin ? leftMin : e.x - 25 - 50;
+        this.time_window_style.left = this.time_window_left_property + "px";
+      })
 
-          if (this.datasetsVisible.find(i => i.label == dataObj.label) == undefined) {
-            this.datasetsVisible.push({ label: dataObj.label, visible: true, color: dataObj.borderColor })
-          }
-
-          if (!this.datasetsVisible.find(i => i.label == dataObj.label).visible)
-            continue;
-          datasets.push({
-            label: dataObj.label,
-            data: Object.values(dataObj.data),
-            borderColor: dataObj.borderColor != undefined ? dataObj.borderColor : this.colors[index],
-            borderWidth: dataObj.borderWidth != undefined ? dataObj.borderWidth : 1,
-            fill: false,
-            pointStyle: 'none',
-            pointRadius: 0,
-            lineTension: 0,
-          });
-        }
-        this.loading = false;
-        await this.RenderData(xlabels, datasets);
-      } catch (error) {
-        return "err";
-      }
-    },
-    ShowPreviewChart() {
-      this.$refs['preview_chart'].ShowPreviewChart();
-    },
-    HidePreviewChart() {
-      this.$refs['preview_chart'].HidePreviewChart();
-    },
-    FeedData(time = [], dataSets = [{ label: '', data: -1, borderColor: 'blue', borderWidth: 1 }]) {
-      if (dataSets.length == 0)
-        return;
-      if (time == undefined)
-        return;
-
-      this.xlabels.push(time);
-      dataSets.forEach(dataObj => {
-        var series = this.datasets.find(s => s.label == dataObj.label);
-        if (series) {
-          series.data.push(dataObj.data);
-        } else {
-          this.datasets.push({
-            label: dataObj.label,
-            data: [dataObj.data],
-            backgroundColor: "",
-            borderColor: dataObj.borderColor ? dataObj.borderColor : 'blue',
-            borderWidth: dataObj.borderWidth ? dataObj.borderWidth : 1,
-            fill: false,
-            pointStyle: 'none',
-            pointRadius: 0, lineTension: 0,
-          })
+      document.getElementById("preview-region").addEventListener('mousemove', (e) => {
+        if (this.isRightBoundClickDown) {
+          console.log('adjust width', e);
+          var increse = e.x - this.bound_ori_mouse_x;
+          this.time_window_width = this.ori_time_window_width + increse;
+          this.time_window_style.width = this.time_window_width + "px";
         }
       })
-      this.DataFIFO();
-      this.RenderData();
+      document.getElementById("preview-region").addEventListener('mouseup', () => {
+        this.isRightBoundClickDown = false;
+      })
+
+      document.getElementById("preview-region").addEventListener('mousedown', (e) => {
+        this.ori_time_window_width = this.time_window_width;
+        this.bound_ori_mouse_x = e.x;
+      })
+
+      document.getElementById("right-bound").addEventListener('mousedown', () => {
+        this.isRightBoundClickDown = true;
+      })
+      document.getElementById("right-bound").addEventListener('mouseup', () => this.isRightBoundClickDown = false)
+      document.getElementById("right-bound").addEventListener('mousemove', (e) => {
+        if (this.isRightBoundClickDown) {
+          console.log('adjust width', e);
+        }
+      })
+    },
+    async UpdatePreviewChart(timeList = [], valueList = []) {
+      this.PreviewChartEventRegist();
+      console.info('開始渲染');
+      this.preview_chartInstance.data.labels = timeList;
+      this.preview_chartInstance.data.datasets = [{
+        label: 'preview',
+        data: Object.values(valueList),
+        borderColor: 'red',
+        backgroundColor: 'red',
+        borderWidth: 1,
+        fill: 'end',
+        pointStyle: 'none',
+        pointRadius: 0,
+        lineTension: 0,
+
+      }];
+      this.preview_chartInstance.update();
+      console.info('結束渲染');
+    },
+    ShowPreviewChart() {
+      this.PreviewShow = true;
+    },
+    HidePreviewChart() {
+      this.PreviewShow = false;
     },
     Clear() {
-      this.datasetsVisible = [];
-      this.RenderData([], []);
+      this.preview_chartInstance.data.datasets = [];
+      this.preview_chartInstance.data.labels = [];
+      this.preview_chartInstance.update();
     },
 
     async RenderData(xlabels, datasets) {
-
       await new Promise((resolve, reject) => {
         try {
           this.chartInstance.data.datasets = datasets;
@@ -353,85 +319,76 @@ export default {
           this.ChartInit();
           reject(error)
         }
-
       });
     },
-    DataFIFO() {
-      if (this.xlabels.length > 50) {
-        this.xlabels.splice(0, 1);
-        this.datasets.forEach(s => {
-          s.data.splice(0, 1)
-        })
-      }
+    TimeWindowMouseDown(e) {
+      if (this.isAdjustWindowSizeMode)
+        return;
+      this.isTimeWindowClickDown = true;
+      this.lastOffsetOFTimeWindow = e.offsetX;
+      this.time_window_style.backgroundColor = 'red';
     },
+    TimeWindowMouseUp(e) {
+      this.isTimeWindowClickDown = false;
+      this.time_window_style.backgroundColor = 'white';
 
+      console.info('from', this.preview_chartInstance.scales['x-axis-0'].getValueForPixel(e.x).toString());
+      console.info('to', this.preview_chartInstance.scales['x-axis-0'].getValueForPixel(e.x + this.time_window_width).toString());
+    },
+    TimeWindowMouseMove(e) {
+      if (this.isAdjustWindowSizeMode)
+        return;
+      if (this.isTimeWindowClickDown) {
+        var leftMin = this.preview_chartInstance.scales['x-axis-0'].left
+        this.time_window_left_property = e.x <= leftMin ? leftMin : e.x - 25;
+        this.time_window_style.left = this.time_window_left_property + "px";
+
+      }
+    }
   },
   computed: {
-    currentDataSet() {
-      var dataAry = [];
-      this.chartInstance.data.datasets.forEach(s => {
-        dataAry.push(s.data)
-      })
-
-      return {
-        labels: this.chartInstance.data.labels,
-        datas: dataAry
-      }
-    },
     TimeWindowDom() {
       return document.getElementById("time-window");
     }
   },
   mounted() {
     this.ChartInit();
-
   },
   created() {
   }
 }
 </script>
 <style >
-.my-legend,
-.setting-region {
+.preview-region {
+  position: relative;
+  background-color: #313131;
+}
+.preview {
   position: absolute;
-  top: 16px;
+  z-index: 100;
 }
-
-.setting-region {
-  top: 5px;
-  right: 8px;
-  z-index: 40000000;
+#time-window {
+  opacity: 0.1;
+  z-index: 55500;
+  cursor: move;
 }
-
-.setting-region .el-icon {
+.bound-opt {
+  width: 7px;
   position: absolute;
-  padding-top: 15px;
-  cursor: pointer;
-  z-index: 3014;
+  z-index: 55520;
+}
+.bound-opt:hover {
+  cursor: grab;
 }
 
-.setting-region .light-icon {
-  left: 1px;
+.b-l {
+  left: -7px;
 }
-.setting-region .dark-icon {
-  right: 1px;
-}
-
-.setting-region button {
-  border-radius: 30px;
+.b-r {
+  right: -7px;
 }
 
-.setting-region:hover {
-  opacity: 1;
-}
-.my-legend {
-  left: 79px;
-  cursor: pointer;
-}
-.color-dis {
-  width: 20px;
-  height: 12px;
-  margin-top: 5px;
-  margin-left: 5px;
+#time-window:hover {
+  border: 2px solid white;
 }
 </style>

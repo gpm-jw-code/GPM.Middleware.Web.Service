@@ -63,7 +63,7 @@
       <div class="col-md-8 flex-1 result w-100 h-100">
         <div class="py-2 px-1 my-3 h-100" v-loading="loading">
           <div class="d-flex result-message font-red">{{ServerResponseData.message}}</div>
-          <div class="d-flex">統計</div>
+          <div class="d-flex" style="font-size:9px">ID:{{ServerResponseData.queryID}}</div>
           <GPMChart
             class="query-chart"
             chart_id="query-chart"
@@ -107,6 +107,7 @@ export default {
         message: "",
         timeList: [],
         valueList: [],
+        queryID: '-'
       }
     }
   },
@@ -155,10 +156,6 @@ export default {
         if (this.QueryOptions.SelectedQueryItem == 'Alert Index')
           QueryAlertIndex(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
 
-        setTimeout(() => {
-          this.loading = false;
-        }, 400);
-
       })
 
     },
@@ -174,21 +171,29 @@ export default {
 
     async RenderChart(data) {
       this.ServerResponseData = data;
+      if (data.preview != null) {
+        this.$refs.query_chart.UpdatePreviewChart(data.preview.timeLs, data.preview.dataLs);
+        this.$refs.query_chart.ShowPreviewChart();
 
-      await new Promise((resolve) => {
-        var dataset = [];
-        data.valueList.forEach(dataInfo => {
-          dataset.push({
-            label: dataInfo.labelName,
-            data: dataInfo.valueList,
-            borderColor: dataInfo.displayColor
-          });
+      }
+      else {
+        this.$refs.query_chart.HidePreviewChart();
+        await new Promise((resolve) => {
+          var dataset = [];
+          data.valueList.forEach(dataInfo => {
+            dataset.push({
+              label: dataInfo.labelName,
+              data: dataInfo.valueList,
+              borderColor: dataInfo.displayColor
+            });
+          })
+
+          this.$refs.query_chart.UpdateChart(data.timeList, dataset, false);
+
+          resolve();
         })
-
-        this.$refs.query_chart.UpdateChart(data.timeList, dataset, false);
-
-        resolve();
-      })
+      }
+      this.loading = false;
     }
   },
   mounted() {

@@ -13,9 +13,10 @@ var configs = {
           '//' +
           window.location.hostname +
           ':44332'
-      : 'ws://127.0.0.1:44332'
+      : 'ws://192.168.0.123:44332'
   },
-  mode: process.env.NODE_ENV === 'production' ? 'gpm' : 'dev',
+  // mode: process.env.NODE_ENV === 'production' ? 'gpm' : 'dev',
+  mode: 'gpm',
 }
 console.info(
   window.location.protocol.replace('http', 'ws') +
