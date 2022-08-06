@@ -16,15 +16,25 @@ export async function GetDatabaseList() {
 export async function GetModuleInfoStoredInDB() {
   return await GetRequest('/api/Query/ModuleInfos')
 }
-
+export async function QueryVibrationEnergy(ip, startT, endT) {
+  return await GetRequest(
+    `/api/DB/VibrationEnergy?ip=${ip}&from=${startT}&to=${endT}`,
+  )
+}
 export async function QueryHealthScore(ip, startT, endT) {
   return await GetRequest(
-    `/api/Query/HealthScore?ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/HealthScore?ip=${ip}&from=${startT}&to=${endT}`,
   )
 }
 export async function QueryAlertIndex(ip, startT, endT) {
   return await GetRequest(
-    `/api/Query/AlertIndex?ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/AlertIndex?ip=${ip}&from=${startT}&to=${endT}`,
+  )
+}
+
+export async function QueryVibration_raw_data(ip, startT, endT) {
+  return await GetRequest(
+    `/api/DB/vibration_raw_data?ip=${ip}&from=${startT}&to=${endT}`,
   )
 }
 

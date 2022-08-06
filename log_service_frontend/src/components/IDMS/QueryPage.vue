@@ -60,7 +60,7 @@
         </div>
       </div>
       <!-- 結果與圖表 -->
-      <div class="result d-flex flex-column flex-fill w-100 my-1">
+      <div class="result d-flex flex-column flex-fill w-100 my-1" v-loading="loading">
         <div class="d-flex result-message font-red">{{ServerResponseData.message}}</div>
         <GPMPreviewChart
           ref="preview_chart"
@@ -100,7 +100,7 @@ import GPMPreviewChart from '@/components/Charting/GPMPreviewChart.vue'
 import DatabaseSetting from './components/DatabaseSetting'
 import moment from 'moment';
 // import { QueryHealthScore, QueryAlertIndex } from '@/APIHelpers/DatabaseServerAPI';
-import { GetModuleInfoStoredInDB, QueryHealthScore, QueryAlertIndex, QueryHealthScoreSplice, GetDatabaseList } from '@/APIHelpers/DatabaseServerAPI';
+import { GetModuleInfoStoredInDB, QueryVibrationEnergy, QueryVibration_raw_data, QueryHealthScore, QueryAlertIndex, QueryHealthScoreSplice, GetDatabaseList } from '@/APIHelpers/DatabaseServerAPI';
 
 export default {
   components: {
@@ -117,7 +117,7 @@ export default {
         SelectedQueryItem: '',
         TimeRange: []
       },
-      QueryItems: ['Raw Data', 'Health Score', 'Alert Index'],
+      QueryItems: ['Raw Data', 'Health Score', 'Alert Index', '振動能量'],
       loading: false,
       chart_loading: false,
       showSettingPnl: false,
@@ -183,6 +183,11 @@ export default {
           QueryHealthScore(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
         else if (this.QueryOptions.SelectedQueryItem == 'Alert Index')
           QueryAlertIndex(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+        else if (this.QueryOptions.SelectedQueryItem == '振動能量')
+          QueryVibrationEnergy(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+        else if (this.QueryOptions.SelectedQueryItem == 'Raw Data') {
+          QueryVibration_raw_data(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime)
+        }
         else
           this.loading = false;
       })
