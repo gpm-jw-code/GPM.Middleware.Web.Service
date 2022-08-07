@@ -11,7 +11,7 @@ export async function QueryTest() {
 export async function GetDatabaseList() {
   return await GetRequest('/api/PostgrelDB/Databases')
 }
-
+vcx
 /**從資料庫中撈取儲存的模組資訊 */
 export async function GetModuleInfoStoredInDB() {
   return await GetRequest('/api/Query/ModuleInfos')

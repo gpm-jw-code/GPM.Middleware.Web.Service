@@ -208,37 +208,14 @@ export default {
     async UpdatePreviewChart(timeList = [], valueList = []) {
       this.$refs['preview_chart'].UpdatePreviewChart(timeList, valueList);
     },
-    async UpdateChart(timeList = [], dataSetsInput = [{ label: '', data: [0], borderColor: 'blue', borderWidth: 1 }], showLoading = false) {
+    async UpdateChart(datavw, showLoading = false) {
       try {
         console.info('開始渲染');
         // this.Clear();
         if (showLoading)
           this.loading = true;
 
-        var xlabels = Object.values(timeList);
-        var datasets = [];
-
-        for (let index = 0; index < dataSetsInput.length; index++) {
-          const dataObj = dataSetsInput[index];
-
-          if (this.datasetsVisible.find(i => i.label == dataObj.label) == undefined) {
-            this.datasetsVisible.push({ label: dataObj.label, visible: true, color: dataObj.borderColor })
-          }
-
-          if (!this.datasetsVisible.find(i => i.label == dataObj.label).visible)
-            continue;
-          datasets.push({
-            label: dataObj.label,
-            data: Object.values(dataObj.data),
-            borderColor: dataObj.borderColor != undefined ? dataObj.borderColor : this.colors[index],
-            borderWidth: dataObj.borderWidth != undefined ? dataObj.borderWidth : 1,
-            fill: false,
-            pointStyle: 'none',
-            pointRadius: 0,
-            lineTension: 0,
-          });
-        }
-        await this.RenderData(xlabels, datasets);
+        await this.RenderData(datavw);
         setTimeout(() => {
           this.loading = false;
         }, 100);
@@ -284,12 +261,21 @@ export default {
       this.RenderData([], []);
     },
 
-    async RenderData(xlabels, datasets) {
-
+    async RenderData(datavw) {
       await new Promise((resolve, reject) => {
         try {
-          this.chartInstance.data.datasets = datasets;
-          this.chartInstance.data.labels = xlabels;
+          var _ds = datavw.datasets[0].data;
+          if (datavw.ymax == -1) {
+            this.chartInstance.options.scales.yAxes[0].ticks.max = Math.max.apply(null, _ds);
+          } else
+            this.chartInstance.options.scales.yAxes[0].ticks.max = datavw.ymax;
+          if (datavw.ymin == -1) {
+            this.chartInstance.options.scales.yAxes[0].ticks.min = Math.min.apply(null, _ds);
+          } else
+            this.chartInstance.options.scales.yAxes[0].ticks.min = datavw.ymin;
+
+          this.chartInstance.data.datasets = datavw.datasets;
+          this.chartInstance.data.labels = datavw.labels;
           this.chartInstance.update();
 
           console.info('結束渲染');
