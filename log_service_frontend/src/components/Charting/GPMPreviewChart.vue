@@ -9,7 +9,7 @@
           @click="{isAdjustWindowSizeMode=!isAdjustWindowSizeMode ; isRightBoundClickDown=false} "
         >{{isAdjustWindowSizeMode?'結束調整':'調整窗大小'}}</el-button>
       </div>
-      <div class="preview-region" id="preview-region" style="height:180px">
+      <div class="preview-region" id="preview-region" :style="previewChartStyle">
         <div class="d-flex preview h-100" id="time-window" v-bind:style="time_window_style">
           <div v-show="isAdjustWindowSizeMode" id="left-bound" class="bound-opt b-l bg-info h-100"></div>
           <div v-show="isAdjustWindowSizeMode" id="right-bound" class="bound-opt b-r bg-info h-100"></div>
@@ -238,22 +238,23 @@ export default {
         }
       })
     },
-    async UpdatePreviewChart(timeList = [], valueList = []) {
+    async UpdatePreviewChart(preveiwData) {
       this.PreviewChartEventRegist();
       console.info('開始渲染');
-      this.preview_chartInstance.data.labels = timeList;
-      this.preview_chartInstance.data.datasets = [{
-        label: 'preview',
-        data: Object.values(valueList),
-        borderColor: 'white',
-        backgroundColor: 'rgb(27, 90, 181)',
-        borderWidth: 1,
-        fill: 'end',
-        pointStyle: 'none',
-        pointRadius: 0,
-        lineTension: 0,
 
-      }];
+      var _ds = preveiwData.datasets[0].data;
+      if (preveiwData.ymax == -1) {
+        this.preview_chartInstance.options.scales.yAxes[0].ticks.max = Math.max.apply(null, _ds);
+      } else
+        this.preview_chartInstance.options.scales.yAxes[0].ticks.max = preveiwData.ymax;
+      if (preveiwData.ymin == -1) {
+        this.preview_chartInstance.options.scales.yAxes[0].ticks.min = Math.min.apply(null, _ds);
+      } else
+        this.preview_chartInstance.options.scales.yAxes[0].ticks.min = preveiwData.min;
+
+
+      this.preview_chartInstance.data.labels = preveiwData.labels;
+      this.preview_chartInstance.data.datasets = preveiwData.datasets;
       this.preview_chartInstance.update();
       console.info('結束渲染');
     },
@@ -316,6 +317,9 @@ export default {
   computed: {
     TimeWindowDom() {
       return document.getElementById("time-window");
+    },
+    previewChartStyle() {
+      return window.screen.width > 560 ? "height:180px" : "height:120px";
     }
   },
   mounted() {

@@ -88,7 +88,7 @@
         </div>
       </div>
     </div>
-    <el-drawer v-model="showSettingPnl" title="SETTING" size="50%">
+    <el-drawer v-model="showSettingPnl" title="SETTING" :size="IsMobileScreen?'100%':'50%'">
       <DatabaseSetting></DatabaseSetting>
     </el-drawer>
   </div>
@@ -159,6 +159,9 @@ export default {
       if (this.QueryOptions.SelectedQueryItem == 'Alert Index')
         return 'Index';
       return '';
+    },
+    IsMobileScreen() {
+      return window.screen.width < 600;
     }
   },
   methods: {
@@ -204,8 +207,8 @@ export default {
     },
     async RenderChart(data) {
       this.ServerResponseData = data;
-      if (data.preview != null) {
-        this.RenderPreviewChart(data.preview);
+      if (data.isPreview) {
+        this.RenderPreviewChart(data);
       }
       else {
         this.$refs.preview_chart.HidePreviewChart();
@@ -217,29 +220,18 @@ export default {
       this.chart_loading = true;
       var data_ret = await QueryHealthScoreSplice(this.ServerResponseData.QueryID, datetimeInterval.from, datetimeInterval.to);
       await this.RenderFullChart(data_ret);
-
       this.chart_loading = false;
     },
     async RenderFullChart(data, showloading = false) {
       await new Promise((resolve) => {
-        var dataset = [];
-        data.valueList.forEach(dataInfo => {
-          dataset.push({
-            label: dataInfo.labelName,
-            data: dataInfo.valueList,
-            borderColor: dataInfo.displayColor
-          });
-        })
-
-        this.$refs.query_chart.UpdateChart(data.timeList, dataset, showloading);
-
+        this.$refs.query_chart.UpdateChart(data, showloading);
         resolve();
       })
     },
 
     async RenderPreviewChart(previewData) {
       await new Promise((resolve) => {
-        this.$refs.preview_chart.UpdatePreviewChart(previewData.TimeLs, previewData.DataLs);
+        this.$refs.preview_chart.UpdatePreviewChart(previewData);
         this.$refs.preview_chart.ShowPreviewChart();
         resolve();
       })
