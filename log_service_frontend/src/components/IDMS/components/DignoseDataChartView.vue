@@ -60,7 +60,12 @@
             <ZoomIn />
           </el-icon>
         </span>
-        <span class="value-show">{{data.HealthScore}}</span>
+
+        <span
+          v-show="featureType=='HS'"
+          class="value-show"
+        >{{data.datasets[0].data[data.datasets[0].data.length-1]}}</span>
+
         <GPMChart
           :ref="'health-chart-'+data.IP"
           class="chart-h"
