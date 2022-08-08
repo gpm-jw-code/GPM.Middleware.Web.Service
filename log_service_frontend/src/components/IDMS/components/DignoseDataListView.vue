@@ -1,8 +1,5 @@
 <template>
   <div class="dignose-list-view px-2">
-    <div class="d-flex justify-content-end">
-      <el-button @click="TableExpandHandle">{{ this.expandAll?'全部收合' :'全部展開'}}</el-button>
-    </div>
     <!-- 表格 -->
     <el-table
       :default-sort="{ prop: 'EqName', order: 'ascending' }"
@@ -16,7 +13,7 @@
       row-key="IP"
       ref="table"
     >
-      <el-table-column fixed="'left'" width="40">
+      <el-table-column fixed="left" width="40">
         <template #default="scope">
           <div class="py-1">
             <el-icon
@@ -39,14 +36,17 @@
         <template #default="scope">
           <el-tag
             effect="dark"
-            size="large"
+            size="normal"
             style="width:100px"
             :type="scope.row.ModuleAbnormal? 'danger':'success'"
           >{{scope.row.ModuleAbnormal?'異常':'正常'}}</el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column type="expand">
+      <el-table-column width="85px" fixed="right" type="expand">
+        <template #header>
+          <el-button size="small" @click="TableExpandHandle">{{ this.expandAll?'全部收合' :'全部展開'}}</el-button>
+        </template>
         <template #default="props">
           <div class="dignose-detail-info d-flex">
             <div>
@@ -88,7 +88,7 @@
             <div class="mx-3" d-flex>
               <el-button @click="ShowModelList(props.row.IP)">模型列表</el-button>
               <el-button>事件列表</el-button>
-              <el-button>Raw Data</el-button>
+              <el-button @click="ShowRawData(props.row.IP)">Raw Data</el-button>
             </div>
           </div>
         </template>
@@ -108,6 +108,7 @@
         </el-icon>REAL-TIME CHART
       </b-button>
     </div>
+
     <transition name="el-zoom-in-bottom">
       <div
         v-show="share_chart_show"
@@ -147,6 +148,7 @@
       </div>
     </transition>
     <ModelListView ref="modelListView"></ModelListView>
+    <RealtimeRawView ref="rawDataView"></RealtimeRawView>
   </div>
 </template>
 
@@ -154,6 +156,7 @@
 import GPMChartVue from '@/components/Charting/GPMChart.vue';
 import { GenDiagnoseChartData, display_modes } from '../Helpers';
 import ModelListView from './ModelListView.vue';
+import RealtimeRawView from './RealtimeRawView.vue'
 import { GetDignoseDataListWsInstance, GetDignoseThresholdVal, GetTrendchartWsInstance, SetDignoseWarningThreshold, SetDignoseAlarmThreshold } from '@/APIHelpers/IDMSAPIs.js';
 class clsTresholdSetting {
   warningThreshold = 69;
@@ -162,7 +165,7 @@ class clsTresholdSetting {
 
 export default {
   components: {
-    GPMChartVue, ModelListView
+    GPMChartVue, ModelListView, RealtimeRawView
   },
   data() {
     return {
@@ -284,6 +287,9 @@ export default {
     ShowModelList(ip) {
       this.$refs.modelListView.UpdateModuleInfos();
       this.$refs.modelListView.ShowModelList(ip);
+    },
+    ShowRawData(ip) {
+      this.$refs.rawDataView.Show(ip);
     }
   },
   computed: {
@@ -403,7 +409,7 @@ export default {
 }
 .showing-down-arrow {
   bottom: -13px;
-  z-index: 5001;
+  z-index: 1001;
   width: 100%;
 }
 </style>
