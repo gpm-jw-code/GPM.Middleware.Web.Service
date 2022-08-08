@@ -180,16 +180,19 @@ export default {
         return;
 
       this.DignoseDatas.forEach(data => {
-        var timeUnit = this.display_mode == 'Health Score' ? 'second' : this.display_mode == 'Alert Index(day)' ? 'day' : 'hour';
-        var chart_ref = this.$refs[`health-chart-${data.IP}`]
-        if (chart_ref && chart_ref[0])
-          chart_ref[0].UpdateChart(data, timeUnit);
+        new Promise(reslove => {
+          var timeUnit = this.display_mode == 'Health Score' ? 'second' : this.display_mode == 'Alert Index(day)' ? 'day' : 'hour';
+          var chart_ref = this.$refs[`health-chart-${data.IP}`]
+          if (chart_ref && chart_ref[0])
+            chart_ref[0].UpdateChart(data, timeUnit);
 
-        //render zoom data 
-        if (this.zooming && data.IP == this.zoomingIP) {
-          this.zoom_data = data;
-          this.$refs["zoom-chart"].UpdateChart(data, timeUnit);
-        }
+          //render zoom data 
+          if (this.zooming && data.IP == this.zoomingIP) {
+            this.zoom_data = data;
+            this.$refs["zoom-chart"].UpdateChart(data, timeUnit);
+          }
+          reslove();
+        })
 
       });
     },

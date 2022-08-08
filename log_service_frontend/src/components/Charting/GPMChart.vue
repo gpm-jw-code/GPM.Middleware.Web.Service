@@ -205,12 +205,9 @@ export default {
       });
       this.chartInstance.options.animation = false;
     },
-    async UpdatePreviewChart(timeList = [], valueList = []) {
-      this.$refs['preview_chart'].UpdatePreviewChart(timeList, valueList);
-    },
+
     async UpdateChart(datavw, timeUnit = 'second', showLoading = false) {
       try {
-        console.info('開始渲染');
         // this.Clear();
         if (showLoading)
           this.loading = true;
@@ -222,12 +219,6 @@ export default {
       } catch (error) {
         return "err";
       }
-    },
-    ShowPreviewChart() {
-      this.$refs['preview_chart'].ShowPreviewChart();
-    },
-    HidePreviewChart() {
-      this.$refs['preview_chart'].HidePreviewChart();
     },
     FeedData(time = [], dataSets = [{ label: '', data: -1, borderColor: 'blue', borderWidth: 1 }]) {
       if (dataSets.length == 0)
@@ -258,7 +249,9 @@ export default {
     },
     Clear() {
       this.datasetsVisible = [];
-      this.RenderData([], []);
+      this.chartInstance.data.datasets = [];
+      this.chartInstance.data.labels = [];
+      this.chartInstance.update();
     },
 
     async RenderData(datavw, timeUnit = 'second') {
@@ -279,7 +272,6 @@ export default {
           this.chartInstance.data.labels = datavw.labels;
           this.chartInstance.update();
 
-          console.info('結束渲染');
           resolve();
         } catch (error) {
           console.error(error);
