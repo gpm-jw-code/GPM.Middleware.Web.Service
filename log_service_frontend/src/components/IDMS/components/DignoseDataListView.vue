@@ -1,8 +1,5 @@
 <template>
   <div class="dignose-list-view px-2">
-    <div class="d-flex justify-content-end">
-      <el-button @click="TableExpandHandle">{{ this.expandAll?'全部收合' :'全部展開'}}</el-button>
-    </div>
     <!-- 表格 -->
     <el-table
       :default-sort="{ prop: 'EqName', order: 'ascending' }"
@@ -46,7 +43,10 @@
         </template>
       </el-table-column>
 
-      <el-table-column type="expand">
+      <el-table-column type="expand" fixed="right" width="83px">
+        <template #header>
+          <el-button size="small" @click="TableExpandHandle">{{ this.expandAll?'全部收合' :'全部展開'}}</el-button>
+        </template>
         <template #default="props">
           <div class="dignose-detail-info d-flex">
             <div>
@@ -88,7 +88,7 @@
             <div class="mx-3" d-flex>
               <el-button @click="ShowModelList(props.row.IP)">模型列表</el-button>
               <el-button>事件列表</el-button>
-              <el-button>Raw Data</el-button>
+              <el-button @click="$refs.rawDataView.ShowRaw(props.row.IP)">Raw Data</el-button>
             </div>
           </div>
         </template>
@@ -147,6 +147,7 @@
       </div>
     </transition>
     <ModelListView ref="modelListView"></ModelListView>
+    <RawDataSideShowVue ref="rawDataView"></RawDataSideShowVue>
   </div>
 </template>
 
@@ -154,6 +155,7 @@
 import GPMChartVue from '@/components/Charting/GPMChart.vue';
 import { GenDiagnoseChartData, display_modes } from '../Helpers';
 import ModelListView from './ModelListView.vue';
+import RawDataSideShowVue from './RawDataSideShow.vue';
 import { GetDignoseDataListWsInstance, GetDignoseThresholdVal, GetTrendchartWsInstance, SetDignoseWarningThreshold, SetDignoseAlarmThreshold } from '@/APIHelpers/IDMSAPIs.js';
 class clsTresholdSetting {
   warningThreshold = 69;
@@ -162,7 +164,7 @@ class clsTresholdSetting {
 
 export default {
   components: {
-    GPMChartVue, ModelListView
+    GPMChartVue, ModelListView, RawDataSideShowVue
   },
   data() {
     return {
@@ -346,7 +348,7 @@ export default {
   padding: 10px 20px;
   border-radius: 8px;
   border: black 1px solid;
-  z-index: 5000;
+  z-index: 3000;
 }
 .share-chart {
   height: 280px;
@@ -403,7 +405,7 @@ export default {
 }
 .showing-down-arrow {
   bottom: -13px;
-  z-index: 5001;
+  z-index: 3001;
   width: 100%;
 }
 </style>

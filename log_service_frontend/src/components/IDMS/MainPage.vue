@@ -2,13 +2,13 @@
   <div style="padding-top:75px">
     <div class="d-flex px-2 py-2">
       <el-radio-group v-model="display_mode">
-        <el-radio-button label="LIST"></el-radio-button>
-        <el-radio-button label="CHART"></el-radio-button>
+        <el-radio-button size="small" label="LIST"></el-radio-button>
+        <el-radio-button size="small" label="CHART"></el-radio-button>
       </el-radio-group>
     </div>
     <el-divider></el-divider>
     <DignoseDataListView v-show="display_mode=='LIST'"></DignoseDataListView>
-    <DignoseDataChartView :pause="display_mode!='CHART'" v-show="display_mode=='CHART'">??</DignoseDataChartView>
+    <DignoseDataChartView v-show="display_mode=='CHART'">??</DignoseDataChartView>
   </div>
 </template>
 

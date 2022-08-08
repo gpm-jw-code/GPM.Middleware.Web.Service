@@ -2,91 +2,98 @@
   <div class="h-100" style="padding-top:80px">
     <div class="d-flex flex-column" style=";height:100%">
       <!-- 選擇項目與時間 -->
-      <div class="d-flex flex-row row settings">
-        <div class="col-lg-2 d-flex py-1">
-          <b>EQ</b>
-          <el-select
-            class="w-100"
-            v-model="QueryOptions.SelectedEQ"
-            @change="QueryOptions.SelectedUNIT=''"
-          >
-            <el-option v-for="eq in EQList" :key="eq" :label="eq" :value="eq"></el-option>
-          </el-select>
-        </div>
-        <div class="col-lg-2 d-flex">
-          <b>UNIT</b>
-          <el-select class="w-100" v-model="QueryOptions.SelectedUNIT ">
-            <el-option
-              v-for="unit_obj in UNITS_IN_EQ"
-              :key="unit_obj.IP"
-              :label="`${unit_obj.UNIT}(${unit_obj.IP})`"
-              :value="unit_obj.IP"
+      <div v-loading="!ready">
+        <div class="d-flex flex-row row settings">
+          <div class="col-lg-2 d-flex">
+            <b>EQ</b>
+            <el-select
+              class="w-100"
+              v-model="QueryOptions.SelectedEQ"
+              @change="QueryOptions.SelectedUNIT=''"
             >
-              <div class="d-flex">
-                <div v-text="unit_obj.UNIT" style="color:black"></div>
-                <div class="w-100" style="text-align:right; ">
-                  <u>{{unit_obj.IP}}</u>
+              <el-option v-for="eq in EQList" :key="eq" :label="eq" :value="eq"></el-option>
+            </el-select>
+          </div>
+          <div class="col-lg-2 d-flex">
+            <b>UNIT</b>
+            <el-select class="w-100" v-model="QueryOptions.SelectedUNIT ">
+              <el-option
+                v-for="unit_obj in UNITS_IN_EQ"
+                :key="unit_obj.IP"
+                :label="`${unit_obj.UNIT}(${unit_obj.IP})`"
+                :value="unit_obj.IP"
+              >
+                <div class="d-flex">
+                  <div v-text="unit_obj.UNIT" style="color:black"></div>
+                  <div class="w-100" style="text-align:right; ">
+                    <u>{{unit_obj.IP}}</u>
+                  </div>
                 </div>
-              </div>
-            </el-option>
-          </el-select>
+              </el-option>
+            </el-select>
+          </div>
+          <div class="col-lg-2 d-flex">
+            <b>查詢項目</b>
+            <el-select class="w-100" v-model="QueryOptions.SelectedQueryItem">
+              <el-option
+                v-for="item in QueryItems"
+                :key="item.label"
+                :label="item.label"
+                :value="item.label"
+              ></el-option>
+            </el-select>
+          </div>
+          <div class="col-lg-2 d-flex">
+            <b>類型</b>
+            <el-select class="w-100" v-model="selectedTabpage">
+              <el-option
+                v-for="item in TypeItems"
+                :key="item.name"
+                :label="item.label"
+                :value="item.name"
+              ></el-option>
+            </el-select>
+          </div>
+          <div v-if="selectedTabpage=='eventTabpage'" class="col-lg-2 d-flex">
+            <b>事件?</b>
+            <el-select class="w-100" v-model="QueryOptions.SelectedEvent">
+              <el-option
+                v-for="item in EventQueryOptions"
+                :key="item "
+                :label="item "
+                :value="item "
+              ></el-option>
+            </el-select>
+          </div>
+          <!-- 用來填空的^_^ -->
+          <div v-if="selectedTabpage!='eventTabpage'" class="col-lg-2 flex-fill"></div>
+          <div class="col-lg-2">
+            <b-button class="w-100 bg-danger">清除</b-button>
+          </div>
         </div>
-        <div class="col-lg-2 d-flex">
-          <b>查詢項目</b>
-          <el-select class="w-100" v-model="QueryOptions.SelectedQueryItem">
-            <el-option
-              v-for="item in QueryItems"
-              :key="item.label"
-              :label="item.label"
-              :value="item.label"
-            ></el-option>
-          </el-select>
-        </div>
-        <div class="col-lg-2 d-flex py-1">
-          <b>類型</b>
-          <el-select class="w-100" v-model="selectedTabpage">
-            <el-option
-              v-for="item in TypeItems"
-              :key="item.name"
-              :label="item.label"
-              :value="item.name"
-            ></el-option>
-          </el-select>
-        </div>
-        <div v-if="selectedTabpage=='eventTabpage'" class="col-lg-2 d-flex py-1">
-          <b>事件?</b>
-          <el-select class="w-100" v-model="QueryOptions.SelectedEvent">
-            <el-option v-for="item in EventQueryOptions" :key="item " :label="item " :value="item "></el-option>
-          </el-select>
-        </div>
-        <!-- 用來填空的^_^ -->
-        <div v-if="selectedTabpage!='eventTabpage'" class="col-lg-2 flex-fill"></div>
-        <div class="col-lg-2">
-          <b-button class="w-100 bg-danger">清除</b-button>
-        </div>
-      </div>
-      <div class="d-flex flex-row row settings">
-        <div class="col-lg-4 d-flex">
-          <b>開始時間</b>
-          <el-date-picker
-            class="w-100"
-            style="width:203px"
-            v-model="QueryOptions.TimeRange[0]"
-            type="datetime"
-          />
-        </div>
-        <div class="col-lg-4 d-flex">
-          <b>結束時間</b>
-          <el-date-picker
-            class="w-100"
-            style="width:203px"
-            v-model="QueryOptions.TimeRange[1]"
-            type="datetime"
-          />
-        </div>
-        <div class="col-lg-2 flex-fill"></div>
-        <div class="col-lg-2">
-          <b-button class="w-100 bg-primary" @click="QueryHandle">查詢</b-button>
+        <div class="d-flex flex-row row settings">
+          <div class="col-lg-4 d-flex">
+            <b>開始時間</b>
+            <el-date-picker
+              class="w-100"
+              style="width:203px"
+              v-model="QueryOptions.TimeRange[0]"
+              type="datetime"
+            />
+          </div>
+          <div class="col-lg-4 d-flex">
+            <b>結束時間</b>
+            <el-date-picker
+              class="w-100"
+              style="width:203px"
+              v-model="QueryOptions.TimeRange[1]"
+              type="datetime"
+            />
+          </div>
+          <div class="col-lg-2 flex-fill"></div>
+          <div class="col-lg-2">
+            <b-button class="w-100 bg-primary" @click="QueryHandle">查詢</b-button>
+          </div>
         </div>
       </div>
 
@@ -144,7 +151,7 @@
         </div>
       </div>
 
-      <div class="d-flex flex-row shadow-sm px-2" style="height:25px">
+      <div class="info-footer d-flex flex-row shadow-sm px-2" style="height:25px">
         <div class="flex-fill text-left" style="font-size:9px">{{ServerResponseData.QueryID}}</div>
         <div style="font-size:16px">
           <el-icon style="cursor:pointer" @click="showSettingPnl=!showSettingPnl">
@@ -178,6 +185,7 @@ export default {
   },
   data() {
     return {
+      ready: false,
       selectedTabpage: 'dataTabpage',
       TypeItems: [{ name: 'dataTabpage', label: '數據' }, { name: 'eventTabpage', label: '事件' }],
       DatabaseList: [],
@@ -276,9 +284,9 @@ export default {
       this.ModuleList = await GetModuleInfos().catch(async (er) => {
         console.info('IDMS websocket連接失敗,從資料庫調取模組資訊', er);
         var _ModuleList = await GetModuleInfoStoredInDB(); //從IDMS拿不到資訊就從資料庫拿
-
         return _ModuleList;
       });
+      this.ready = true;
       console.info(this.ModuleList);
     },
     async QueryHandle() {
@@ -358,6 +366,7 @@ export default {
   async mounted() {
     this.FetchModuleList().then(() => {
       this.ReadQueryOptionsFromLocalStorage();
+
     });
     this.DatabaseList = await GetDatabaseList();
   }
@@ -382,7 +391,9 @@ export default {
   background-color: rgb(39, 39, 39);
   margin-top: 20px;
 }
-.query-chart {
+.info-footer {
+  background-color: rgb(11, 94, 215);
+  color: white;
 }
 
 @media screen and (max-width: 900px) {

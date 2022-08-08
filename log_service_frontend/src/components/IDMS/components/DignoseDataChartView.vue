@@ -1,21 +1,26 @@
 <template>
-  <div id="dignose-chart-view" v-loading="loading">
+  <div id="dignose-chart-view" v-loading="LOADING">
     <el-backtop :right="30" :bottom="50" />
 
     <div class="charting-options py-1 px-1 mx-2 d-flex">
       <div class="d-flex justify-content-start w-100">
         <!-- <span>顯示</span> -->
         <el-radio-group v-model="display_mode" @change="FeatureTypeChangeHandle">
-          <el-radio-button v-for="mode in display_modes" :key="mode.value" :label="mode.label"></el-radio-button>
+          <el-radio-button
+            size="small"
+            v-for="mode in display_modes"
+            :key="mode.value"
+            :label="mode.label"
+          ></el-radio-button>
         </el-radio-group>
       </div>
 
       <div class="d-flex justify-content-end w-70">
-        <div class="py-2" style="width:300px;font-size:16px">Column Number</div>
-        <el-select size="large" v-model="ColsNumber" @change="RenderCharts">
+        <div style="width:300px;font-size:12px">Column Number</div>
+        <el-select size="small" v-model="ColsNumber" @change="RenderCharts">
           <el-option v-for="num in [1,2,3]" :key="num" :value="num" :label="num"></el-option>
         </el-select>
-        <el-input v-model="search_str" placeholder="輸入內容查詢..." clearable>
+        <el-input size="small" v-model="search_str" placeholder="輸入內容查詢..." clearable>
           <template #prepend>
             <el-icon>
               <Search />
@@ -64,7 +69,7 @@
         <span
           v-show="featureType=='HS'"
           class="value-show"
-        >{{data.datasets[0].data[data.datasets[0].data.length-1]}}</span>
+        >{{data.datasets==undefined? -1:data.datasets[0].data[data.datasets[0].data.length-1]}}</span>
 
         <GPMChart
           :ref="'health-chart-'+data.IP"
@@ -164,6 +169,9 @@ export default {
     featureType() {
       var type = this.display_mode == 'Health Score' ? 'HS' : this.display_mode == 'Alert Index(day)' ? 'AID' : 'AIH';
       return type;
+    },
+    LOADING() {
+      return process.env.NODE_ENV == 'production' ? this.loading : false;
     }
   },
   methods: {
@@ -233,6 +241,7 @@ export default {
   components: { GPMChart },
   mounted() {
     this.WsConnect();
+
   },
   unmounted() {
     this.ws.close();
