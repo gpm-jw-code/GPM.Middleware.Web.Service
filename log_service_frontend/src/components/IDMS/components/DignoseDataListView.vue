@@ -13,7 +13,7 @@
       row-key="IP"
       ref="table"
     >
-      <el-table-column fixed="'left'" width="40">
+      <el-table-column fixed="left" width="40">
         <template #default="scope">
           <div class="py-1">
             <el-icon
