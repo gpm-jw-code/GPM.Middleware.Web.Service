@@ -96,7 +96,7 @@
     </el-table>
 
     <!-- 底部圖表區域 -->
-    <div class="d-flex" v-bind:class=" ['showing-down-arrow','fixed-in-bottom'] ">
+    <div class="d-flex px-0 w-100" v-bind:class=" ['showing-down-arrow','fixed-in-bottom'] ">
       <b-button
         class="btn-share-chart-show"
         :variant=" share_chart_show? 'light': 'primary' "
@@ -105,7 +105,7 @@
         <el-icon class="mx-2">
           <ArrowDownBold v-if="share_chart_show"></ArrowDownBold>
           <ArrowUpBold v-else></ArrowUpBold>
-        </el-icon>REAL-TIME CHART
+        </el-icon>即時圖表
       </b-button>
     </div>
     <transition name="el-zoom-in-bottom">
@@ -135,7 +135,7 @@
             element-loading-background="rgba(122, 122, 122, 0.8)"
           >
             <GPMChartVue
-              class="share-chart"
+              class="share-chart my-2"
               chart_id="share-chart"
               :key="selectedDiagnoseData.IP+chart_display_mode"
               :title="ChartTitle"
@@ -345,8 +345,7 @@ export default {
   height: 320px;
   /* margin: 10px; */
   /* box-shadow: 12px 2px 32px 10px black; */
-  padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: 4px;
   border: black 1px solid;
   z-index: 3000;
 }
