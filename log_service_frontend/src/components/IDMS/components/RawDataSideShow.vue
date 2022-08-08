@@ -22,13 +22,16 @@ export default {
     return {
       ShowDrawer: false,
       SensorIP: "",
-      ws: null
+      ws: null,
+      mockTimer: null,
     }
   },
   methods: {
     CloseHandle() {
       console.info('drawer close');
+
       try {
+        clearInterval(this.mockTimer);
         this.ws.close();
       } catch (error) {
         console.info('drawer close', error);
@@ -56,7 +59,7 @@ export default {
       if (process.env.NODE_ENV == 'production')
         return;
       console.info('ws conneect fail use fake data');
-      setInterval(() => {
+      this.mockTimer = setInterval(() => {
         let time = Date.now();
         var xls = [];
         var yls = [];
@@ -77,16 +80,19 @@ export default {
               label: 'X',
               borderColor: 'blue',
               borderWidth: 1,
+              pointRadius: 0
             }, {
               data: yls,
               label: 'Y',
               borderColor: 'green',
               borderWidth: 1,
+              pointRadius: 0
             }, {
               data: zls,
               label: 'Z',
               borderColor: 'red',
               borderWidth: 1,
+              pointRadius: 0
             }
           ]
         }
