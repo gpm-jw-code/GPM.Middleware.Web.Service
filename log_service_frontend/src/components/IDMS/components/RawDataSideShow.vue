@@ -30,7 +30,6 @@ export default {
       console.info('drawer close');
       try {
         this.ws.close();
-
       } catch (error) {
         console.info('drawer close', error);
 
