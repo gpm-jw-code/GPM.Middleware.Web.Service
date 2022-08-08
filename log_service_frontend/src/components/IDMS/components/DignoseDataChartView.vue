@@ -5,7 +5,7 @@
     <div class="charting-options py-1 px-1 mx-2 d-flex">
       <div class="d-flex justify-content-start w-100">
         <!-- <span>顯示</span> -->
-        <el-radio-group v-model="display_mode" @change="RenderCharts">
+        <el-radio-group v-model="display_mode" @change="FeatureTypeChangeHandle">
           <el-radio-button v-for="mode in display_modes" :key="mode.value" :label="mode.label"></el-radio-button>
         </el-radio-group>
       </div>
@@ -62,7 +62,6 @@
         </span>
         <span class="value-show">{{data.HealthScore}}</span>
         <GPMChart
-          @click="ZoomClickHandle(data.IP)"
           :ref="'health-chart-'+data.IP"
           class="chart-h"
           :chart_id="data.IP+'-HealthScore'"
@@ -74,9 +73,17 @@
     </div>
 
     <el-drawer v-model="zooming" direction="btt" size="90%">
+      <span>看看其他的 :</span>
+      <el-select v-model="zoomingIP">
+        <el-option
+          v-for="data in DignoseDatas_Show"
+          :key="data.IP"
+          :value="data.IP"
+          :label="`${data.EqName}-${data.UnitName}(${data.IP})`"
+        ></el-option>
+      </el-select>
       <GPMChart
         ref="zoom-chart"
-        @click="zooming=false"
         class="chart-zoom"
         chart_id="zoom-chart"
         :title="`${zoom_data.EqName}-${zoom_data.UnitName}(${zoom_data.IP})`"
@@ -148,44 +155,51 @@ export default {
     },
     selected_display_mode_value() {
       return this.display_modes.find(mod => mod.label == this.display_mode).value;
+    },
+    featureType() {
+      var type = this.display_mode == 'Health Score' ? 'HS' : this.display_mode == 'Alert Index(day)' ? 'AID' : 'AIH';
+      return type;
     }
   },
   methods: {
     ZoomClickHandle(ip) {
       this.zooming = true;
       this.zoom_data = this.DignoseDatas.find(i => i.IP == ip);
-      var chartingObj = GenDiagnoseChartData(this.zoom_data, this.selected_display_mode_value);
-      var timeList = chartingObj.timeLs;
-      var datasets = chartingObj.datasets;
       setTimeout(() => {
-        this.$refs["zoom-chart"].UpdateChart(timeList, datasets);
+        this.$refs["zoom-chart"].UpdateChart(this.zoom_data);
       }, 200);
       this.zoomingIP = ip;
+    },
+    FeatureTypeChangeHandle() {
+      if (this.ws) {
+        this.ws.close();
+      }
     },
     async RenderCharts() {
       if (this.pause)
         return;
-      this.DignoseDatas.forEach(data => {
-        var chartingObj = GenDiagnoseChartData(data, this.selected_display_mode_value);
-        var timeList = chartingObj.timeLs;
-        var datasets = chartingObj.datasets;
 
+      this.DignoseDatas.forEach(data => {
+        var timeUnit = this.display_mode == 'Health Score' ? 'second' : this.display_mode == 'Alert Index(day)' ? 'day' : 'hour';
         var chart_ref = this.$refs[`health-chart-${data.IP}`]
         if (chart_ref && chart_ref[0])
-          chart_ref[0].UpdateChart(timeList, datasets);
+          chart_ref[0].UpdateChart(data, timeUnit);
 
         //render zoom data 
         if (this.zooming && data.IP == this.zoomingIP) {
-
           this.zoom_data = data;
-          this.$refs["zoom-chart"].UpdateChart(timeList, datasets);
+          this.$refs["zoom-chart"].UpdateChart(data, timeUnit);
         }
 
       });
     },
 
     WsConnect() {
-      this.ws = new WebSocket(`${configs.idms_websocket_host}/Dignose?type=chart&number=${this.MaxHSDisplayNum}`);
+
+      if (this.ws)
+        this.ws.close();
+
+      this.ws = new WebSocket(`${configs.idms_websocket_host}/Dignose?type=chart&number=${this.MaxHSDisplayNum}&featureType=${this.featureType}`);
       this.ws.onopen = () => {
         this.loading = false;
       }
@@ -200,7 +214,6 @@ export default {
         this.ws.onmessage = null;
         this.WsConnect();
       }
-
     },
     HSDisplayNumChangedHandel() {
       console.info(this.MaxHSDisplayNum);

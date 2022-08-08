@@ -120,9 +120,9 @@ export default {
             time: {
               unit: 'second',
               displayFormats: {
-                day: 'YYYY-MM-DD HH:mm:ss',
-                hour: 'YYYY-MM-DD HH:mm:ss',
-                second: 'YY/MM/DD HH:mm'
+                day: 'YYYY-MM-DD',
+                hour: 'YYYY-MM-DD HH',
+                second: 'YY/MM/DD HH:mm:ss'
               }
             },
             gridLines: {
@@ -208,14 +208,14 @@ export default {
     async UpdatePreviewChart(timeList = [], valueList = []) {
       this.$refs['preview_chart'].UpdatePreviewChart(timeList, valueList);
     },
-    async UpdateChart(datavw, showLoading = false) {
+    async UpdateChart(datavw, timeUnit = 'second', showLoading = false) {
       try {
         console.info('開始渲染');
         // this.Clear();
         if (showLoading)
           this.loading = true;
 
-        await this.RenderData(datavw);
+        await this.RenderData(datavw, timeUnit);
         setTimeout(() => {
           this.loading = false;
         }, 100);
@@ -261,7 +261,7 @@ export default {
       this.RenderData([], []);
     },
 
-    async RenderData(datavw) {
+    async RenderData(datavw, timeUnit = 'second') {
       await new Promise((resolve, reject) => {
         try {
           var _ds = datavw.datasets[0].data;
@@ -274,6 +274,7 @@ export default {
           } else
             this.chartInstance.options.scales.yAxes[0].ticks.min = datavw.ymin;
 
+          this.chartInstance.options.scales.xAxes[0].time.unit = timeUnit;
           this.chartInstance.data.datasets = datavw.datasets;
           this.chartInstance.data.labels = datavw.labels;
           this.chartInstance.update();

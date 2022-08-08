@@ -96,6 +96,6 @@ nav a {
 #breadcrumb {
   position: fixed;
   width: 100%;
-  z-index: 3000;
+  z-index: 3001;
 }
 </style>

@@ -20,9 +20,11 @@ export async function GetDignoseDataListWsInstance() {
     ws.onerror = (er) => reject(er)
   })
 }
-export async function GetTrendchartWsInstance(ip) {
+export async function GetTrendchartWsInstance(ip, featureType = 'HS') {
   return await new Promise((resolve, reject) => {
-    var ws = new WebSocket(`${ws_host}/Dignose?type=chart&number=90&ip=${ip}`)
+    var ws = new WebSocket(
+      `${ws_host}/Dignose?type=chart&number=90&ip=${ip}&featureType=${featureType}`,
+    )
     ws.onopen = () => resolve(ws)
     ws.onerror = () => reject(null)
   })

@@ -123,7 +123,7 @@
                 <b-button
                   size="sm"
                   class="w-100"
-                  @click="chart_display_mode=mode.value"
+                  @click="ChangeChartDisplayTypeHandle(mode.value)"
                   :variant=" chart_display_mode==mode.value?'primary' :'light'"
                 >{{mode.label}}</b-button>
               </div>
@@ -195,6 +195,10 @@ export default {
     }
   },
   methods: {
+    ChangeChartDisplayTypeHandle(mode) {
+      this.chart_display_mode = mode;
+      this.RTChartWebsocketIni(this.selectedDiagnoseData.IP);
+    },
     TableExpandHandle() {
       this.expandAll = !this.expandAll;
       this.DignoseDatas.forEach(row => {
@@ -224,7 +228,7 @@ export default {
       if (this.trendchart_ws)
         this.trendchart_ws.close();
 
-      this.trendchart_ws = await GetTrendchartWsInstance(ip);
+      this.trendchart_ws = await GetTrendchartWsInstance(ip, this.chart_display_mode);
       this.chart_loading = this.trendchart_ws == null;
       if (this.trendchart_ws != null) {
 
@@ -240,28 +244,16 @@ export default {
     RenderTrendChart(data) {
       try {
         this.renderingDiagnoseData = data;
-
-        //TODO 閥值線物件
-        var thresObjs = undefined;
-
-        if (this.chart_display_mode === 'HS') {
-          var warnThres = data.DignoseDetailData.WarningThreshold;
-          var alarmThres = data.DignoseDetailData.AlarmThreshold;
-          thresObjs = [{ name: 'Warning', value: warnThres, color: 'gold' },
-          { name: 'alarm', value: alarmThres, color: 'red' }]
-        }
-
-        var chartingObj = GenDiagnoseChartData(data, this.chart_display_mode, thresObjs);
-
-
+        var timeUnit = this.chart_display_mode == 'HS' ? 'second' : this.chart_display_mode == 'AID' ? 'day' : 'hour';
         if (this.$refs.trendChart)
-          var ret = this.$refs.trendChart.UpdateChart(chartingObj.timeLs, chartingObj.datasets);
-        if (ret == "err") {
-          this.RTChartWebsocketIni(this.selectedDiagnoseData.IP);
-        }
+          var ret = this.$refs.trendChart.UpdateChart(data, timeUnit);
 
-        var dignoseState = data.DignoseDetailData.dignoseResult;
-        this.current_share_chart_style = this.share_chart_styles[dignoseState];
+        // if (ret == "err") {
+        //   this.RTChartWebsocketIni(this.selectedDiagnoseData.IP);
+        // }
+
+        // var dignoseState = data.DignoseDetailData.dignoseResult;
+        // this.current_share_chart_style = this.share_chart_styles[dignoseState];
 
       } catch (error) {
         console.info(error)
@@ -303,9 +295,9 @@ export default {
     DisplayModeName() {
       if (this.chart_display_mode == 'HS')
         return "健康分數趨勢"
-      if (this.chart_display_mode == 'AID')
-        return "劣化指標(小時)"
       if (this.chart_display_mode == 'AIH')
+        return "劣化指標(小時)"
+      if (this.chart_display_mode == 'AID')
         return "劣化指標(天)"
       return "";
     },

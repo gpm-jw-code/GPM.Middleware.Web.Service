@@ -11,8 +11,8 @@
       </div>
       <div class="preview-region" id="preview-region" :style="previewChartStyle">
         <div class="d-flex preview h-100" id="time-window" v-bind:style="time_window_style">
-          <div v-show="isAdjustWindowSizeMode" id="left-bound" class="bound-opt b-l bg-info h-100"></div>
-          <div v-show="isAdjustWindowSizeMode" id="right-bound" class="bound-opt b-r bg-info h-100"></div>
+          <!-- <div v-show="isAdjustWindowSizeMode" id="left-bound" class="bound-opt b-l bg-info h-100"></div> -->
+          <div v-show="isAdjustWindowSizeMode" id="right-bound" class="bound-opt b-r h-100"></div>
         </div>
         <canvas class="preview" :id="'preview_chart_'+chart_id"></canvas>
       </div>
@@ -154,7 +154,7 @@ export default {
       isDark: true,
       currentTheme: 'dark',
       colors: ['blue', 'green', 'red', 'orange', 'pink', 'grey', 'black', 'seagreen'],
-      time_window_style: { width: '100px', left: '100px', backgroundColor: 'white' },
+      time_window_style: { visibility: 'visible', width: '100px', left: '100px', backgroundColor: 'white', },
       time_window_left_property: 100,
       time_window_width: 100,
       ori_time_window_width: 100,
@@ -162,7 +162,8 @@ export default {
       isTimeWindowClickDown: false,
       isRightBoundClickDown: false,
       isAdjustWindowSizeMode: false,
-      bound_ori_mouse_x: -1
+      bound_ori_mouse_x: -1,
+      previewData: null
     }
   },
   methods: {
@@ -238,23 +239,25 @@ export default {
         }
       })
     },
-    async UpdatePreviewChart(preveiwData) {
+    async UpdatePreviewChart(previewData) {
+      this.time_window_style.visibility = 'visible';
+      this.previewData = previewData
       this.PreviewChartEventRegist();
       console.info('開始渲染');
 
-      var _ds = preveiwData.datasets[0].data;
-      if (preveiwData.ymax == -1) {
+      var _ds = previewData.datasets[0].data;
+      if (previewData.ymax == -1) {
         this.preview_chartInstance.options.scales.yAxes[0].ticks.max = Math.max.apply(null, _ds);
       } else
-        this.preview_chartInstance.options.scales.yAxes[0].ticks.max = preveiwData.ymax;
-      if (preveiwData.ymin == -1) {
+        this.preview_chartInstance.options.scales.yAxes[0].ticks.max = previewData.ymax;
+      if (previewData.ymin == -1) {
         this.preview_chartInstance.options.scales.yAxes[0].ticks.min = Math.min.apply(null, _ds);
       } else
-        this.preview_chartInstance.options.scales.yAxes[0].ticks.min = preveiwData.min;
+        this.preview_chartInstance.options.scales.yAxes[0].ticks.min = previewData.min;
 
 
-      this.preview_chartInstance.data.labels = preveiwData.labels;
-      this.preview_chartInstance.data.datasets = preveiwData.datasets;
+      this.preview_chartInstance.data.labels = previewData.labels;
+      this.preview_chartInstance.data.datasets = previewData.datasets;
       this.preview_chartInstance.update();
       console.info('結束渲染');
     },
@@ -268,6 +271,7 @@ export default {
       this.preview_chartInstance.data.datasets = [];
       this.preview_chartInstance.data.labels = [];
       this.preview_chartInstance.update();
+      this.previewData = null;
     },
 
     async RenderData(xlabels, datasets) {
@@ -340,15 +344,19 @@ export default {
 }
 #time-window {
   opacity: 0.1;
+  background-color: rgba(255, 255, 255, 0.2);
   z-index: 2999;
   cursor: move;
+  border: 2px solid blue;
 }
 .bound-opt {
+  background-color: rgb(80, 200, 255);
   width: 7px;
   position: absolute;
-  z-index: 2999;
+  z-index: 3000;
 }
 .bound-opt:hover {
+  background-color: rgb(0, 247, 255);
   cursor: grab;
 }
 

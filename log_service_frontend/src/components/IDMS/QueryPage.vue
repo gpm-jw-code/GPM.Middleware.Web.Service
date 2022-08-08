@@ -34,10 +34,39 @@
         <div class="col-lg-2 d-flex">
           <b>查詢項目</b>
           <el-select class="w-100" v-model="QueryOptions.SelectedQueryItem">
-            <el-option v-for="item in QueryItems" :key="item" :label="item" :value="item"></el-option>
+            <el-option
+              v-for="item in QueryItems"
+              :key="item.label"
+              :label="item.label"
+              :value="item.label"
+            ></el-option>
           </el-select>
         </div>
-        <div class="col-lg-2 d-flex">
+        <div class="col-lg-2 d-flex py-1">
+          <b>類型</b>
+          <el-select class="w-100" v-model="selectedTabpage">
+            <el-option
+              v-for="item in TypeItems"
+              :key="item.name"
+              :label="item.label"
+              :value="item.name"
+            ></el-option>
+          </el-select>
+        </div>
+        <div v-if="selectedTabpage=='eventTabpage'" class="col-lg-2 d-flex py-1">
+          <b>事件?</b>
+          <el-select class="w-100" v-model="QueryOptions.SelectedEvent">
+            <el-option v-for="item in EventQueryOptions" :key="item " :label="item " :value="item "></el-option>
+          </el-select>
+        </div>
+        <!-- 用來填空的^_^ -->
+        <div v-if="selectedTabpage!='eventTabpage'" class="col-lg-2 flex-fill"></div>
+        <div class="col-lg-2">
+          <b-button class="w-100 bg-danger">清除</b-button>
+        </div>
+      </div>
+      <div class="d-flex flex-row row settings">
+        <div class="col-lg-4 d-flex">
           <b>開始時間</b>
           <el-date-picker
             class="w-100"
@@ -46,7 +75,7 @@
             type="datetime"
           />
         </div>
-        <div class="col-lg-2 d-flex">
+        <div class="col-lg-4 d-flex">
           <b>結束時間</b>
           <el-date-picker
             class="w-100"
@@ -55,30 +84,66 @@
             type="datetime"
           />
         </div>
-        <div class="col-lg-2 flex-fill">
+        <div class="col-lg-2 flex-fill"></div>
+        <div class="col-lg-2">
           <b-button class="w-100 bg-primary" @click="QueryHandle">查詢</b-button>
         </div>
       </div>
-      <!-- 結果與圖表 -->
-      <div class="result d-flex flex-column flex-fill w-100 my-1" v-loading="loading">
-        <div class="d-flex result-message font-red">{{ServerResponseData.message}}</div>
-        <GPMPreviewChart
-          ref="preview_chart"
-          title="Preview"
-          :yAxisLabel="Ylabel"
-          xAxisLabel
-          @DateTimeIntervalOnchanged="GetSliceDataHandle"
-        ></GPMPreviewChart>
-        <GPMChart
-          v-loading="chart_loading"
-          class="query-chart flex-fill"
-          chart_id="query-chart"
-          ref="query_chart"
-          :title="`${QueryOptions.SelectedQueryItem}:${QueryOptions.SelectedEQ}/${QueryOptions.SelectedUNIT}`"
-          :key="chart_key"
-          :yAxisLabel="Ylabel"
-        ></GPMChart>
+
+      <!-- <el-divider></el-divider> -->
+      <!-- TABPAGE 控制 -->
+      <div class="px-1 py-0">
+        <el-tabs type="card" class="flex-fill" v-model="selectedTabpage">
+          <el-tab-pane
+            v-for="item in TypeItems"
+            :key="item.name"
+            :label="item.label"
+            :name="item.name"
+            class="d-flex flex-column"
+          ></el-tab-pane>
+        </el-tabs>
       </div>
+      <!-- 結果與圖表 -->
+      <div class="d-flex flex-column flex-fill w-100 h-100" style="position:relative;">
+        <div
+          v-show="selectedTabpage=='dataTabpage'"
+          class="result d-flex flex-column flex-fill w-100 my-1"
+          v-loading="loading"
+        >
+          <div class="d-flex result-message font-red">{{ServerResponseData.message}}</div>
+          <GPMPreviewChart
+            ref="preview_chart"
+            title="Preview"
+            :yAxisLabel="Ylabel"
+            xAxisLabel
+            @DateTimeIntervalOnchanged="GetSliceDataHandle"
+          ></GPMPreviewChart>
+          <GPMChart
+            v-loading="chart_loading"
+            class="query-chart flex-fill"
+            chart_id="query-chart"
+            ref="query_chart"
+            :title="`${QueryOptions.SelectedQueryItem}:${QueryOptions.SelectedEQ}/${QueryOptions.SelectedUNIT}`"
+            :key="chart_key"
+            :yAxisLabel="Ylabel"
+          ></GPMChart>
+        </div>
+        <div
+          v-show="selectedTabpage=='eventTabpage'"
+          class="w-100 h-100 bg-light"
+          style="position:absolute;z-index:3000"
+        >
+          <EventQueryResultView
+            ref="Event_QueryHelper"
+            :queryItem="QueryOptions.SelectedQueryItem"
+            :eventItem="QueryOptions.SelectedEvent"
+            :ip="QueryOptions.SelectedUNIT"
+            :from="StartTime"
+            :to="EndTime"
+          ></EventQueryResultView>
+        </div>
+      </div>
+
       <div class="d-flex flex-row shadow-sm px-2" style="height:25px">
         <div class="flex-fill text-left" style="font-size:9px">{{ServerResponseData.QueryID}}</div>
         <div style="font-size:16px">
@@ -98,26 +163,64 @@ import { GetModuleInfos } from '@/APIHelpers/IDMSAPIs'
 import GPMChart from '@/components/Charting/GPMChart.vue'
 import GPMPreviewChart from '@/components/Charting/GPMPreviewChart.vue'
 import DatabaseSetting from './components/DatabaseSetting'
+import EventQueryResultView from './components/EventQueryResultView'
 import moment from 'moment';
 // import { QueryHealthScore, QueryAlertIndex } from '@/APIHelpers/DatabaseServerAPI';
-import { GetModuleInfoStoredInDB, QueryVibrationEnergy, QueryVibration_raw_data, QueryHealthScore, QueryAlertIndex, QueryHealthScoreSplice, GetDatabaseList } from '@/APIHelpers/DatabaseServerAPI';
+import {
+  GetModuleInfoStoredInDB, QueryVibrationEnergy, QueryVibration_raw_data,
+  QueryHealthScore, QueryAlertIndex, QueryPhysical_quantity, QuerySideBandSeverity, QueryFrequency_doublingSeverity,
+  QuerySplice, GetDatabaseList
+} from '@/APIHelpers/DatabaseServerAPI';
 
 export default {
   components: {
-    GPMChart, GPMPreviewChart, DatabaseSetting
+    GPMChart, GPMPreviewChart, DatabaseSetting, EventQueryResultView
   },
   data() {
     return {
-
+      selectedTabpage: 'dataTabpage',
+      TypeItems: [{ name: 'dataTabpage', label: '數據' }, { name: 'eventTabpage', label: '事件' }],
       DatabaseList: [],
       ModuleList: [],
       QueryOptions: {
         SelectedEQ: '',
         SelectedUNIT: '',
         SelectedQueryItem: '',
+        SelectedEvent: '',
         TimeRange: []
       },
-      QueryItems: ['Raw Data', 'Health Score', 'Alert Index', '振動能量'],
+      // QueryItems: ['Raw Data', 'Health Score', 'Alert Index', '振動能量', 'Physical Quanity', 'Sideband Severity', 'FrequencyDoubling Severity'],
+      QueryItems: [{
+        label: 'Raw Data',
+        eventOptions: []
+      },
+      {
+        label: 'Health Score',
+        eventOptions: ['Out Of Threshold']
+      },
+      {
+        label: 'Raw Data',
+        eventOptions: []
+      },
+      {
+        label: 'Alert Index',
+        eventOptions: []
+      },
+      {
+        label: '振動能量',
+        eventOptions: []
+      },
+      {
+        label: 'Physical Quanity',
+        eventOptions: []
+      }, {
+        label: 'Sideband Severity',
+        eventOptions: ['Out Of Threshold']
+      },
+      {
+        label: 'FrequencyDoubling Severity',
+        eventOptions: []
+      }],
       loading: false,
       chart_loading: false,
       showSettingPnl: false,
@@ -162,6 +265,9 @@ export default {
     },
     IsMobileScreen() {
       return window.screen.width < 600;
+    },
+    EventQueryOptions() {
+      return this.QueryItems.find(i => i.label == this.QueryOptions.SelectedQueryItem).eventOptions;
     }
   },
   methods: {
@@ -176,24 +282,36 @@ export default {
       console.info(this.ModuleList);
     },
     async QueryHandle() {
+
       this.SaveQueryOptionsToLocalStorage();
-      this.loading = true;
-      new Promise(() => {
-
-        this.$refs.query_chart.Clear();
-
-        if (this.QueryOptions.SelectedQueryItem == 'Health Score')
-          QueryHealthScore(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
-        else if (this.QueryOptions.SelectedQueryItem == 'Alert Index')
-          QueryAlertIndex(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
-        else if (this.QueryOptions.SelectedQueryItem == '振動能量')
-          QueryVibrationEnergy(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
-        else if (this.QueryOptions.SelectedQueryItem == 'Raw Data') {
-          QueryVibration_raw_data(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime)
-        }
-        else
-          this.loading = false;
-      })
+      if (this.selectedTabpage == 'dataTabpage') {
+        this.loading = true;
+        new Promise(() => {
+          this.$refs.query_chart.Clear();
+          if (this.QueryOptions.SelectedQueryItem == 'Health Score')
+            QueryHealthScore(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+          else if (this.QueryOptions.SelectedQueryItem == 'Alert Index')
+            QueryAlertIndex(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+          else if (this.QueryOptions.SelectedQueryItem == '振動能量')
+            QueryVibrationEnergy(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+          else if (this.QueryOptions.SelectedQueryItem == 'Raw Data') {
+            QueryVibration_raw_data(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime)
+          }
+          else if (this.QueryOptions.SelectedQueryItem == 'Physical Quanity') {
+            QueryPhysical_quantity(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+          }
+          else if (this.QueryOptions.SelectedQueryItem == 'Sideband Severity') {
+            QuerySideBandSeverity(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+          }
+          else if (this.QueryOptions.SelectedQueryItem == 'FrequencyDoubling Severity') {
+            QueryFrequency_doublingSeverity(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+          }
+          else
+            this.loading = false;
+        })
+      } else {
+        this.$refs.Event_QueryHelper.QueryHandle();
+      }
 
     },
     SaveQueryOptionsToLocalStorage() {
@@ -218,7 +336,7 @@ export default {
     },
     async GetSliceDataHandle(datetimeInterval = {}) {
       this.chart_loading = true;
-      var data_ret = await QueryHealthScoreSplice(this.ServerResponseData.QueryID, datetimeInterval.from, datetimeInterval.to);
+      var data_ret = await QuerySplice(this.ServerResponseData.QueryID, datetimeInterval.from, datetimeInterval.to);
       await this.RenderFullChart(data_ret);
       this.chart_loading = false;
     },
