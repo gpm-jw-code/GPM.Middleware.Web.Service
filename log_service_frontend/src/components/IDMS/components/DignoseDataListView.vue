@@ -36,8 +36,8 @@
         <template #default="scope">
           <el-tag
             effect="dark"
-            size="large"
-            style="width:100px"
+            size="small"
+            style="width:70px"
             :type="scope.row.ModuleAbnormal? 'danger':'success'"
           >{{scope.row.ModuleAbnormal?'異常':'正常'}}</el-tag>
         </template>
