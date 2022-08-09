@@ -34,7 +34,11 @@
           </div>
           <div class="col-lg-2 d-flex">
             <b>查詢項目</b>
-            <el-select class="w-100" v-model="QueryOptions.SelectedQueryItem">
+            <el-select
+              class="w-100"
+              v-model="QueryOptions.SelectedQueryItem"
+              @change="QueryItemChangeHandle"
+            >
               <el-option
                 v-for="item in QueryItems"
                 :key="item.label"
@@ -45,7 +49,11 @@
           </div>
           <div class="col-lg-2 d-flex">
             <b>類型</b>
-            <el-select class="w-100" v-model="selectedTabpage">
+            <el-select
+              class="w-100"
+              v-model="selectedTabpage"
+              @change="QueryOptions.SelectedEvent=''"
+            >
               <el-option
                 v-for="item in TypeItems"
                 :key="item.name"
@@ -116,6 +124,8 @@
           v-show="selectedTabpage=='dataTabpage'"
           class="result d-flex flex-column flex-fill w-100 my-1"
           v-loading="loading"
+          element-loading-text="數據載入中...若響應速度過慢,可以試試將查詢時間區間縮短。"
+          element-loading-background="rgba(122, 122, 122, 0.8)"
         >
           <div class="d-flex result-message font-red">{{ServerResponseData.message}}</div>
           <GPMPreviewChart
@@ -127,6 +137,8 @@
           ></GPMPreviewChart>
           <GPMChart
             v-loading="chart_loading"
+            element-loading-text="數據載入中...若響應速度過慢,可以試試調整窗大小。"
+            element-loading-background="rgba(122, 122, 122, 0.8)"
             class="query-chart flex-fill"
             chart_id="query-chart"
             ref="query_chart"
@@ -176,7 +188,7 @@ import moment from 'moment';
 import {
   GetModuleInfoStoredInDB, QueryVibrationEnergy, QueryVibration_raw_data,
   QueryHealthScore, QueryAlertIndex, QueryPhysical_quantity, QuerySideBandSeverity, QueryFrequency_doublingSeverity,
-  QuerySplice, GetDatabaseList
+  QuerySplice, GetDatabaseList, QueryVibration_raw_data_with_QueryID
 } from '@/APIHelpers/DatabaseServerAPI';
 
 export default {
@@ -198,37 +210,34 @@ export default {
         TimeRange: []
       },
       // QueryItems: ['Raw Data', 'Health Score', 'Alert Index', '振動能量', 'Physical Quanity', 'Sideband Severity', 'FrequencyDoubling Severity'],
-      QueryItems: [{
-        label: 'Raw Data',
-        eventOptions: []
-      },
-      {
-        label: 'Health Score',
-        eventOptions: ['Out Of Threshold']
-      },
-      {
-        label: 'Raw Data',
-        eventOptions: []
-      },
-      {
-        label: 'Alert Index',
-        eventOptions: []
-      },
-      {
-        label: '振動能量',
-        eventOptions: []
-      },
-      {
-        label: 'Physical Quanity',
-        eventOptions: []
-      }, {
-        label: 'Sideband Severity',
-        eventOptions: ['Out Of Threshold']
-      },
-      {
-        label: 'FrequencyDoubling Severity',
-        eventOptions: []
-      }],
+      QueryItems: [
+        {
+          label: 'Health Score',
+          eventOptions: ['Out Of Threshold']
+        },
+        {
+          label: 'Raw Data',
+          eventOptions: []
+        },
+        {
+          label: 'Alert Index',
+          eventOptions: []
+        },
+        {
+          label: '振動能量',
+          eventOptions: []
+        },
+        {
+          label: 'Physical Quanity',
+          eventOptions: []
+        }, {
+          label: 'Sideband Severity',
+          eventOptions: ['Out Of Threshold']
+        },
+        {
+          label: 'FrequencyDoubling Severity',
+          eventOptions: []
+        }],
       loading: false,
       chart_loading: false,
       showSettingPnl: false,
@@ -289,6 +298,10 @@ export default {
       this.ready = true;
       console.info(this.ModuleList);
     },
+    QueryItemChangeHandle(item) {
+      if (item == 'Raw Data')
+        alert("資料量龐大會有點慢")
+    },
     async QueryHandle() {
 
       this.SaveQueryOptionsToLocalStorage();
@@ -303,7 +316,7 @@ export default {
           else if (this.QueryOptions.SelectedQueryItem == '振動能量')
             QueryVibrationEnergy(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
           else if (this.QueryOptions.SelectedQueryItem == 'Raw Data') {
-            QueryVibration_raw_data(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime)
+            QueryVibration_raw_data(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
           }
           else if (this.QueryOptions.SelectedQueryItem == 'Physical Quanity') {
             QueryPhysical_quantity(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
@@ -332,6 +345,7 @@ export default {
       }
     },
     async RenderChart(data) {
+      this.$toast.success('Done', { position: 'top-right', duration: 1000 });
       this.ServerResponseData = data;
       if (data.isPreview) {
         this.RenderPreviewChart(data);
@@ -344,7 +358,14 @@ export default {
     },
     async GetSliceDataHandle(datetimeInterval = {}) {
       this.chart_loading = true;
-      var data_ret = await QuerySplice(this.ServerResponseData.QueryID, datetimeInterval.from, datetimeInterval.to);
+      var data_ret = {};
+
+      if (this.QueryOptions.SelectedQueryItem == 'Raw Data') {
+        data_ret = await QueryVibration_raw_data_with_QueryID(this.QueryOptions.SelectedUNIT, datetimeInterval.from, datetimeInterval.to, "givemedetail");
+      } else {
+        data_ret = await QuerySplice(this.ServerResponseData.QueryID, datetimeInterval.from, datetimeInterval.to);
+      }
+
       await this.RenderFullChart(data_ret);
       this.chart_loading = false;
     },

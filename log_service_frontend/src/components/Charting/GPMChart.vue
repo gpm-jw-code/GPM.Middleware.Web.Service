@@ -275,7 +275,6 @@ export default {
           resolve();
         } catch (error) {
           console.error(error);
-          this.ChartInit();
           reject(error)
         }
 

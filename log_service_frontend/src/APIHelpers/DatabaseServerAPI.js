@@ -37,6 +37,17 @@ export async function QueryVibration_raw_data(ip, startT, endT) {
   )
 }
 
+export async function QueryVibration_raw_data_with_QueryID(
+  ip,
+  startT,
+  endT,
+  queryID,
+) {
+  return await GetRequest(
+    `/api/DB/vibration_raw_data_with_QueryID?ip=${ip}&from=${startT}&to=${endT}&queryID=${queryID}`,
+  )
+}
+
 export async function QueryPhysical_quantity(ip, startT, endT) {
   return await GetRequest(
     `/api/DB/Physical_quantity?ip=${ip}&from=${startT}&to=${endT}`,

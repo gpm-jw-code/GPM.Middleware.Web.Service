@@ -1,10 +1,11 @@
 <template>
   <div class="dignose-list-view px-2">
     <!-- 表格 -->
+
     <el-table
       :default-sort="{ prop: 'EqName', order: 'ascending' }"
       :height="table_height"
-      :data="DignoseDatas"
+      :data="DignoseDatasToShow"
       v-loading="loading"
       highlight-current-row
       @row-click="TableRowClickHandle"
@@ -43,19 +44,31 @@
         </template>
       </el-table-column>
 
-      <el-table-column type="expand" fixed="right" width="83px">
+      <el-table-column type="expand" fixed="right" width="283px">
         <template #header>
-          <el-button size="small" @click="TableExpandHandle">{{ this.expandAll?'全部收合' :'全部展開'}}</el-button>
+          <div class="d-flex flex-row">
+            <el-input size="small" v-model="search_str" placeholder="輸入內容查詢..." clearable>
+              <template #prepend>
+                <el-icon>
+                  <Search />
+                </el-icon>
+              </template>
+              <!-- <template #append>
+            <el-button>Search</el-button>
+              </template>-->
+            </el-input>
+            <el-button size="small" @click="TableExpandHandle">{{ this.expandAll?'全部收合' :'全部展開'}}</el-button>
+          </div>
         </template>
         <template #default="props">
-          <div class="dignose-detail-info d-flex">
-            <div>
-              <div class="d-flex">
+          <div class="row dignose-detail-info d-flex flex-row">
+            <div class="col-md-9 row g-0 flex-fill">
+              <div class="d-flex col-md-3">
                 <div class="item-name">當前模型</div>
-                <div>{{props.row.DignoseDetailData.currentModelName}}</div>
+                <div class>{{props.row.DignoseDetailData.currentModelName}}</div>
               </div>
-              <div class="d-flex">
-                <div class="item-name">Warning Threshold</div>
+              <div class="d-flex col-md-3">
+                <div class="item-name warning-threshold-lab">Warning Threshold</div>
                 <div>
                   <el-input-number
                     :max="100"
@@ -67,8 +80,8 @@
                   ></el-input-number>
                 </div>
               </div>
-              <div class="d-flex">
-                <div class="item-name">Alarm Threshold</div>
+              <div class="d-flex col-md-3">
+                <div class="item-name alarm-threshold-lab">Alarm Threshold</div>
                 <div>
                   <el-input-number
                     :max="100"
@@ -85,10 +98,18 @@
                 <div>{{props.row.DignoseDetailData.isOutoutSPC}}</div>
               </div>-->
             </div>
-            <div class="mx-3" d-flex>
-              <el-button @click="ShowModelList(props.row.IP)">模型列表</el-button>
-              <el-button>事件列表</el-button>
-              <el-button @click="$refs.rawDataView.ShowRaw(props.row.IP)">Raw Data</el-button>
+            <div class="row col-md-2 dig-actions">
+              <el-button class="col-sm-3" @click="ShowModelList(props.row.IP)">
+                <el-icon>
+                  <List />
+                </el-icon>模型列表
+              </el-button>
+              <!-- <el-button>事件列表</el-button> -->
+              <el-button class="col-sm-3" @click="$refs.rawDataView.ShowRaw(props.row.IP)">
+                <el-icon>
+                  <TrendCharts />
+                </el-icon>Raw Data
+              </el-button>
             </div>
           </div>
         </template>
@@ -147,7 +168,7 @@
       </div>
     </transition>
     <ModelListView ref="modelListView"></ModelListView>
-    <RawDataSideShowVue ref="rawDataView"></RawDataSideShowVue>
+    <RawDataSideShowVue ref="rawDataView" :ExistModuleList="DignoseDatas"></RawDataSideShowVue>
   </div>
 </template>
 
@@ -179,6 +200,7 @@ export default {
       display_modes: display_modes,
       DignoseDatas: [],
       chart_display_mode: 'HS',
+      search_str: '',
       selectedDiagnoseData: { IP: '???' },
       renderingDiagnoseData: [],
       ThresholdSettings: {
@@ -215,8 +237,15 @@ export default {
       if (this.selectedDiagnoseData.IP != row.IP) {
 
         this.chart_loading = true;
-        console.info('to create ws', row.IP);
-        this.RTChartWebsocketIni(row.IP);
+
+        if (this.trendchart_ws != null)
+          this.trendchart_ws.onmessage = null;
+
+        setTimeout(() => {
+          console.info('to create ws', row.IP);
+          this.RTChartWebsocketIni(row.IP);
+        }, 200);
+
       }
       this.selectedDiagnoseData = row;
 
@@ -227,13 +256,14 @@ export default {
 
     },
     async RTChartWebsocketIni(ip) {
-      if (this.trendchart_ws)
+      if (this.trendchart_ws != null) {
+        this.trendchart_ws.onmessage = null;
         this.trendchart_ws.close();
+      }
 
       this.trendchart_ws = await GetTrendchartWsInstance(ip, this.chart_display_mode);
       this.chart_loading = this.trendchart_ws == null;
       if (this.trendchart_ws != null) {
-
         this.trendchart_ws.onmessage = (evt) => {
           var data = JSON.parse(evt.data);
           this.RenderTrendChart(data[0]);
@@ -289,6 +319,20 @@ export default {
     }
   },
   computed: {
+    DignoseDatasToShow() {
+      if (this.search_str == '')
+        return this.DignoseDatas;
+      else {
+        var result = [];
+        var _search_str = this.search_str.toUpperCase();
+        this.DignoseDatas.forEach(element => {
+          if (element.IP.includes(_search_str) | element.UnitName.toUpperCase().includes(_search_str) | element.EqName.toUpperCase().includes(_search_str))
+            result.push(element);
+        });
+
+        return result;
+      }
+    },
     ChartTitle() {
       if (!this.selectedDiagnoseData.EqName)
         return "點選表格以顯示趨勢圖表";
@@ -392,8 +436,19 @@ export default {
   margin: 8px;
 }
 
+@media screen and (min-width: 700px) {
+  .item-name {
+    width: 150px;
+  }
+}
+
+.alarm-threshold-lab,
+.warning-threshold-lab {
+  width: 137px;
+}
+
 .dignose-detail-info .item-name {
-  width: 140px;
+  margin-right: 10px;
 }
 
 .btn-share-chart-show {
@@ -406,5 +461,10 @@ export default {
   bottom: -13px;
   z-index: 3001;
   width: 100%;
+}
+
+.dig-actions button {
+  width: 200px;
+  margin: 0px;
 }
 </style>
