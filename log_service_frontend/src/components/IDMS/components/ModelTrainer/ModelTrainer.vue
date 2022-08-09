@@ -1,7 +1,6 @@
 <template>
   <el-drawer v-model="Show" direction="rtl" size="50%">
-    <div class="d-flex flex-column h-100">
-      <div class="bg-info" style="height:40px"></div>
+    <div class="d-flex flex-column" style="height:40%">
       <div class="flex-fill d-flex flex-row">
         <div style="width:120px">
           <el-steps :active="1" direction="vertical">
@@ -13,7 +12,6 @@
         </div>
         <div class="training-content flex-fill d-flex flex-column justify-content-start">
           <div class="step-content d-flex flex-column justify-content-start">
-            <el-button>?</el-button>
             <IDMSModuleSelectVue @changed="ModuleChangeHandle"></IDMSModuleSelectVue>
           </div>
           <div class="step-content d-flex flex-column justify-content-start">
@@ -36,7 +34,7 @@ import IDMSModuleSelectVue from '../IDMSModuleSelect.vue'
 export default {
   data() {
     return {
-      Show: false
+      Show: true
     }
   },
   components: {
