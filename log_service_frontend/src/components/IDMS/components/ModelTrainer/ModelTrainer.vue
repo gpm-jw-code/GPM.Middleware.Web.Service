@@ -3,7 +3,7 @@
     <div class="d-flex flex-column h-100">
       <div class="bg-info" style="height:40px"></div>
       <div class="flex-fill d-flex flex-row">
-        <div>
+        <div style="width:120px">
           <el-steps :active="1" direction="vertical">
             <el-step title="Step 1" description="選擇模組" />
             <el-step title="Step 2" description="為模型命名" />
