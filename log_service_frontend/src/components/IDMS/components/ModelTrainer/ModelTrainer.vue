@@ -1,28 +1,39 @@
 <template>
-  <el-drawer v-model="Show" direction="rtl" size="50%">
+  <el-drawer v-model="Show" direction="rtl" size="50%" title="Model Training">
     <div class="d-flex flex-column" style="height:40%">
-      <div class="flex-fill d-flex flex-row">
-        <div style="width:120px">
-          <el-steps :active="1" direction="vertical">
-            <el-step title="Step 1" description="選擇模組" />
-            <el-step title="Step 2" description="為模型命名" />
-            <el-step title="Step 3" description="設定訓練時間" />
-            <el-step title="Step 4" description="開始!" />
-          </el-steps>
+      <div class="training-content flex-fill d-flex flex-column justify-content-start">
+        <div class="step-content justify-content-start">
+          <h5>選擇模組</h5>
+          <!-- <IDMSModuleSelectVue @changed="ModuleChangeHandle"></IDMSModuleSelectVue> -->
+          <div
+            style="height:220px; overflow-y: scroll; margin-left:0 "
+            class="bg-info d-flex flex-column justify-content-start"
+          >
+            <el-checkbox-group v-model="IPList">
+              <div
+                class="bg-info d-flex flex-column justify-content-start"
+                v-for="i in [78,79,81,82]"
+                :key="i"
+              >
+                <el-checkbox :label="'192.168.0.'+i"></el-checkbox>
+              </div>
+            </el-checkbox-group>
+          </div>
         </div>
-        <div class="training-content flex-fill d-flex flex-column justify-content-start">
-          <div class="step-content d-flex flex-column justify-content-start">
-            <IDMSModuleSelectVue @changed="ModuleChangeHandle"></IDMSModuleSelectVue>
-          </div>
-          <div class="step-content d-flex flex-column justify-content-start">
-            <el-input></el-input>
-          </div>
-          <div class="step-content d-flex flex-column justify-content-start">
-            <el-input-number class="w-100"></el-input-number>
-          </div>
-          <div class="step-content-end d-flex flex-column justify-content-start">
-            <el-button>START</el-button>
-          </div>
+
+        <div class="step-content d-flex flex-column justify-content-start">
+          <h5>命名模型</h5>
+          <el-input v-model="ModelName"></el-input>
+        </div>
+
+        <div class="step-content d-flex flex-column justify-content-start">
+          <h5>設定錄製時間</h5>
+          <el-input-number min="5" v-model="RecordPeriod" class="w-100"></el-input-number>
+        </div>
+
+        <el-divider></el-divider>
+        <div class="step-content-end d-flex flex-column justify-content-start">
+          <b-button variant="primary" :disabled="!Start_Enable" @click="SendTrainingRequest">START</b-button>
         </div>
       </div>
     </div>
@@ -30,18 +41,32 @@
 </template>
 
 <script>
-import IDMSModuleSelectVue from '../IDMSModuleSelect.vue'
+// import IDMSModuleSelectVue from '../IDMSModuleSelect.vue'
+import { configs } from '@/config';
 export default {
   data() {
     return {
-      Show: true
+      Show: true,
+      IPList: [],
+      ModelName: '',
+      RecordPeriod: 10,
+      websocket: null
     }
   },
   components: {
-    IDMSModuleSelectVue,
+    // IDMSModuleSelectVue,
   },
-  mounted() {
-
+  computed: {
+    Start_Enable() {
+      return this.IPList.length !== 0 && this.ModelName !== '' && this.RecordPeriod !== 0;
+    },
+    TrainingReqObj() {
+      return {
+        IPList: this.IPList,
+        ModelName: this.ModelName,
+        RecordPeriod: this.RecordPeriod
+      }
+    }
   },
   methods: {
     ModuleChangeHandle(v) {
@@ -50,13 +75,27 @@ export default {
     ShowUp() {
       console.info('Show!!');
       this.Show = true;
+    },
+    SendTrainingRequest() {
+      this.websocket = new WebSocket(`${configs.idms_websocket_host}/Model_Training`);
+      this.websocket.onopen = () => {
+        this.websocket.send(JSON.stringify(this.TrainingReqObj));
+      }
+      this.websocket.onmessage = (ent) => this.TrainingStatusHandle(JSON.parse(ent.data));
+    },
+    TrainingStatusHandle(status) {
+
     }
+
   }
 }
 </script>
 
 <style>
-.training-content .step-content {
-  height: 33%;
+.step-content h5 {
+  text-align: left;
+}
+.step-content {
+  margin-top: 22px;
 }
 </style>
