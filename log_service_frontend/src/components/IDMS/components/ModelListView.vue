@@ -54,22 +54,25 @@ export default {
       UNIT: "",
       modelData: [],
       loading: false,
-      module_infos: []
+      module_infos: [],
+      edgeIP: '12.2.2.2'
     }
   },
   methods: {
-    ShowModelList(ip) {
+    ShowModelList(edgeIP, ip) {
       this.show = true;
+      this.edgeIP = edgeIP;
       this.IP = ip;
+      this.UpdateModuleInfos();
       this.Fetch();
     },
     async UpdateModuleInfos() {
-      this.module_infos = await GetModuleInfos();
+      this.module_infos = await GetModuleInfos(this.edgeIP);
 
     },
     async Fetch() {
       this.loading = true;
-      var ret = await GetModelList(this.IP);
+      var ret = await GetModelList(this.edgeIP, this.IP);
       console.info('Fetch Models', ret);
       this.EQ = ret.EQ;
       this.UNIT = ret.UNIT;

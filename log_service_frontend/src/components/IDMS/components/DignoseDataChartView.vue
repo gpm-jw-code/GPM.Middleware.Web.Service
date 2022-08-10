@@ -114,6 +114,10 @@ export default {
     pause: {
       type: Boolean,
       default: true
+    },
+    edgeIP: {
+      type: String,
+      default: "127.0.0.1"
     }
   },
   data() {
@@ -215,7 +219,7 @@ export default {
       if (this.ws)
         this.ws.close();
 
-      this.ws = new WebSocket(`${configs.idms_websocket_host}/Dignose?type=chart&number=${this.MaxHSDisplayNum}&featureType=${this.featureType}`);
+      this.ws = new WebSocket(`ws://${this.edgeIP}:44332/Dignose?type=chart&number=${this.MaxHSDisplayNum}&featureType=${this.featureType}`);
       this.ws.onopen = () => {
         this.loading = false;
       }

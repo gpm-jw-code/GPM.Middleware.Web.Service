@@ -105,7 +105,7 @@
                 </el-icon>模型列表
               </el-button>
               <!-- <el-button>事件列表</el-button> -->
-              <el-button class="col-sm-3" @click="$refs.rawDataView.ShowRaw(props.row.IP)">
+              <el-button class="col-sm-3" @click="$refs.rawDataView.ShowRaw(edgeIP, props.row.IP)">
                 <el-icon>
                   <TrendCharts />
                 </el-icon>Raw Data
@@ -261,7 +261,7 @@ export default {
         this.trendchart_ws.close();
       }
 
-      this.trendchart_ws = await GetTrendchartWsInstance(ip, this.chart_display_mode);
+      this.trendchart_ws = await GetTrendchartWsInstance(ip, this.chart_display_mode, this.edgeIP);
       this.chart_loading = this.trendchart_ws == null;
       if (this.trendchart_ws != null) {
         this.trendchart_ws.onmessage = (evt) => {
@@ -315,7 +315,7 @@ export default {
     },
     ShowModelList(ip) {
       this.$refs.modelListView.UpdateModuleInfos();
-      this.$refs.modelListView.ShowModelList(ip);
+      this.$refs.modelListView.ShowModelList(this.edgeIP,ip);
     }
   },
   computed: {
@@ -361,9 +361,24 @@ export default {
     }
 
   },
-
+  props: {
+    edgeIP: {
+      type: String,
+      default: "127.0.0.1"
+    }
+  },
+  watch: {
+    edgeIP: {
+      handle: function (n, o) {
+        console.info(n, o);
+      },
+      deep: true,
+      immediate: true
+    }
+  },
   async mounted() {
-    this.ws = await GetDignoseDataListWsInstance();
+    console.info('s', this.edgeIP);
+    this.ws = await GetDignoseDataListWsInstance(this.edgeIP);
     console.info('s', this.ws);
     this.ws.onmessage = (ws) => {
       this.loading = false;

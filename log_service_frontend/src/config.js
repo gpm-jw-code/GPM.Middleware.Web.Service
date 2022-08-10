@@ -25,7 +25,9 @@ console.info(
     window.location.hostname +
     ':44332',
 )
+
 console.info(configs.host)
 console.info('websocket_host', configs.websocket_host)
 console.info('idms_websocket_host', configs.idms_websocket_host)
+
 export { configs }

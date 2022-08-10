@@ -56,7 +56,8 @@ export default {
   data() {
     return {
       ModuleStatesData: [],
-      ws: null //websocket to do data handshake...
+      ws: null,//websocket to do data handshake...
+      EdgeIP: '127.0.0.1'
     }
   },
   mounted() {
@@ -64,7 +65,7 @@ export default {
   },
   methods: {
     WebSocketInitial() {
-      this.ws = new WebSocket(`${configs.idms_websocket_host}/ModuleStates`);
+      this.ws = new WebSocket(`ws://${this.EdgeIP}:44332/ModuleStates`);
       this.ws.onmessage = (_ws) => {
         this.ModuleStatesData = JSON.parse(_ws.data);
       }
@@ -72,6 +73,10 @@ export default {
         this.WebSocketInitial();
       }
     }
+  },
+  created() {
+    console.info('fssssff', this.$route.params.ip)
+    this.EdgeIP = this.$route.params.ip;
   }
 }
 </script>

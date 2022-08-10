@@ -8,7 +8,11 @@
         </button>
         <div class="collapse navbar-collapse" id="navbar">
           <div class="navbar-nav">
-            <router-link v-for="rout in routes" :key="rout.path" :to="rout.path">{{rout.name}}</router-link>
+            <b-button
+              v-for="rout in routes"
+              :key="rout.path"
+              @click="routerHandle(rout.path)"
+            >{{rout.name}}</b-button>
           </div>
         </div>
       </div>
@@ -17,9 +21,7 @@
   <!-- <router-view /> -->
   <router-view v-slot="{ Component }">
     <!-- <transition name="el-fade-in"> -->
-    <keep-alive>
-      <component :is="Component" />
-    </keep-alive>
+    <component :is="Component" />
     <!-- </transition> -->
   </router-view>
 </template>
@@ -34,6 +36,13 @@ export default {
         { text: 'SSM', href: '/' },
         { text: 'Log', href: '/log' },
         { text: 'Library' },]
+    }
+  },
+  methods: {
+    routerHandle(path) {
+      localStorage.getItem('edgeip');
+      console.info(path)
+      this.$router.push(`${path.replace(':ip', localStorage.getItem('edgeip'))}`);
     }
   },
   computed: {

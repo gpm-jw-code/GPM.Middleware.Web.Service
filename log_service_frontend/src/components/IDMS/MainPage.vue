@@ -13,8 +13,12 @@
     </div>
 
     <el-divider></el-divider>
-    <DignoseDataListView v-show="display_mode=='LIST'"></DignoseDataListView>
-    <DignoseDataChartView :pause="display_mode=='LIST'" v-show="display_mode=='CHART'">??</DignoseDataChartView>
+    <DignoseDataListView :edgeIP="EdgeIP" v-show="display_mode=='LIST'"></DignoseDataListView>
+    <DignoseDataChartView
+      :edgeIP="EdgeIP"
+      :pause="display_mode=='LIST'"
+      v-show="display_mode=='CHART'"
+    >??</DignoseDataChartView>
     <ModelTrainerVue ref="modelTrainer"></ModelTrainerVue>
   </div>
 </template>
@@ -26,7 +30,8 @@ import DignoseDataChartView from './components/DignoseDataChartView.vue';
 export default {
   data() {
     return {
-      display_mode: 'LIST'
+      display_mode: 'LIST',
+      EdgeIP: "127.0.0.1"
     }
   },
   components: {
@@ -37,6 +42,12 @@ export default {
       this.$refs.modelTrainer.ShowUp();
     }
   },
+  mounted() {
+  },
+  created() {
+    console.info('fff', this.$route.params.ip)
+    this.EdgeIP = this.$route.params.ip;
+  }
 }
 
 

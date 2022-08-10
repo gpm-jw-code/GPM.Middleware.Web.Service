@@ -64,7 +64,7 @@ import { configs } from '@/config';
 export default {
   data() {
     return {
-      Show: true,
+      Show: false,
       IPList: [],
       ModelName: '',
       RecordPeriod: 10,

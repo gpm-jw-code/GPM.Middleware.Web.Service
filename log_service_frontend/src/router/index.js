@@ -6,6 +6,7 @@ import IDMS from '@/components/IDMS/MainPage.vue'
 import ModuleStatesListViewVue from '@/components/IDMS/ModuleStatesListView.vue'
 import QueryPage from '@/components/IDMS/QueryPage.vue'
 import { configs } from '@/config'
+import EntryPage from '@/components/IDMS/EntryPage/EntryPage.vue'
 
 var gmm_mode_routes = [
   {
@@ -23,11 +24,16 @@ var gmm_mode_routes = [
 var gpm_mode_routes = [
   {
     path: '/',
+    name: 'EntryPage',
+    component: EntryPage,
+  },
+  {
+    path: '/EdgeMain/:ip',
     name: '診斷頁面',
     component: IDMS,
   },
   {
-    path: '/idms/module-states',
+    path: '/EdgeMain/modulestates/:ip',
     name: '感測器狀態',
     component: ModuleStatesListViewVue,
   },
@@ -41,6 +47,11 @@ var gpm_mode_routes = [
 var dev_mode_routes = [
   {
     path: '/',
+    name: 'EntryPage',
+    component: EntryPage,
+  },
+  {
+    path: '/SSM',
     name: 'SSM',
     component: HomeView,
   },
@@ -50,9 +61,16 @@ var dev_mode_routes = [
     component: AdminView,
   },
   {
-    path: '/idms',
+    path: '/EdgeMain',
     name: '診斷頁面',
     component: IDMS,
+    children: [
+      {
+        path: '/modulestates',
+        name: '感測器狀態',
+        component: ModuleStatesListViewVue,
+      },
+    ],
   },
   {
     path: '/idms/module-states',

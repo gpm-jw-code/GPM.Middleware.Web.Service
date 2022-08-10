@@ -86,7 +86,8 @@ export default {
       mockTimer: null,
       connected: false,
       pause: false,
-      data_in: false
+      data_in: false,
+      edgeIP: "123.123.213.213"
     }
   },
   methods: {
@@ -96,7 +97,7 @@ export default {
       this.ws.onclose = null;
       this.ws.onmessage = null;
       this.ws.close();
-      this.WebsocketConnect();
+      this.WebsocketConnect(this.edgeIP);
     },
     CloseHandle() {
       console.info('drawer close');
@@ -109,19 +110,20 @@ export default {
 
       }
     },
-    async ShowRaw(sensor_ip) {
+    async ShowRaw(edgeIP, sensor_ip) {
+      this.edgeIP = edgeIP;
       this.SensorIP = sensor_ip;
       this.ShowDrawer = true;
-      while (! await this.WebsocketConnect()) {
+      while (! await this.WebsocketConnect(edgeIP)) {
         setTimeout(() => {
 
         }, 100);
       }
 
     },
-    async WebsocketConnect() {
+    async WebsocketConnect(edgeIP) {
       return await new Promise((resolve) => {
-        this.ws = new WebSocket(`${configs.idms_websocket_host}/RawG?IP=${this.SensorIP}`);
+        this.ws = new WebSocket(`ws://${edgeIP}:44332/RawG?IP=${this.SensorIP}`);
         this.ws.onopen = () => {
           this.connected = true;
           resolve(true)

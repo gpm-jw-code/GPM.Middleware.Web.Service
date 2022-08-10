@@ -7,6 +7,10 @@ export async function QueryTest() {
   return await GetRequest('/WeatherForecast?id=123')
 }
 
+export async function GetEdgeInformation() {
+  return await GetRequest('/api/DB/GetEdgeInformation')
+}
+
 /**從Server中撈取Database列表 */
 export async function GetDatabaseList() {
   return await GetRequest('/api/PostgrelDB/Databases')
@@ -15,23 +19,23 @@ export async function GetDatabaseList() {
 export async function GetModuleInfoStoredInDB() {
   return await GetRequest('/api/Query/ModuleInfos')
 }
-export async function QueryVibrationEnergy(ip, startT, endT) {
+export async function QueryVibrationEnergy(edgename, ip, startT, endT) {
   return await GetRequest(
     `/api/DB/VibrationEnergy?ip=${ip}&from=${startT}&to=${endT}`,
   )
 }
-export async function QueryHealthScore(ip, startT, endT) {
+export async function QueryHealthScore(edgename, ip, startT, endT) {
   return await GetRequest(
     `/api/DB/HealthScore?ip=${ip}&from=${startT}&to=${endT}`,
   )
 }
-export async function QueryAlertIndex(ip, startT, endT) {
+export async function QueryAlertIndex(edgename, ip, startT, endT) {
   return await GetRequest(
     `/api/DB/AlertIndex?ip=${ip}&from=${startT}&to=${endT}`,
   )
 }
 
-export async function QueryVibration_raw_data(ip, startT, endT) {
+export async function QueryVibration_raw_data(edgename, ip, startT, endT) {
   return await GetRequest(
     `/api/DB/vibration_raw_data?ip=${ip}&from=${startT}&to=${endT}`,
   )
@@ -48,19 +52,24 @@ export async function QueryVibration_raw_data_with_QueryID(
   )
 }
 
-export async function QueryPhysical_quantity(ip, startT, endT) {
+export async function QueryPhysical_quantity(edgename, ip, startT, endT) {
   return await GetRequest(
     `/api/DB/Physical_quantity?ip=${ip}&from=${startT}&to=${endT}`,
   )
 }
-export async function QuerySideBandSeverity(ip, startT, endT) {
+export async function QuerySideBandSeverity(edgename, ip, startT, endT) {
   return await GetRequest(
     `/api/DB/SideBandSeverity?ip=${ip}&from=${startT}&to=${endT}`,
   )
 }
 
 //Frequency_doublingSeverity
-export async function QueryFrequency_doublingSeverity(ip, startT, endT) {
+export async function QueryFrequency_doublingSeverity(
+  edgename,
+  ip,
+  startT,
+  endT,
+) {
   return await GetRequest(
     `/api/DB/Frequency_doublingSeverity?ip=${ip}&from=${startT}&to=${endT}`,
   )
@@ -75,12 +84,12 @@ export async function QuerySplice(queryID, from, to) {
 
 /**事件查詢 */
 export const EventQuery = {
-  async HealthScoreOutOfThreshold(ip, from, to, page = 1) {
+  async HealthScoreOutOfThreshold(edgename, ip, from, to, page = 1) {
     return await GetRequest(
       `/api/DB/DignoseOutOfThreshold?ip=${ip}&from=${from}&to=${to}&page=${page}`,
     )
   },
-  async SideBandSeverityOutOfThres(ip, from, to, page = 1) {
+  async SideBandSeverityOutOfThres(edgename, ip, from, to, page = 1) {
     return await GetRequest(
       `/api/DB/SideBandSeverityOutOfThres?ip=${ip}&from=${from}&to=${to}&page=${page}`,
     )

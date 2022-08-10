@@ -1,9 +1,11 @@
 import { configs } from '@/config'
 const ws_host = configs.idms_websocket_host
 
-export async function GetModuleInfos() {
+export async function GetModuleInfos(edgeIP) {
+  var host = edgeIP == undefined ? ws_host : `ws://${edgeIP}:44332`
+
   return await new Promise((resolve, reject) => {
-    var ws = new WebSocket(`${ws_host}/ModuleInfoGet`)
+    var ws = new WebSocket(`${host}/ModuleInfoGet`)
     ws.onopen = () => ws.send('GetInfos')
     ws.onmessage = (evt) => {
       ws.close()
@@ -13,26 +15,31 @@ export async function GetModuleInfos() {
   })
 }
 
-export async function GetDignoseDataListWsInstance() {
+export async function GetDignoseDataListWsInstance(edgeIP) {
   return await new Promise((resolve, reject) => {
-    var ws = new WebSocket(`${ws_host}/Dignose?type=list`)
+    var host = edgeIP == undefined ? ws_host : `ws://${edgeIP}:44332`
+    console.info('GetDignoseDataListWsInstance', edgeIP)
+    var ws = new WebSocket(`${host}/Dignose?type=list`)
     ws.onopen = () => resolve(ws)
     ws.onerror = (er) => reject(er)
   })
 }
-export async function GetTrendchartWsInstance(ip, featureType = 'HS') {
+export async function GetTrendchartWsInstance(ip, featureType = 'HS', edgeIP) {
+  var host = edgeIP == undefined ? ws_host : `ws://${edgeIP}:44332`
+  console.info('GetTrendchartWsInstance', edgeIP)
   return await new Promise((resolve, reject) => {
     var ws = new WebSocket(
-      `${ws_host}/Dignose?type=chart&number=90&ip=${ip}&featureType=${featureType}`,
+      `${host}/Dignose?type=chart&number=90&ip=${ip}&featureType=${featureType}`,
     )
     ws.onopen = () => resolve(ws)
     ws.onerror = () => reject(null)
   })
 }
 /**取得模型列表 */
-export async function GetModelList(ip = 'ip') {
+export async function GetModelList(edgeIP, ip = 'ip') {
+  var host = edgeIP == undefined ? ws_host : `ws://${edgeIP}:44332`
   return await new Promise((resolve, reject) => {
-    var ws = new WebSocket(`${ws_host}/Diagnose/ModelInfo?StatesMonitor=FALSE`)
+    var ws = new WebSocket(`${host}/Diagnose/ModelInfo?StatesMonitor=FALSE`)
     ws.onopen = () => {
       ws.send(`GIVEMEINFO,${ip}`)
     }
