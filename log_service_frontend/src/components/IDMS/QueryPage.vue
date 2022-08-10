@@ -1,5 +1,5 @@
 <template>
-  <div class="h-100" style="padding-top:80px">
+  <div class="h-100">
     <div class="d-flex flex-column" style=";height:100%">
       <!-- 選擇項目與時間 -->
       <div v-loading="!ready">

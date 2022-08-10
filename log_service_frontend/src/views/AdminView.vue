@@ -1,5 +1,5 @@
 <template >
-  <div class="py-5 admin-view">
+  <div class="admin-view">
     <p>System Start Time : {{AppStartTime}}</p>
     <div class="row">
       <div class="col-lg-4">

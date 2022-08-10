@@ -1,5 +1,5 @@
 <template>
-  <div style="padding-top:80px">
+  <div>
     <ManagerOperatesVue @OnModuleAdd="ModuleAddingHandle"></ManagerOperatesVue>
     <el-divider></el-divider>
     <table class="table my_table">

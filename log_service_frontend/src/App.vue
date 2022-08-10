@@ -17,9 +17,11 @@
   <!-- <router-view /> -->
   <router-view v-slot="{ Component }">
     <!-- <transition name="el-fade-in"> -->
-    <keep-alive>
-      <component :is="Component" />
-    </keep-alive>
+    <div class="router-view-content">
+      <keep-alive>
+        <component :is="Component" />
+      </keep-alive>
+    </div>
     <!-- </transition> -->
   </router-view>
 </template>
@@ -97,5 +99,9 @@ nav a {
   position: fixed;
   width: 100%;
   z-index: 3001;
+}
+.router-view-content {
+  height: 100%;
+  padding-top: 75px;
 }
 </style>
