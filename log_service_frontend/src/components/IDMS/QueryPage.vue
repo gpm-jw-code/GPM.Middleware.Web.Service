@@ -1,5 +1,5 @@
 <template>
-  <div class="h-100">
+  <div class="h-100 fade-in">
     <div class="d-flex flex-column" style=";height:100%">
       <!-- 選擇項目與時間 -->
       <div v-loading="!ready" class="options">
@@ -426,42 +426,5 @@ export default {
   color: red;
   padding-left: 9px;
   font-weight: bold;
-}
-.options {
-  -webkit-animation: top-down, fade-in;
-  animation: top-down, fade-in;
-  animation-duration: 400ms;
-  animation-fill-mode: forwards;
-  animation-delay: 400ms;
-  visibility: hidden;
-}
-.result-content {
-  -webkit-animation: fade-in;
-  animation: fade-in;
-  animation-duration: 400ms;
-  animation-fill-mode: forwards;
-  visibility: hidden;
-}
-
-@keyframes top-down {
-  from {
-    top: -200px;
-    visibility: visible;
-  }
-  to {
-    top: 0px;
-    visibility: visible;
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    visibility: visible;
-  }
-  to {
-    opacity: 1;
-    visibility: visible;
-  }
 }
 </style>
