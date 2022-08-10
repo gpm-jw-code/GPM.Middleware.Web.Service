@@ -1,5 +1,5 @@
 <template >
-  <div class="admin-view">
+  <div class="admin-view fade-in">
     <p>System Start Time : {{AppStartTime}}</p>
     <div class="row">
       <div class="col-lg-4">

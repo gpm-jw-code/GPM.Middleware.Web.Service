@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fade-in">
     <div class="d-flex flex-row px-2 py-2 w-100">
       <div class="d-flex justify-content-start flex-fill w-50">
         <el-radio-group v-model="display_mode">
