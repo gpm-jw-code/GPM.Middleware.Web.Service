@@ -15,8 +15,12 @@
               @click="routerHandle(rout.path)"
             >{{rout.name}}</a>
           </div>
-          <div class="edge-ip d-flex flex-row justify-cotent-end">
-            <span class="py-2 mx-2">{{EdgeIP}}</span>
+
+          <div class="edge-info d-flex flex-row justify-cotent-end">
+            <div>
+              <div class="name mx-2">{{EdgeName.toUpperCase()}}</div>
+              <div class="ip mx-2">{{EdgeIP}}</div>
+            </div>
             <NetworkStatusVue :ip="EdgeIP" toolTipPosition="bottom"></NetworkStatusVue>
           </div>
         </div>
@@ -50,6 +54,7 @@ export default {
         { text: 'Log', href: '/log' },
         { text: 'Library' },],
       EdgeIP: "-",
+      EdgeName: "-",
     }
   },
   methods: {
@@ -71,6 +76,7 @@ export default {
     let route = useRoute();
     watch(() => route.name, (n, o) => {
       this.EdgeIP = localStorage.getItem('edgeip');
+      this.EdgeName = localStorage.getItem('edgename');
       var isNotEntryPAGE = this.showNavbar = n + '' !== 'EntryPage';
       this.navstyle = this.showNavbar ? 'bg-dark' : 'bg-primary';
       console.info(this.showNavbar, n, o)
@@ -141,10 +147,17 @@ nav a {
   padding-top: 75px;
 }
 
-.edge-ip {
+.edge-info {
   color: white;
   font-size: larger;
   font-weight: bold;
   letter-spacing: 2px;
+  text-align: left;
+}
+
+.edge-info .ip {
+  color: rgb(173, 173, 173);
+  font-size: smaller;
+  letter-spacing: 1px;
 }
 </style>

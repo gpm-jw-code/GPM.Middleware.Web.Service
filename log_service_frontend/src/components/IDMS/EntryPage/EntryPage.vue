@@ -1,5 +1,6 @@
 <template>
   <div class="h-100 fade-in" v-loading="loading">
+    <!--     
     <div class="w-100 d-flex flex-row justify-content-end">
       <el-radio-group v-show="false" v-model="display_mode">
         <el-radio-button label="dashboard">
@@ -13,8 +14,8 @@
           </el-icon>
         </el-radio-button>
       </el-radio-group>
-    </div>
-
+    </div>-->
+    <LandingViewVue></LandingViewVue>
     <div v-show="display_mode=='list'">
       <el-table :data="Edges">
         <el-table-column label="Edge 名稱" prop="Name"></el-table-column>
@@ -37,12 +38,13 @@
 </template>
 
 <script>
+import LandingViewVue from './LandingView.vue';
 import EdgeStatusVue from './components/EdgeStatus.vue';
 import { GetEdgeInformation } from '@/APIHelpers/DatabaseServerAPI'
 export default {
 
   components: {
-    EdgeStatusVue,
+    EdgeStatusVue, LandingViewVue
   },
   mounted() {
     console.info('mounted ebtg');

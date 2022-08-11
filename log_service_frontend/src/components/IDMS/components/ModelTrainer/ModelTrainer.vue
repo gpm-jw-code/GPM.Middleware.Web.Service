@@ -69,7 +69,8 @@ export default {
       ModelName: '',
       RecordPeriod: 10,
       websocket: null,
-      TrainStates: []
+      TrainStates: [],
+      edgeIP: '',
     }
   },
   components: {
@@ -91,13 +92,17 @@ export default {
     ModuleChangeHandle(v) {
       console.info('hi', v)
     },
-    ShowUp() {
+    ShowUp(edge_ip) {
       console.info('Show!!');
+      this.edgeIP = edge_ip
+      this.WebsocketConnect();
       this.Show = true;
     },
     WebsocketConnect() {
-      this.websocket = new WebSocket(`${configs.idms_websocket_host}/Model_Training`);
-      this.websocket.onopen = () => { };
+      this.websocket = new WebSocket(`ws://${this.edgeIP}:44332/Model_Training`);
+      this.websocket.onopen = () => {
+        this.$toast.info('Connected');
+      };
       this.websocket.onmessage = (ent) => this.TrainingStatusHandle(JSON.parse(ent.data));
       this.websocket.onerror = (er) => {
         console.error(er);
@@ -120,7 +125,6 @@ export default {
 
   },
   mounted() {
-    this.WebsocketConnect();
   },
   beforeMount() {
     if (this.websocket != null) {

@@ -17,6 +17,30 @@ visibility: hidden;
     }
 }
 
+
+.fade-out {
+    -webkit-animation: fade-out;
+    animation: fade-out;
+    animation-fill-mode: forwards;
+    animation-duration: .6s;
+    animation-delay: .9s;
+    visibility: visible;
+    }
+    
+    @keyframes fade-out {
+        from{
+            visibility: visible;
+            opacity: 1;
+            z-index: 32220;
+        }
+        to{
+            visibility: hidden;
+            opacity: 0;
+            z-index: 0;
+        }
+    }
+
+
 .flip-y {
     -webkit-animation: flip-y;
     animation: flip-y;

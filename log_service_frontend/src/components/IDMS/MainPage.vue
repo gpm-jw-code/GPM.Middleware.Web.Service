@@ -39,7 +39,7 @@ export default {
   },
   methods: {
     Test() {
-      this.$refs.modelTrainer.ShowUp();
+      this.$refs.modelTrainer.ShowUp(this.EdgeIP);
     }
   },
   mounted() {

@@ -12,26 +12,36 @@
       </div>
     </div>
     <el-divider></el-divider>
-    <el-progress type="circle" :percentage="100" :width="circleWidth" status="primary">
-      <div class="sensor-num-div">
-        <div class="sensor-num">{{edgeStatusFromIDMS.OnlineSensorNum}}</div>
-        <div>感測器數量</div>
+    <div class="d-flex flex-row justify-content-center">
+      <div>
+        <el-progress type="circle" :percentage="100" :width="circleWidth" status="primary">
+          <div class="sensor-num-div">
+            <div>感測器數量</div>
+            <div class="sensor-num connected-num">
+              <count-to :startVal="0" :endVal="edgeStatusFromIDMS.OnlineSensorNum" :duration="2100"></count-to>
+            </div>
+          </div>
+        </el-progress>
+        <div class="shadow"></div>
       </div>
-    </el-progress>
-    <el-progress
-      type="circle"
-      :percentage="100"
-      :width="circleWidth"
-      :status="IDMSAlive ? 'success':'exception'"
-    >
-      <div class="sensor-num-div">
-        <div
-          class="sensor-num"
-          v-bind:class="IDMSAlive?'Online':'Offline'"
-        >{{IDMSAlive?'ONLINE':'OFFLINE'}}</div>
-        <div>狀態</div>
+      <div>
+        <el-progress
+          type="circle"
+          :percentage="100"
+          :width="circleWidth"
+          :status="IDMSAlive ? 'success':'exception'"
+        >
+          <div class="sensor-num-div">
+            <div class>IDMS</div>
+            <div
+              class="sensor-num"
+              v-bind:class="IDMSAlive?'Online':'Offline'"
+            >{{IDMSAlive?'ONLINE':'OFFLINE'}}</div>
+          </div>
+        </el-progress>
+        <div class="shadow"></div>
       </div>
-    </el-progress>
+    </div>
     <div class="my-2">
       <b-button class="bg-primary w-100" @click="EnterEdgeHandle">Enter</b-button>
     </div>
@@ -114,6 +124,7 @@ export default {
 <style>
 .edge-status h3 {
   letter-spacing: 0.21rem;
+  font-weight: bolder;
 }
 .edge-status span {
   letter-spacing: 0.11rem;
@@ -124,7 +135,8 @@ export default {
 }
 .edge-status .el-progress {
   margin: 10px;
-  /* box-shadow: 1px 1px 1px 2px black; */
+
+  text-shadow: 33px 1px 10px 2px rgb(10, 10, 10);
 }
 .edge-status:hover {
   background-color: rgb(187, 214, 253);
@@ -140,6 +152,13 @@ export default {
 .sensor-num-div {
   color: grey;
 }
+
+.sensor-num-div .connected-num {
+  font-size: 58px;
+  color: rgb(32, 160, 255);
+  margin: 0;
+}
+
 .sensor-num {
   font-size: 38px;
   margin: 10px;
@@ -150,6 +169,16 @@ export default {
 }
 
 .Online {
-  color: green;
+  color: rgb(19, 206, 102);
+}
+
+.shadow {
+  margin: auto 10px;
+  height: 11px;
+  /* box-shadow: 10px -2px 10px 12px black; */
+  position: relative;
+  top: -18px;
+  opacity: 0.7;
+  transform: skewY(-4deg);
 }
 </style>
