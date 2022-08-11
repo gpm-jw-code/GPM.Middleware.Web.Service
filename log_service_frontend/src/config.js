@@ -17,7 +17,7 @@ var configs = {
     // 'ws://127.0.0.1:44332'
   },
   // mode: process.env.NODE_ENV === 'production' ? 'gpm' : 'dev',
-  mode: 'gpm',
+  mode: 'dev',
 }
 console.info(
   window.location.protocol.replace('http', 'ws') +

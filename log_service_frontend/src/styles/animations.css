@@ -1,0 +1,18 @@
+.fade-in {
+-webkit-animation: fade-in;
+animation: fade-in 1s;
+animation-fill-mode: forwards;
+animation-duration: .3s;
+visibility: hidden;
+}
+
+@keyframes fade-in {
+    from{
+        visibility: visible;
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+        visibility: visible;
+    }
+}

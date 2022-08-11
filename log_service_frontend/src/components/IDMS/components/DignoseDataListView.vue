@@ -10,6 +10,7 @@
       highlight-current-row
       @row-click="TableRowClickHandle"
       @expand-change="ExpandHandle"
+      @row-dblclick="RowDoubleClickHandle"
       :row-class-name="tableRowClassName"
       row-key="IP"
       ref="table"
@@ -61,7 +62,7 @@
           </div>
         </template>
         <template #default="props">
-          <div class="row dignose-detail-info d-flex flex-row">
+          <div class="fade-in row dignose-detail-info d-flex flex-row">
             <div class="col-md-9 row g-0 flex-fill">
               <div class="d-flex col-md-3">
                 <div class="item-name">當前模型</div>
@@ -117,7 +118,10 @@
     </el-table>
 
     <!-- 底部圖表區域 -->
-    <div class="d-flex px-0 w-100" v-bind:class=" ['showing-down-arrow','fixed-in-bottom'] ">
+    <div
+      class="show-chart-control d-flex px-0 w-100"
+      v-bind:class=" ['showing-down-arrow','fixed-in-bottom'] "
+    >
       <b-button
         class="btn-share-chart-show"
         :variant=" share_chart_show? 'light': 'primary' "
@@ -222,6 +226,9 @@ export default {
     ChangeChartDisplayTypeHandle(mode) {
       this.chart_display_mode = mode;
       this.RTChartWebsocketIni(this.selectedDiagnoseData.IP);
+    },
+    RowDoubleClickHandle(row, column, event) {
+      this.$refs.table.toggleRowExpansion(row, true);
     },
     TableExpandHandle() {
       this.expandAll = !this.expandAll;
@@ -445,6 +452,7 @@ export default {
   background-color: rgb(241, 241, 241);
   padding: 10px 40px;
   font-weight: bold;
+  margin-left: 50px;
 }
 
 .dignose-detail-info .d-flex {
@@ -481,5 +489,29 @@ export default {
 .dig-actions button {
   width: 200px;
   margin: 0px;
+}
+
+.show-chart-control {
+  visibility: hidden;
+  animation: slide-in;
+  -webkit-animation: slide-in;
+  animation-duration: 600ms;
+  animation-delay: 0.5s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes slide-in {
+  0% {
+    opacity: 0;
+  }
+  from {
+    bottom: -46px;
+    opacity: 0;
+  }
+  to {
+    bottom: -13px;
+    opacity: 1;
+    visibility: visible;
+  }
 }
 </style>

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import ComponetTestVue from '@/views/ComponentTestPage'
 import HomeView from '../views/HomeView.vue'
 // import LogView from '../components/LogView.vue'
 import AdminView from '../views/AdminView.vue'
@@ -45,6 +46,11 @@ var gpm_mode_routes = [
 ]
 
 var dev_mode_routes = [
+  {
+    path: '/ComponentTest',
+    name: 'ct',
+    component: ComponetTestVue,
+  },
   {
     path: '/',
     name: 'EntryPage',

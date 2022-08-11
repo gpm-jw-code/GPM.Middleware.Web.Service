@@ -1,5 +1,5 @@
 <template>
-  <div style="padding-top:75px">
+  <div class="fade-in">
     <el-table stripe :data="ModuleStatesData" row-key="IP">
       <el-table-column width="44" fixed="left">
         <template #default="scope">

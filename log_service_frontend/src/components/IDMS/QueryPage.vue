@@ -1,8 +1,8 @@
 <template>
-  <div class="h-100" style="padding-top:80px">
+  <div class="h-100 fade-in">
     <div class="d-flex flex-column" style=";height:100%">
       <!-- 選擇項目與時間 -->
-      <div v-loading="!ready">
+      <div v-loading="!ready" class="options">
         <div class="d-flex flex-row row settings">
           <div class="col-lg-2 d-flex">
             <b>EQ</b>
@@ -119,7 +119,10 @@
         </el-tabs>
       </div>
       <!-- 結果與圖表 -->
-      <div class="d-flex flex-column flex-fill w-100 h-100" style="position:relative;">
+      <div
+        class="result-content d-flex flex-column flex-fill w-100 h-100"
+        style="position:relative;"
+      >
         <div
           v-show="selectedTabpage=='dataTabpage'"
           class="result d-flex flex-column flex-fill w-100 my-1"
