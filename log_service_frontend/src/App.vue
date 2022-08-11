@@ -21,7 +21,7 @@
               <div class="name mx-2">{{EdgeName.toUpperCase()}}</div>
               <div class="ip mx-2">{{EdgeIP}}</div>
             </div>
-            <NetworkStatusVue :ip="EdgeIP" toolTipPosition="bottom"></NetworkStatusVue>
+            <NetworkStatusVue class="px-0 py-0 mx-0 my-0" :ip="EdgeIP" toolTipPosition="bottom"></NetworkStatusVue>
           </div>
         </div>
       </div>
