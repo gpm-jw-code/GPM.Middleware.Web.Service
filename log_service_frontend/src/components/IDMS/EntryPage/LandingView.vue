@@ -1,5 +1,5 @@
 <template>
-  <div class="fade-out fade-in h-100 w-100 bg-light landing-view" sticky>
+  <div class="fade-out fade-in h-100 w-100 bg-dark landing-view" sticky>
     <div class="gpm-text w-100">GPM</div>
   </div>
 </template>

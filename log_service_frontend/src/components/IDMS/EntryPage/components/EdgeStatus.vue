@@ -1,6 +1,6 @@
 <template>
-  <div class="edge-status mx-1 my-1" v-loading="loading">
-    <div class="d-flex flex-row">
+  <div class="edge-status mx-1 my-1" @click="EnterEdgeHandle" v-loading="loading">
+    <div class="d-flex flex-row" v-bind:style="TitleColor">
       <div class="title d-flex flex-column px-1">
         <h3>{{EdgeProp.Name.toUpperCase()}}</h3>
         <span>{{EdgeProp.EdgeIP}}</span>
@@ -43,7 +43,7 @@
       </div>
     </div>
     <div class="my-2">
-      <b-button class="bg-primary w-100" @click="EnterEdgeHandle">Enter</b-button>
+      <b-button v-bind:class="EnterButtonColorMode" class="w-100" @click="EnterEdgeHandle">Enter</b-button>
     </div>
   </div>
 </template>
@@ -66,6 +66,19 @@ export default {
         }
       }
     },
+    ColorMode: {
+      type: String,
+      default: 'bg-dark'
+    }
+  },
+  computed: {
+    TitleColor() {
+      return { color: this.ColorMode == 'bg-dark' ? '#939393' : 'black' }
+    },
+    EnterButtonColorMode() {
+      return this.ColorMode == 'bg-dark' ? 'bg-dark' : 'bg-primary'
+
+    }
   },
   data() {
     return {
@@ -122,6 +135,9 @@ export default {
 </script>
 
 <style>
+.edge-status {
+  border-radius: 10px;
+}
 .edge-status h3 {
   letter-spacing: 0.21rem;
   font-weight: bolder;

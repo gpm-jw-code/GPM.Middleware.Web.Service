@@ -483,11 +483,13 @@ export default {
 }
 
 .btn-share-chart-show {
+  text-align: left;
   height: 32px;
   width: 100%;
   position: relative;
   top: -13px;
 }
+
 .showing-down-arrow {
   bottom: -13px;
   z-index: 3001;

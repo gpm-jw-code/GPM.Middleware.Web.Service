@@ -78,10 +78,10 @@ export default {
       this.EdgeIP = localStorage.getItem('edgeip');
       this.EdgeName = localStorage.getItem('edgename');
       var isNotEntryPAGE = this.showNavbar = n + '' !== 'EntryPage';
-      this.navstyle = this.showNavbar ? 'bg-dark' : 'bg-primary';
       console.info(this.showNavbar, n, o)
 
       if (!isNotEntryPAGE && o != undefined) {
+        this.navstyle = localStorage.getItem('entry-page-dark-mode') == 'true' ? 'bg-dark' : 'bg-primary';
         location.reload();
       }
 

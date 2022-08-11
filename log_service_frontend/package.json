@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "build": "vue-cli-service build && publish_to_idms_server.cmd",
+    "lint": "vue-cli-service lint",
+    "sync": "publish_to_idms_server.cmd"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.6",

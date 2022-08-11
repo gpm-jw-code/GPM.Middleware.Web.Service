@@ -1,8 +1,7 @@
 <template>
-  <div class="h-100 fade-in" v-loading="loading">
-    <!--     
+  <div class="h-100 fade-in" v-loading="loading" v-bind:class="ColorMode">
     <div class="w-100 d-flex flex-row justify-content-end">
-      <el-radio-group v-show="false" v-model="display_mode">
+      <!-- <el-radio-group v-model="display_mode">
         <el-radio-button label="dashboard">
           <el-icon>
             <Grid />
@@ -13,8 +12,16 @@
             <Expand />
           </el-icon>
         </el-radio-button>
-      </el-radio-group>
-    </div>-->
+      </el-radio-group>-->
+      <el-switch
+        v-model="dark_mode"
+        active-text="Dark"
+        active-color="grey"
+        inactive-text="Light"
+        inactive-color="rgb(13, 110, 253)"
+        @change="SaveDarkModeToLocal"
+      ></el-switch>
+    </div>
     <LandingViewVue></LandingViewVue>
     <div v-show="display_mode=='list'">
       <el-table :data="Edges">
@@ -24,14 +31,14 @@
         <el-table-column label="Edge IP" prop="EdgeIP"></el-table-column>
       </el-table>
     </div>
-    <div v-show="display_mode=='dashboard'" class="w-100 row g-2">
+    <div v-show="display_mode=='dashboard'" class="w-100 row g-0 mx-0 my-0">
       <div
-        class="edge-container bg-light px-1 py-1"
-        v-bind:class="Edges.length==1?' col-md-12':' col-md-6'"
+        class="edge-container px-1 py-1 my-1"
+        v-bind:class="[Edges.length==1?' col-md-12':' col-md-6',ColorMode]"
         v-for="edge in Edges"
         :key="edge.EdgeIP"
       >
-        <EdgeStatusVue :EdgeProp="edge"></EdgeStatusVue>
+        <EdgeStatusVue :ColorMode="ColorMode" :EdgeProp="edge"></EdgeStatusVue>
       </div>
     </div>
   </div>
@@ -48,6 +55,8 @@ export default {
   },
   mounted() {
     console.info('mounted ebtg');
+    this.dark_mode = localStorage.getItem('entry-page-dark-mode') == 'true';
+
     this.Initialize();
   },
   methods: {
@@ -57,10 +66,19 @@ export default {
         this.Edges = await GetEdgeInformation();
         this.loading = false;
       }, 100);
+    },
+    SaveDarkModeToLocal() {
+      localStorage.setItem('entry-page-dark-mode', this.dark_mode);
+    }
+  },
+  computed: {
+    ColorMode() {
+      return this.dark_mode ? 'bg-dark' : 'bg-light';
     }
   },
   data() {
     return {
+      dark_mode: true,
       display_mode: 'dashboard',
       loading: true,
       Edges: [
@@ -91,6 +109,7 @@ export default {
 <style>
 .edge-container {
   height: 50%;
+  border-radius: 10px;
   box-shadow: 5px 5px 23px 1px rgba(0, 0, 0, 0.452);
 }
 </style>
