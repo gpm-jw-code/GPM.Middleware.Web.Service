@@ -16,3 +16,19 @@ visibility: hidden;
         visibility: visible;
     }
 }
+
+.flip-y {
+    -webkit-animation: flip-y;
+    animation: flip-y;
+    animation-fill-mode: forwards;
+}
+
+@keyframes flip-y {
+    from{
+        visibility: hidden;
+    }
+    to{
+        visibility: visible;
+        transform: rotateY(180deg);
+    }
+}

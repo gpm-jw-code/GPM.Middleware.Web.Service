@@ -1,7 +1,29 @@
 <template>
   <div class="h-100 fade-in" v-loading="loading">
-    <!-- <h1>EDGES</h1> -->
-    <div class="w-100 row g-2">
+    <div class="w-100 d-flex flex-row justify-content-end">
+      <el-radio-group v-show="false" v-model="display_mode">
+        <el-radio-button label="dashboard">
+          <el-icon>
+            <Grid />
+          </el-icon>
+        </el-radio-button>
+        <el-radio-button label="list">
+          <el-icon>
+            <Expand />
+          </el-icon>
+        </el-radio-button>
+      </el-radio-group>
+    </div>
+
+    <div v-show="display_mode=='list'">
+      <el-table :data="Edges">
+        <el-table-column label="Edge 名稱" prop="Name"></el-table-column>
+        <el-table-column label="Edge IP" prop="EdgeIP"></el-table-column>
+        <el-table-column label="Edge IDMS 狀態" prop="EdgeIP"></el-table-column>
+        <el-table-column label="Edge IP" prop="EdgeIP"></el-table-column>
+      </el-table>
+    </div>
+    <div v-show="display_mode=='dashboard'" class="w-100 row g-2">
       <div
         class="edge-container bg-light px-1 py-1"
         v-bind:class="Edges.length==1?' col-md-12':' col-md-6'"
@@ -17,9 +39,8 @@
 <script>
 import EdgeStatusVue from './components/EdgeStatus.vue';
 import { GetEdgeInformation } from '@/APIHelpers/DatabaseServerAPI'
-import { watch } from 'vue';
-import { useRoute } from 'vue-router';
 export default {
+
   components: {
     EdgeStatusVue,
   },
@@ -38,6 +59,7 @@ export default {
   },
   data() {
     return {
+      display_mode: 'dashboard',
       loading: true,
       Edges: [
         {

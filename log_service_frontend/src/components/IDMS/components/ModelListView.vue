@@ -80,13 +80,13 @@ export default {
       this.loading = false;
     },
     async ModelDeleteHandle(modelName = "") {
-      var res = await DeleteModel(this.IP, modelName);
+      var res = await DeleteModel(this.edgeIP, this.IP, modelName);
       if (res.success) {
         this.Fetch();
       }
     },
     async ModelEnableHandle(modelName = "", enable = false) {
-      var res = await SetModelEnable(this.IP, modelName, enable);
+      var res = await SetModelEnable(this.edgeIP, this.IP, modelName, enable);
       if (res.success) {
         this.Fetch();
       }

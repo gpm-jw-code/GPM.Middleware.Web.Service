@@ -24,7 +24,7 @@ export async function GetDignoseDataListWsInstance(edgeIP) {
     ws.onerror = (er) => reject(er)
   })
 }
-export async function GetTrendchartWsInstance(ip, featureType = 'HS', edgeIP) {
+export async function GetTrendchartWsInstance(edgeIP, ip, featureType = 'HS') {
   var host = edgeIP == undefined ? ws_host : `ws://${edgeIP}:44332`
   console.info('GetTrendchartWsInstance', edgeIP)
   return await new Promise((resolve, reject) => {
@@ -57,11 +57,10 @@ export async function GetModelList(edgeIP, ip = 'ip') {
   })
 }
 
-export async function GetDignoseThresholdVal(ip) {
+export async function GetDignoseThresholdVal(edgeIP, ip) {
+  var host = edgeIP == undefined ? ws_host : `ws://${edgeIP}:44332`
   return await new Promise((resolve, reject) => {
-    var ws = new WebSocket(
-      `${configs.idms_websocket_host}/Settings?Get=DignoseThresholds&IP=${ip}`,
-    )
+    var ws = new WebSocket(`${host}/Settings?Get=DignoseThresholds&IP=${ip}`)
     ws.onmessage = (evt) => {
       var ret = JSON.parse(evt.data)
       ws.close()
@@ -77,10 +76,11 @@ export async function GetDignoseThresholdVal(ip) {
  * @Parm ip = 模組IP
  * @Parm threshold = 設定值
  */
-export async function SetDignoseWarningThreshold(ip, threshold) {
+export async function SetDignoseWarningThreshold(edgeIP, ip, threshold) {
+  var host = edgeIP == undefined ? ws_host : `ws://${edgeIP}:44332`
   return await new Promise((resolve, reject) => {
     var ws = new WebSocket(
-      `${ws_host}/Settings?IP=${ip}&DignoseWarningThres=${threshold}`,
+      `${host}/Settings?IP=${ip}&DignoseWarningThres=${threshold}`,
     )
     ws.onmessage = (evt) => {
       ws.close()
@@ -94,10 +94,11 @@ export async function SetDignoseWarningThreshold(ip, threshold) {
  * @Parm ip = 模組IP
  * @Parm threshold = 設定值
  */
-export async function SetDignoseAlarmThreshold(ip, threshold) {
+export async function SetDignoseAlarmThreshold(edgeIP, ip, threshold) {
+  var host = edgeIP == undefined ? ws_host : `ws://${edgeIP}:44332`
   return await new Promise((resolve, reject) => {
     var ws = new WebSocket(
-      `${ws_host}/Settings?IP=${ip}&DignoseAlarmThres=${threshold}`,
+      `${host}/Settings?IP=${ip}&DignoseAlarmThres=${threshold}`,
     )
     ws.onmessage = (evt) => {
       ws.close()
@@ -107,13 +108,13 @@ export async function SetDignoseAlarmThreshold(ip, threshold) {
   })
 }
 
-export async function SetModelEnable(ip, modelName, enabled) {
+export async function SetModelEnable(edgeIP, ip, modelName, enabled) {
   // public string Action { get; set; }
   // public string IP { get; set; }
   // public string Model_Name { get; set; }
-
+  var host = edgeIP == undefined ? ws_host : `ws://${edgeIP}:44332`
   return await new Promise((resolve, reject) => {
-    var ws = new WebSocket(`${ws_host}/Diagnose/ModelInfo`)
+    var ws = new WebSocket(`${host}/Diagnose/ModelInfo`)
     ws.onopen = () => {
       ws.send(
         JSON.stringify({
@@ -131,13 +132,14 @@ export async function SetModelEnable(ip, modelName, enabled) {
   })
 }
 
-export async function DeleteModel(ip, modelName) {
+export async function DeleteModel(edgeIP, ip, modelName) {
   // public string Action { get; set; }
   // public string IP { get; set; }
   // public string Model_Name { get; set; }
+  var host = edgeIP == undefined ? ws_host : `ws://${edgeIP}:44332`
 
   return await new Promise((resolve, reject) => {
-    var ws = new WebSocket(`${ws_host}/Diagnose/ModelInfo`)
+    var ws = new WebSocket(`${host}/Diagnose/ModelInfo`)
     ws.onopen = () => {
       ws.send(
         JSON.stringify({

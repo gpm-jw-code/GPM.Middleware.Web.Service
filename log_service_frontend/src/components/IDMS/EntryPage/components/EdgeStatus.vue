@@ -5,11 +5,13 @@
         <h3>{{EdgeProp.Name.toUpperCase()}}</h3>
         <span>{{EdgeProp.EdgeIP}}</span>
       </div>
+
       <div class="flex-fill d-flex flex-row justify-content-end">
         <span class="network-status-label py-1">網路狀態</span>
         <NetworkStatusVue :ip="EdgeProp.EdgeIP" toolTipPosition="bottom"></NetworkStatusVue>
       </div>
     </div>
+    <el-divider></el-divider>
     <el-progress type="circle" :percentage="100" :width="circleWidth" status="primary">
       <div class="sensor-num-div">
         <div class="sensor-num">{{edgeStatusFromIDMS.OnlineSensorNum}}</div>

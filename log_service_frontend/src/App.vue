@@ -2,19 +2,18 @@
   <div id="breadcrumb" sticky>
     <nav class="navbar navbar-expand-sm sticky" v-bind:class="navstyle">
       <div class="container-fluid">
-        <a class="navbar-brand" style="position:relative;left:-30px">GPM</a>
+        <a class="navbar-brand" style="position:relative;left:-30px" href="/">GPM</a>
         <button class="navbar-toggler" type="button" v-b-toggle="'navbar'">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div v-if="showNavbar" class="collapse navbar-collapse d-flex flex-row" id="navbar">
           <div class="navbar-nav flex-fill">
-            <b-button
-              variant="primary"
+            <a
               class="mx-1"
               v-for="rout in routes"
               :key="rout.path"
               @click="routerHandle(rout.path)"
-            >{{rout.name}}</b-button>
+            >{{rout.name}}</a>
           </div>
           <div class="edge-ip d-flex flex-row justify-cotent-end">
             <span class="py-2 mx-2">{{EdgeIP}}</span>
@@ -107,6 +106,7 @@ nav {
 }
 
 nav a {
+  cursor: pointer;
   font-weight: bold;
   color: #2c3e50;
 }

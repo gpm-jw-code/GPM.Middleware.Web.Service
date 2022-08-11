@@ -239,8 +239,16 @@ export default {
     tableRowClassName({ row }) {
       return row.DignoseDetailData.dignoseResult;
     },
+    HideAllExpand() {
+      this.DignoseDatas.forEach(row => {
+        this.$refs.table.toggleRowExpansion(row, false);
+      })
+    },
 
     async TableRowClickHandle(row) {
+      console.log(row)
+      this.HideAllExpand();
+      this.$refs.table.toggleRowExpansion(row, true);
       if (this.selectedDiagnoseData.IP != row.IP) {
 
         this.chart_loading = true;
@@ -256,7 +264,7 @@ export default {
       }
       this.selectedDiagnoseData = row;
 
-      var ret = await GetDignoseThresholdVal(this.selectedDiagnoseData.IP);
+      var ret = await GetDignoseThresholdVal(this.edgeIP, this.selectedDiagnoseData.IP);
       if (ret.success) {
         this.ThresholdSettings[this.selectedDiagnoseData.IP] = ret.data;
       }
@@ -268,7 +276,7 @@ export default {
         this.trendchart_ws.close();
       }
 
-      this.trendchart_ws = await GetTrendchartWsInstance(ip, this.chart_display_mode, this.edgeIP);
+      this.trendchart_ws = await GetTrendchartWsInstance(this.edgeIP, ip, this.chart_display_mode);
       this.chart_loading = this.trendchart_ws == null;
       if (this.trendchart_ws != null) {
         this.trendchart_ws.onmessage = (evt) => {
@@ -309,20 +317,20 @@ export default {
       if (rows.length == 0)
         return;
       var ip = rowData.IP;
-      var ret = await GetDignoseThresholdVal(ip);
+      var ret = await GetDignoseThresholdVal(this.edgeIP, ip);
       if (ret.success) {
         this.ThresholdSettings[ip] = ret.data;
       }
     },
     async SetWarningThreshold(ip) {
-      await SetDignoseWarningThreshold(ip, this.ThresholdSettings[ip].warningThreshold);
+      await SetDignoseWarningThreshold(this.edgeIP, ip, this.ThresholdSettings[ip].warningThreshold);
     },
     async SetAlarmThreshold(ip) {
-      await SetDignoseAlarmThreshold(ip, this.ThresholdSettings[ip].alarmThreshold);
+      await SetDignoseAlarmThreshold(this.edgeIP, ip, this.ThresholdSettings[ip].alarmThreshold);
     },
     ShowModelList(ip) {
       this.$refs.modelListView.UpdateModuleInfos();
-      this.$refs.modelListView.ShowModelList(this.edgeIP,ip);
+      this.$refs.modelListView.ShowModelList(this.edgeIP, ip);
     }
   },
   computed: {
