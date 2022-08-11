@@ -1,24 +1,9 @@
 <template>
-  <div class="h-100">
-    <nav class="navbar navbar-expand-sm navbar-dark bg-dark sticky">
-      <div class="container-fluid">
-        <a class="navbar-brand" style="position:relative;left:-30px">GPM</a>
-        <button class="navbar-toggler" type="button" v-b-toggle="'navbar'">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbar">
-          <div class="navbar-nav">
-            <!-- <router-link v-for="rout in routes" :key="rout.path" :to="rout.path">{{rout.name}}</router-link> -->
-          </div>
-        </div>
-      </div>
-    </nav>
-
-    <h1>Entry Page</h1>
-
-    <div class="w-100 row g-1">
+  <div class="h-100 fade-in" v-loading="loading">
+    <!-- <h1>EDGES</h1> -->
+    <div class="w-100 row g-2">
       <div
-        class="edge-container bg-light px-1 py-1 border"
+        class="edge-container bg-light px-1 py-1"
         v-bind:class="Edges.length==1?' col-md-12':' col-md-6'"
         v-for="edge in Edges"
         :key="edge.EdgeIP"
@@ -32,19 +17,28 @@
 <script>
 import EdgeStatusVue from './components/EdgeStatus.vue';
 import { GetEdgeInformation } from '@/APIHelpers/DatabaseServerAPI'
+import { watch } from 'vue';
+import { useRoute } from 'vue-router';
 export default {
   components: {
     EdgeStatusVue,
   },
   mounted() {
-    document.getElementById('breadcrumb').style['visibility'] = 'hidden';
-    setTimeout(async () => {
-      this.Edges = await GetEdgeInformation();
-
-    }, 100);
+    console.info('mounted ebtg');
+    this.Initialize();
+  },
+  methods: {
+    Initialize() {
+      this.Edges = [];
+      setTimeout(async () => {
+        this.Edges = await GetEdgeInformation();
+        this.loading = false;
+      }, 100);
+    }
   },
   data() {
     return {
+      loading: true,
       Edges: [
         {
           Name: 'Line-1',
@@ -73,5 +67,6 @@ export default {
 <style>
 .edge-container {
   height: 50%;
+  box-shadow: 5px 5px 23px 1px rgba(0, 0, 0, 0.452);
 }
 </style>

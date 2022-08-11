@@ -42,7 +42,8 @@ export default {
     return {
       success: false,
       ping: -1,
-      displayPingTime: false
+      displayPingTime: false,
+      websocket: null
     }
   },
   computed: {
@@ -61,14 +62,19 @@ export default {
     }
   },
   mounted() {
-    var websocket = new WebSocket(this.host_route + `?ip=${this.ip}`);
-    websocket.onerror = () => { };
-    websocket.onmessage = (evt) => {
+    this.websocket = new WebSocket(this.host_route + `?ip=${this.ip}`);
+    this.websocket.onerror = () => { };
+    this.websocket.onmessage = (evt) => {
       var object = JSON.parse(evt.data)
       this.success = object.Success;
       this.ping = object.PingTime;
     }
 
+  },
+  unmounted() {
+    this.websocket.onerror = null;
+    this.websocket.onmessage = null;
+    this.websocket.close();
   }
 }
 </script>

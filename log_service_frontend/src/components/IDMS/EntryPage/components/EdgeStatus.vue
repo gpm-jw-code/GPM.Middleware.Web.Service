@@ -1,12 +1,18 @@
 <template>
-  <div class="edge-status">
-    <div class="title d-flex flex-column px-1 w-100">
-      <h3>{{EdgeProp.Name}}</h3>
-      <span>{{EdgeProp.EdgeIP}}</span>
+  <div class="edge-status mx-1 my-1" v-loading="loading">
+    <div class="d-flex flex-row">
+      <div class="title d-flex flex-column px-1">
+        <h3>{{EdgeProp.Name.toUpperCase()}}</h3>
+        <span>{{EdgeProp.EdgeIP}}</span>
+      </div>
+      <div class="flex-fill d-flex flex-row justify-content-end">
+        <span class="network-status-label py-1">網路狀態</span>
+        <NetworkStatusVue :ip="EdgeProp.EdgeIP" toolTipPosition="bottom"></NetworkStatusVue>
+      </div>
     </div>
     <el-progress type="circle" :percentage="100" :width="circleWidth" status="primary">
       <div class="sensor-num-div">
-        <div class="sensor-num">{{EdgeProp.SensorNum}}</div>
+        <div class="sensor-num">{{edgeStatusFromIDMS.OnlineSensorNum}}</div>
         <div>感測器數量</div>
       </div>
     </el-progress>
@@ -14,10 +20,13 @@
       type="circle"
       :percentage="100"
       :width="circleWidth"
-      :status="EdgeProp.Status=='Offline'? 'exception':'success'"
+      :status="IDMSAlive ? 'success':'exception'"
     >
       <div class="sensor-num-div">
-        <div class="sensor-num" v-bind:class="EdgeProp.Status+''">{{EdgeProp.Status}}</div>
+        <div
+          class="sensor-num"
+          v-bind:class="IDMSAlive?'Online':'Offline'"
+        >{{IDMSAlive?'ONLINE':'OFFLINE'}}</div>
         <div>狀態</div>
       </div>
     </el-progress>
@@ -28,7 +37,11 @@
 </template>
 
 <script>
+import NetworkStatusVue from '../../components/NetworkStatus.vue';
 export default {
+  components: {
+    NetworkStatusVue,
+  },
   props: {
     EdgeProp: {
       type: Object,
@@ -44,16 +57,54 @@ export default {
   },
   data() {
     return {
-      circleWidth: 140
+      loading: true,
+      edgeStatusWebsocket: null,
+      circleWidth: 170,
+      edgeStatusFromIDMS: {
+        OnlineSensorNum: -1
+      },
+      IDMSAlive: false
     }
   },
   methods: {
     EnterEdgeHandle() {
       localStorage.setItem('edgeip', this.EdgeProp.EdgeIP);
-      document.getElementById('breadcrumb').style['visibility'] = 'visible';
+      localStorage.setItem('edgename', this.EdgeProp.Name.toLowerCase());
       this.$router.push(`/EdgeMain/${this.EdgeProp.EdgeIP}`);
       //   this.$router.push(`/EdgeMain`);
     }
+  },
+  mounted() {
+
+    try {
+      this.edgeStatusWebsocket = new WebSocket(`ws://${this.EdgeProp.EdgeIP}:44332/EdgeStatus`);
+      this.edgeStatusWebsocket.onmessage = (evt) => {
+        this.edgeStatusFromIDMS = JSON.parse(evt.data);
+        this.IDMSAlive = true;
+        this.loading = false;
+      }
+      this.edgeStatusWebsocket.onclose = () => {
+        console.info('edge ws close ');
+        this.IDMSAlive = false;
+        this.loading = false;
+      }
+      this.edgeStatusWebsocket.onerror = (err) => {
+        this.IDMSAlive = false;
+        this.loading = false;
+        console.info('edge ws ', err);
+
+      }
+    } catch (error) {
+      console.info('edge ws ', error);
+      this.IDMSAlive = false;
+      this.loading = false;
+    }
+
+  },
+  unmounted() {
+    this.edgeStatusWebsocket.onclose = null;
+    this.edgeStatusWebsocket.onerror = null;
+    this.edgeStatusWebsocket.close();
   }
 }
 </script>
@@ -69,12 +120,28 @@ export default {
 .edge-status .title {
   text-align: left;
 }
+.edge-status .el-progress {
+  margin: 10px;
+  /* box-shadow: 1px 1px 1px 2px black; */
+}
+.edge-status:hover {
+  background-color: rgb(187, 214, 253);
+  color: white;
+  cursor: pointer;
+}
+
+.network-status-label {
+  font-size: 8px;
+  color: rgb(129, 129, 129);
+}
 
 .sensor-num-div {
   color: grey;
 }
 .sensor-num {
   font-size: 38px;
+  margin: 10px;
+  font-weight: bold;
 }
 .Offline {
   color: red;

@@ -21,45 +21,46 @@ export async function GetModuleInfoStoredInDB() {
 }
 export async function QueryVibrationEnergy(edgename, ip, startT, endT) {
   return await GetRequest(
-    `/api/DB/VibrationEnergy?ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/VibrationEnergy?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}`,
   )
 }
 export async function QueryHealthScore(edgename, ip, startT, endT) {
   return await GetRequest(
-    `/api/DB/HealthScore?ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/HealthScore?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}`,
   )
 }
 export async function QueryAlertIndex(edgename, ip, startT, endT) {
   return await GetRequest(
-    `/api/DB/AlertIndex?ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/AlertIndex?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}`,
   )
 }
 
 export async function QueryVibration_raw_data(edgename, ip, startT, endT) {
   return await GetRequest(
-    `/api/DB/vibration_raw_data?ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/vibration_raw_data?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}`,
   )
 }
 
 export async function QueryVibration_raw_data_with_QueryID(
+  edgename,
   ip,
   startT,
   endT,
   queryID,
 ) {
   return await GetRequest(
-    `/api/DB/vibration_raw_data_with_QueryID?ip=${ip}&from=${startT}&to=${endT}&queryID=${queryID}`,
+    `/api/DB/vibration_raw_data_with_QueryID?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}&queryID=${queryID}`,
   )
 }
 
 export async function QueryPhysical_quantity(edgename, ip, startT, endT) {
   return await GetRequest(
-    `/api/DB/Physical_quantity?ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/Physical_quantity?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}`,
   )
 }
 export async function QuerySideBandSeverity(edgename, ip, startT, endT) {
   return await GetRequest(
-    `/api/DB/SideBandSeverity?ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/SideBandSeverity?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}`,
   )
 }
 
@@ -71,7 +72,7 @@ export async function QueryFrequency_doublingSeverity(
   endT,
 ) {
   return await GetRequest(
-    `/api/DB/Frequency_doublingSeverity?ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/Frequency_doublingSeverity?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}`,
   )
 }
 
@@ -86,12 +87,12 @@ export async function QuerySplice(queryID, from, to) {
 export const EventQuery = {
   async HealthScoreOutOfThreshold(edgename, ip, from, to, page = 1) {
     return await GetRequest(
-      `/api/DB/DignoseOutOfThreshold?ip=${ip}&from=${from}&to=${to}&page=${page}`,
+      `/api/DB/DignoseOutOfThreshold?edgename=${edgename}&ip=${ip}&from=${from}&to=${to}&page=${page}`,
     )
   },
   async SideBandSeverityOutOfThres(edgename, ip, from, to, page = 1) {
     return await GetRequest(
-      `/api/DB/SideBandSeverityOutOfThres?ip=${ip}&from=${from}&to=${to}&page=${page}`,
+      `/api/DB/SideBandSeverityOutOfThres?edgename=${edgename}&ip=${ip}&from=${from}&to=${to}&page=${page}`,
     )
   },
   //SideBandSeverityOutOfThres

@@ -1,18 +1,24 @@
 <template>
   <div id="breadcrumb" sticky>
-    <nav class="navbar navbar-expand-sm navbar-dark bg-dark sticky">
+    <nav class="navbar navbar-expand-sm sticky" v-bind:class="navstyle">
       <div class="container-fluid">
         <a class="navbar-brand" style="position:relative;left:-30px">GPM</a>
         <button class="navbar-toggler" type="button" v-b-toggle="'navbar'">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbar">
-          <div class="navbar-nav">
+        <div v-if="showNavbar" class="collapse navbar-collapse d-flex flex-row" id="navbar">
+          <div class="navbar-nav flex-fill">
             <b-button
+              variant="primary"
+              class="mx-1"
               v-for="rout in routes"
               :key="rout.path"
               @click="routerHandle(rout.path)"
             >{{rout.name}}</b-button>
+          </div>
+          <div class="edge-ip d-flex flex-row justify-cotent-end">
+            <span class="py-2 mx-2">{{EdgeIP}}</span>
+            <NetworkStatusVue :ip="EdgeIP" toolTipPosition="bottom"></NetworkStatusVue>
           </div>
         </div>
       </div>
@@ -20,33 +26,38 @@
   </div>
   <!-- <router-view /> -->
   <router-view v-slot="{ Component }">
-    <!-- <transition name="el-fade-in"> -->
     <div class="router-view-content">
-      <keep-alive>
-        <component :is="Component" />
-      </keep-alive>
+      <component :is="Component" />
     </div>
-    <!-- </transition> -->
   </router-view>
 </template>
 
 <script>
 import { configs } from '@/config'
 import { GetRouters } from '@/router/index.js';
+import { watch } from 'vue'
+import { useRoute } from 'vue-router';
+import NetworkStatusVue from './components/IDMS/components/NetworkStatus.vue';
 export default {
+  components: {
+    NetworkStatusVue,
+  },
   data() {
     return {
+      showNavbar: false,
+      navstyle: 'bg-dark',
       breadcrumbItems: [
         { text: 'SSM', href: '/' },
         { text: 'Log', href: '/log' },
-        { text: 'Library' },]
+        { text: 'Library' },],
+      EdgeIP: "-",
     }
   },
   methods: {
     routerHandle(path) {
-      localStorage.getItem('edgeip');
+      this.EdgeIP = localStorage.getItem('edgeip');
       console.info(path)
-      this.$router.push(`${path.replace(':ip', localStorage.getItem('edgeip'))}`);
+      this.$router.push(`${path.replace(':ip', this.EdgeIP)}`);
     }
   },
   computed: {
@@ -57,6 +68,20 @@ export default {
       return GetRouters();
     }
   },
+  mounted() {
+    let route = useRoute();
+    watch(() => route.name, (n, o) => {
+      this.EdgeIP = localStorage.getItem('edgeip');
+      var isNotEntryPAGE = this.showNavbar = n + '' !== 'EntryPage';
+      this.navstyle = this.showNavbar ? 'bg-dark' : 'bg-primary';
+      console.info(this.showNavbar, n, o)
+
+      if (!isNotEntryPAGE && o != undefined) {
+        location.reload();
+      }
+
+    })
+  }
 }
 
 </script>
@@ -114,5 +139,12 @@ nav a {
 .router-view-content {
   height: 100%;
   padding-top: 75px;
+}
+
+.edge-ip {
+  color: white;
+  font-size: larger;
+  font-weight: bold;
+  letter-spacing: 2px;
 }
 </style>

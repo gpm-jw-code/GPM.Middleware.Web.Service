@@ -200,6 +200,8 @@ export default {
   },
   data() {
     return {
+      edge_ip: '',
+      edge_name: '',
       ready: false,
       selectedTabpage: 'dataTabpage',
       TypeItems: [{ name: 'dataTabpage', label: '數據' }, { name: 'eventTabpage', label: '事件' }],
@@ -293,7 +295,7 @@ export default {
   methods: {
     async FetchModuleList() {
 
-      this.ModuleList = await GetModuleInfos().catch(async (er) => {
+      this.ModuleList = await GetModuleInfos(this.edge_ip).catch(async (er) => {
         console.info('IDMS websocket連接失敗,從資料庫調取模組資訊', er);
         var _ModuleList = await GetModuleInfoStoredInDB(); //從IDMS拿不到資訊就從資料庫拿
         return _ModuleList;
@@ -313,22 +315,22 @@ export default {
         new Promise(() => {
           this.$refs.query_chart.Clear();
           if (this.QueryOptions.SelectedQueryItem == 'Health Score')
-            QueryHealthScore(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+            QueryHealthScore(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
           else if (this.QueryOptions.SelectedQueryItem == 'Alert Index')
-            QueryAlertIndex(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+            QueryAlertIndex(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
           else if (this.QueryOptions.SelectedQueryItem == '振動能量')
-            QueryVibrationEnergy(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+            QueryVibrationEnergy(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
           else if (this.QueryOptions.SelectedQueryItem == 'Raw Data') {
-            QueryVibration_raw_data(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+            QueryVibration_raw_data(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
           }
           else if (this.QueryOptions.SelectedQueryItem == 'Physical Quanity') {
-            QueryPhysical_quantity(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+            QueryPhysical_quantity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
           }
           else if (this.QueryOptions.SelectedQueryItem == 'Sideband Severity') {
-            QuerySideBandSeverity(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+            QuerySideBandSeverity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
           }
           else if (this.QueryOptions.SelectedQueryItem == 'FrequencyDoubling Severity') {
-            QueryFrequency_doublingSeverity(this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+            QueryFrequency_doublingSeverity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
           }
           else
             this.loading = false;
@@ -364,7 +366,7 @@ export default {
       var data_ret = {};
 
       if (this.QueryOptions.SelectedQueryItem == 'Raw Data') {
-        data_ret = await QueryVibration_raw_data_with_QueryID(this.QueryOptions.SelectedUNIT, datetimeInterval.from, datetimeInterval.to, "givemedetail");
+        data_ret = await QueryVibration_raw_data_with_QueryID(this.edge_name, this.QueryOptions.SelectedUNIT, datetimeInterval.from, datetimeInterval.to, "givemedetail");
       } else {
         data_ret = await QuerySplice(this.ServerResponseData.QueryID, datetimeInterval.from, datetimeInterval.to);
       }
@@ -388,6 +390,13 @@ export default {
     },
   },
   async mounted() {
+
+    var edge_ip = localStorage.getItem('edgeip');
+    var edge_name = localStorage.getItem('edgename');
+    console.log(edge_ip, edge_name);
+    this.edge_ip = edge_ip;
+    this.edge_name = edge_name;
+
     this.FetchModuleList().then(() => {
       this.ReadQueryOptionsFromLocalStorage();
 
