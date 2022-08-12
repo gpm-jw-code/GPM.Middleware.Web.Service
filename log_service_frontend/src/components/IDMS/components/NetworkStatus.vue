@@ -4,7 +4,7 @@
       <el-button
         @click="Click"
         class="my-s"
-        size="small"
+        :size="size"
         round
         v-bind:style="[style]"
         :type=" success? 'success': 'danger'"
@@ -36,11 +36,15 @@ export default {
     host_route: {
       type: String,
       default: `${configs.websocket_host}/ping-ip`
+    },
+    size: {
+      type: String,
+      default: 'small'
     }
   },
   data() {
     return {
-      success: false,
+      success: 'unknown',
       ping: -1,
       displayPingTime: false,
       websocket: null
@@ -49,9 +53,9 @@ export default {
   computed: {
     style() {
       return {
-        backgroundColor: this.success ? this.successColor : this.failColor,
+        backgroundColor: this.success == 'unknown' ? 'orange' : this.success ? this.successColor : this.failColor,
         width: this.displayPingTime ? '60px' : 'auto',
-        boxShadow: `2px -2px 12px 0.001rem ${this.success ? this.successColor : this.failColor}`,
+        boxShadow: `2px -2px 12px 0.001rem ${this.success == 'unknown' ? 'orange' : this.success ? this.successColor : this.failColor}`,
         // border: '1px solid grey'
       }
     }

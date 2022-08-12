@@ -2,6 +2,10 @@ import axios from 'axios'
 import { configs } from '../config'
 axios.defaults.baseURL = configs.host
 
+export async function GetWebSiteVersion() {
+  return await GetRequest('/api/Version/WebsiteVersion')
+}
+
 //https://localhost:7005/WeatherForecast
 export async function QueryTest() {
   return await GetRequest('/WeatherForecast?id=123')

@@ -47,6 +47,7 @@ export default {
   created() {
     console.info('fff', this.$route.params.ip)
     this.EdgeIP = this.$route.params.ip;
+    localStorage.setItem('edgeip', this.EdgeIP);
   }
 }
 

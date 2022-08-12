@@ -329,7 +329,7 @@ export default {
       await SetDignoseAlarmThreshold(this.edgeIP, ip, this.ThresholdSettings[ip].alarmThreshold);
     },
     ShowModelList(ip) {
-      this.$refs.modelListView.UpdateModuleInfos();
+      this.$refs.modelListView.UpdateModuleInfos(this.edgeIP);
       this.$refs.modelListView.ShowModelList(this.edgeIP, ip);
     }
   },
@@ -372,7 +372,7 @@ export default {
     },
     table_height() {
       console.info(window.innerHeight);
-      return this.share_chart_show ? window.innerHeight * 0.35 : window.innerHeight - 220;
+      return this.share_chart_show ? window.innerHeight * 0.45 : window.innerHeight - 220;
     }
 
   },

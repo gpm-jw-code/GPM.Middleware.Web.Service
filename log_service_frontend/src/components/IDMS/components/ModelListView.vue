@@ -16,11 +16,11 @@
       </div>
     </div>
     <el-table :data="modelData" v-loading="loading">
-      <el-table-column prop="Recipe_ID" label="模型名稱" fixed="left" width="160px"></el-table-column>
-      <el-table-column prop="Model_Start_Time" label="開始時間"></el-table-column>
+      <el-table-column prop="Recipe_ID" label="模型名稱" fixed="left" width="160px" sortable></el-table-column>
+      <el-table-column prop="Model_Start_Time" label="開始時間" sortable></el-table-column>
       <el-table-column prop="Model_End_Time" label="結束時間"></el-table-column>
       <el-table-column prop="Comment" label="Comment"></el-table-column>
-      <el-table-column prop="Enabled" label="狀態">
+      <el-table-column prop="Enabled" label="狀態" sortable>
         <template #default="scope">
           <el-tag
             effect="dark"
@@ -63,10 +63,11 @@ export default {
       this.show = true;
       this.edgeIP = edgeIP;
       this.IP = ip;
-      this.UpdateModuleInfos();
+      this.UpdateModuleInfos(edgeIP);
       this.Fetch();
     },
-    async UpdateModuleInfos() {
+    async UpdateModuleInfos(edgeIP) {
+      this.edgeIP = edgeIP;
       this.module_infos = await GetModuleInfos(this.edgeIP);
 
     },
@@ -93,7 +94,6 @@ export default {
     }
   },
   mounted() {
-    this.UpdateModuleInfos();
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="Show" direction="rtl" size="60%" title="Model Training">
+  <el-drawer @closed="CloseHandle" v-model="Show" direction="rtl" size="60%" title="Model Training">
     <!-- Information? -->
 
     <!-- Main-Content -->
@@ -9,16 +9,16 @@
           <h5>選擇模組</h5>
           <!-- <IDMSModuleSelectVue @changed="ModuleChangeHandle"></IDMSModuleSelectVue> -->
           <div
-            style="height:220px; overflow-y: scroll; margin-left:0 "
+            style="height:120px; overflow-y: scroll; margin-left:0 "
             class="d-flex flex-column justify-content-start border px-2"
           >
-            <el-checkbox-group v-model="IPList" @change="SensorSelectsChanged">
-              <div
-                class="d-flex flex-column justify-content-start"
-                v-for="i in [78,79,81,82]"
-                :key="i"
-              >
-                <el-checkbox :label="'192.168.0.'+i"></el-checkbox>
+            <el-checkbox-group
+              :disabled="IsIDMSRecording"
+              v-model="SelectedIPList"
+              @change="SensorSelectsChanged"
+            >
+              <div class="d-flex flex-column justify-content-start" v-for="ip in IPList" :key="ip">
+                <el-checkbox :label="ip"></el-checkbox>
               </div>
             </el-checkbox-group>
           </div>
@@ -26,12 +26,17 @@
 
         <div class="step-content d-flex flex-column justify-content-start">
           <h5>命名模型</h5>
-          <el-input autocomplete="on" placeholder="模型名稱" v-model="ModelName"></el-input>
+          <el-input
+            :disabled="IsIDMSRecording"
+            autocomplete="on"
+            placeholder="模型名稱"
+            v-model="ModelName"
+          ></el-input>
         </div>
 
         <div class="step-content d-flex flex-column justify-content-start">
           <h5>設定錄製時間</h5>
-          <el-input-number min="5" v-model="RecordPeriod" class="w-100"></el-input-number>
+          <el-input-number :disabled="IsIDMSRecording" min="5" v-model="RecordPeriod" class="w-100"></el-input-number>
         </div>
 
         <el-divider></el-divider>
@@ -45,7 +50,7 @@
         </div>
       </div>
       <div>
-        <el-table :data="TrainStates">
+        <el-table :data="TrainStates" height="180px">
           <el-table-column label="IP" prop="IP"></el-table-column>
           <el-table-column label="請求模型名稱" prop="ModelName"></el-table-column>
           <el-table-column label="狀態" prop="State"></el-table-column>
@@ -54,6 +59,27 @@
           <el-table-column label="Message" prop="Message"></el-table-column>
         </el-table>
       </div>
+      <div class="step-content d-flex flex-column justify-content-start">
+        <h5>訓練模組狀態</h5>
+        <div class="recorder d-flex flex-row justify-content-start">
+          <div class="d-flex flex-column">
+            <span>狀態</span>
+            <el-button
+              effect="dark"
+              :type="IsIDMSRecording?'danger':'info'"
+              size="normal"
+            >{{IsIDMSRecording?'訓練中':'IDLE'}}</el-button>
+          </div>
+          <div class="d-flex flex-column">
+            <span>時間設定</span>
+            <div class="duration-setting">{{IDMSRecordPeriod}} 秒</div>
+          </div>
+          <div class="d-flex flex-column">
+            <span>累計時間</span>
+            <div class="count-down px-3 py-0">{{CountDown}}</div>
+          </div>
+        </div>
+      </div>
     </div>
   </el-drawer>
 </template>
@@ -61,16 +87,22 @@
 <script>
 // import IDMSModuleSelectVue from '../IDMSModuleSelect.vue'
 import { configs } from '@/config';
+import { GetModuleInfos } from '@/APIHelpers/IDMSAPIs.js'
 export default {
   data() {
     return {
       Show: false,
       IPList: [],
+      SelectedIPList: [],
       ModelName: '',
       RecordPeriod: 10,
       websocket: null,
       TrainStates: [],
       edgeIP: '',
+      IsIDMSRecording: false,
+      CountDown: '00:00:00',
+      IDMSRecordPeriod: 10,
+
     }
   },
   components: {
@@ -78,11 +110,11 @@ export default {
   },
   computed: {
     Start_Enable() {
-      return this.IPList.length !== 0 && this.ModelName !== '' && this.RecordPeriod !== 0;
+      return !this.IsIDMSRecording && this.SelectedIPList.length !== 0 && this.ModelName !== '' && this.RecordPeriod !== 0;
     },
     TrainingReqObj() {
       return {
-        IPList: this.IPList,
+        IPList: this.SelectedIPList,
         ModelName: this.ModelName,
         RecordPeriod: this.RecordPeriod
       }
@@ -93,15 +125,29 @@ export default {
       console.info('hi', v)
     },
     ShowUp(edge_ip) {
-      console.info('Show!!');
-      this.edgeIP = edge_ip
-      this.WebsocketConnect();
       this.Show = true;
+      setTimeout(async () => {
+        this.IPList = [];
+        let infos = await GetModuleInfos(edge_ip);
+        infos.forEach(info => {
+          this.IPList.push(info.IP);
+        })
+        this.edgeIP = edge_ip
+        this.WebsocketConnect();
+
+      }, 100)
+    },
+    CloseHandle() {
+      if (this.websocket != null) {
+        this.websocket.close();
+      }
     },
     WebsocketConnect() {
       this.websocket = new WebSocket(`ws://${this.edgeIP}:44332/Model_Training`);
       this.websocket.onopen = () => {
         this.$toast.info('Connected');
+        this.websocket.send("ModuleUpdate-" + JSON.stringify(this.SelectedIPList));
+
       };
       this.websocket.onmessage = (ent) => this.TrainingStatusHandle(JSON.parse(ent.data));
       this.websocket.onerror = (er) => {
@@ -113,14 +159,17 @@ export default {
       };
     },
     SensorSelectsChanged() {
-      this.websocket.send("ModuleUpdate-" + JSON.stringify(this.IPList));
+      this.websocket.send("ModuleUpdate-" + JSON.stringify(this.SelectedIPList));
     },
     SendTrainingRequest() {
       this.websocket.send(JSON.stringify(this.TrainingReqObj));
       this.$toast.info('模型訓練請求已送出!');
     },
     TrainingStatusHandle(status) {
+      this.IsIDMSRecording = status.isRecoding;
       this.TrainStates = status.trainStates;
+      this.CountDown = status.recorderCountDownText;
+      this.IDMSRecordPeriod = status.RecordPeriod;
     }
 
   },
@@ -141,5 +190,30 @@ export default {
 }
 .step-content {
   margin-top: 22px;
+}
+
+.recorder {
+  font-size: 30px;
+}
+.recorder span {
+  font-size: 20px;
+  text-decoration: underline;
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+.recorder .el-button {
+  margin-top: 7px;
+  padding: 10px;
+}
+.recorder .el-button,
+.count-down,
+.duration-setting {
+  margin-left: 10px;
+}
+
+.recorder .count-down {
+  background-color: rgb(0, 64, 64);
+  color: rgb(0, 192, 0);
+  border-radius: 8px;
 }
 </style>

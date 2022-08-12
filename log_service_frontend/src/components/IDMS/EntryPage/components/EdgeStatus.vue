@@ -1,5 +1,5 @@
 <template>
-  <div class="edge-status mx-1 my-1" @click="EnterEdgeHandle" v-loading="loading">
+  <div class="edge-status mx-1 my-1" v-loading="loading">
     <div class="d-flex flex-row" v-bind:style="TitleColor">
       <div class="title d-flex flex-column px-1">
         <h3>{{EdgeProp.Name.toUpperCase()}}</h3>
@@ -12,7 +12,7 @@
       </div>
     </div>
     <el-divider></el-divider>
-    <div class="d-flex flex-row justify-content-center">
+    <div class="d-flex flex-row justify-content-center" @click="EnterEdgeHandle">
       <div>
         <el-progress type="circle" :percentage="100" :width="circleWidth" status="primary">
           <div class="sensor-num-div">
@@ -195,6 +195,5 @@ export default {
   position: relative;
   top: -18px;
   opacity: 0.7;
-  transform: skewY(-4deg);
 }
 </style>

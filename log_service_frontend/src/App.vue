@@ -33,6 +33,7 @@
       <component :is="Component" />
     </div>
   </router-view>
+  <ReleaseNote></ReleaseNote>
 </template>
 
 <script>
@@ -41,9 +42,10 @@ import { GetRouters } from '@/router/index.js';
 import { watch } from 'vue'
 import { useRoute } from 'vue-router';
 import NetworkStatusVue from './components/IDMS/components/NetworkStatus.vue';
+import ReleaseNote from '@/components/IDMS/components/AppReleaseView/ReleaseNoteView.vue'
 export default {
   components: {
-    NetworkStatusVue,
+    NetworkStatusVue, ReleaseNote
   },
   data() {
     return {
@@ -62,7 +64,7 @@ export default {
       this.EdgeIP = localStorage.getItem('edgeip');
       console.info(path)
       this.$router.push(`${path.replace(':ip', this.EdgeIP)}`);
-    }
+    },
   },
   computed: {
     mode() {
@@ -74,6 +76,7 @@ export default {
   },
   mounted() {
     let route = useRoute();
+
     watch(() => route.name, (n, o) => {
       this.EdgeIP = localStorage.getItem('edgeip');
       this.EdgeName = localStorage.getItem('edgename');
@@ -86,6 +89,7 @@ export default {
       }
 
     })
+
   }
 }
 
