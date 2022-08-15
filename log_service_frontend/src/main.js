@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import { createApp ,vue} from 'vue'
 import BootstrapVue3 from 'bootstrap-vue-3'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css'
@@ -13,6 +13,7 @@ import countTo from 'vue3-count-to'
 import { configs } from './config'
 import Toaster from '@meforma/vue-toaster'
 import '@/styles/animations.css'
+
 
 const app = createApp(App)
 app.use(configs)

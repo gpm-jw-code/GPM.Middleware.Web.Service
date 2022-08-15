@@ -82,23 +82,23 @@ export default {
       display_mode: 'dashboard',
       loading: true,
       Edges: [
-        {
-          Name: 'Line-1',
-          EdgeIP: "127.0.0.1",
-          SensorNum: 10,
-          Status: 'Offline'
-        },
-        {
-          Name: 'Line-2',
-          EdgeIP: "127.0.0.2",
-          SensorNum: 20,
-          Status: 'Online'
-        }, {
-          Name: 'Line-3',
-          EdgeIP: "127.0.0.3",
-          SensorNum: 30,
-          Status: 'Offline'
-        }
+        // {
+        //   Name: 'Line-1',
+        //   EdgeIP: "127.0.0.1",
+        //   SensorNum: 10,
+        //   Status: 'Offline'
+        // },
+        // {
+        //   Name: 'Line-2',
+        //   EdgeIP: "127.0.0.2",
+        //   SensorNum: 20,
+        //   Status: 'Online'
+        // }, {
+        //   Name: 'Line-3',
+        //   EdgeIP: "127.0.0.3",
+        //   SensorNum: 30,
+        //   Status: 'Offline'
+        // }
       ]
     }
   },

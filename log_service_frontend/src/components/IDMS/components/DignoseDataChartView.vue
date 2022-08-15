@@ -50,7 +50,7 @@
         </div>
       </div>
     </div>
-    <div class="row g-0">
+    <div class="row g-0" id="chccccc">
       <div class="empty-result" v-if="DignoseDatas_Show.length==0">
         <el-empty description="未包含任何圖表項目" :image-size="200" />
       </div>
@@ -179,6 +179,9 @@ export default {
     }
   },
   methods: {
+    visibilityChanged(isVisible, entry) {
+      console.log(isVisible, entry)
+    },
     ZoomClickHandle(ip) {
       this.zooming = true;
       this.zoom_data = this.DignoseDatas.find(i => i.IP == ip);

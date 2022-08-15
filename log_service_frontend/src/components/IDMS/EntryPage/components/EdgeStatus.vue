@@ -181,17 +181,14 @@ export default {
           this.WebsocketIni();
           this.IDMSAlive = false;
           this.loading = false;
-          console.info(this.EdgeProp.EdgeIP, 'edge ws close ');
         }
         this.edgeStatusWebsocket.onerror = (err) => {
           this.WebsocketClear();
           this.WebsocketIni();
           this.IDMSAlive = false;
           this.loading = false;
-          console.info(this.EdgeProp.EdgeIP, 'edge ws ', err);
         }
       } catch (error) {
-        console.info(this.EdgeProp.EdgeIP, 'edge ws ', error);
         this.IDMSAlive = false;
         this.loading = false;
       }
@@ -206,9 +203,7 @@ export default {
     }
   },
   mounted() {
-
     setInterval(() => GetPCPerformance(this.EdgeProp.EdgeIP).then(ret => this.PerformanceData = ret), 1000)
-
     this.WebsocketIni();
 
   },

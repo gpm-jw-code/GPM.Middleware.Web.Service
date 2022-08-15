@@ -1,5 +1,11 @@
 <template>
-  <div class="gpm-chart" v-bind:style="chart_style" v-loading="loading">
+  <div
+    :ref="'gpm-chart-'+chart_id"
+    class="gpm-chart"
+    v-bind:style="chart_style"
+    v-loading="loading|outOfViewPort"
+    :id="id"
+  >
     <!-- <div class="d-flex theme">
       <el-icon
         v-show="!isDark"
@@ -165,7 +171,8 @@ export default {
       datasetsVisible: [],
       isDark: true,
       currentTheme: 'dark',
-      colors: ['blue', 'green', 'red', 'orange', 'pink', 'grey', 'black', 'seagreen']
+      colors: ['blue', 'green', 'red', 'orange', 'pink', 'grey', 'black', 'seagreen'],
+      outOfViewPort: false
     }
   },
   methods: {
@@ -203,10 +210,20 @@ export default {
         },
         options: this.options,
       });
+
+      let target = document.querySelector(`#${this.id}`);
+      this.outOfViewPort = target.getBoundingClientRect().top > window.innerHeight | target.getBoundingClientRect().top < 0;
+      window.addEventListener('scroll', () => {
+        this.outOfViewPort = target.getBoundingClientRect().top > window.innerHeight | target.getBoundingClientRect().top < 0;
+      })
+
       this.chartInstance.options.animation = false;
     },
 
     async UpdateChart(datavw, timeUnit = 'second', showLoading = false) {
+      if (this.outOfViewPort) {
+        return;
+      }
       try {
         // this.Clear();
         if (showLoading)
@@ -274,7 +291,6 @@ export default {
 
           resolve();
         } catch (error) {
-          console.error(error);
           reject(error)
         }
 
@@ -291,6 +307,9 @@ export default {
 
   },
   computed: {
+    id() {
+      return 'gc' + this.chart_id.replaceAll('.', '').replace('-', '');
+    },
     currentDataSet() {
       var dataAry = [];
       this.chartInstance.data.datasets.forEach(s => {

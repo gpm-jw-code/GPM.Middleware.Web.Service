@@ -24,7 +24,8 @@
     "style-loader": "^3.3.1",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
-    "vue3-count-to": "^1.1.2"
+    "vue3-count-to": "^1.1.2",
+    "vue3-observe-visibility": "^0.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
