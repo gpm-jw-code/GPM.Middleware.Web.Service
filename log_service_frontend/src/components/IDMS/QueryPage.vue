@@ -341,12 +341,27 @@ export default {
 
     },
     SaveQueryOptionsToLocalStorage() {
-      localStorage.setItem('query-options', JSON.stringify(this.QueryOptions));
+      var jsonStr = localStorage.getItem('query-options-by-edge');
+      var edgeOptions = {};
+      if (jsonStr) {
+        edgeOptions = JSON.parse(jsonStr);
+        edgeOptions[this.edge_name] = this.QueryOptions;
+      } else {
+        edgeOptions[this.edge_name] = this.QueryOptions;
+      }
+      localStorage.setItem('query-options-by-edge', JSON.stringify(edgeOptions));
     },
     ReadQueryOptionsFromLocalStorage() {
-      var jsonStr = localStorage.getItem('query-options');
+      var jsonStr = localStorage.getItem('query-options-by-edge');
       if (jsonStr) {
-        this.QueryOptions = JSON.parse(jsonStr);
+        var edges_caches = JSON.parse(jsonStr);
+        var _edge_opt = edges_caches[this.edge_name];
+        if (_edge_opt) {
+          this.QueryOptions = _edge_opt
+        } else {
+          this.QueryOptions.SelectedEQ = ''
+          this.QueryOptions.SelectedUNIT = ''
+        }
       }
     },
     async RenderChart(data) {
@@ -393,6 +408,8 @@ export default {
 
     var edge_ip = localStorage.getItem('edgeip');
     var edge_name = localStorage.getItem('edgename');
+
+
     console.log(edge_ip, edge_name);
     this.edge_ip = edge_ip;
     this.edge_name = edge_name;

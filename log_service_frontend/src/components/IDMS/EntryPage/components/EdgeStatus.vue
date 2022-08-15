@@ -1,55 +1,120 @@
 <template>
-  <div class="edge-status mx-1 my-1" v-loading="loading">
+  <div class="edge-status mx-1 my-1 d-flex flex-column h-100" v-loading="loading">
     <div class="d-flex flex-row" v-bind:style="TitleColor">
       <div class="title d-flex flex-column px-1">
         <h3>{{EdgeProp.Name.toUpperCase()}}</h3>
         <span>{{EdgeProp.EdgeIP}}</span>
       </div>
-
       <div class="flex-fill d-flex flex-row justify-content-end">
         <span class="network-status-label py-1">網路狀態</span>
         <NetworkStatusVue :ip="EdgeProp.EdgeIP" toolTipPosition="bottom"></NetworkStatusVue>
       </div>
     </div>
     <el-divider></el-divider>
-    <div class="d-flex flex-row justify-content-center" @click="EnterEdgeHandle">
-      <div>
-        <el-progress type="circle" :percentage="100" :width="circleWidth" status="primary">
-          <div class="sensor-num-div">
-            <div>感測器數量</div>
-            <div class="sensor-num connected-num">
-              <count-to :startVal="0" :endVal="edgeStatusFromIDMS.OnlineSensorNum" :duration="2100"></count-to>
+
+    <div class="show-types">
+      <el-radio-group v-model="DisplayMode">
+        <el-radio-button label="Overview"></el-radio-button>
+        <el-radio-button label="Performance"></el-radio-button>
+      </el-radio-group>
+    </div>
+    <div class="d-flex flex-row justify-content-center flex-fill">
+      <!-- 感測器數量與IDMS運行狀態 -->
+      <div v-if="DisplayMode=='Overview'" class="d-flex flex-row justify-content-center">
+        <div>
+          <el-progress type="circle" :percentage="100" :width="circleWidth" status="primary">
+            <div class="value-num-div">
+              <div>感測器數量</div>
+              <div class="value-num connected-num">
+                <count-to
+                  :startVal="0"
+                  :endVal="edgeStatusFromIDMS.OnlineSensorNum"
+                  :duration="2100"
+                ></count-to>
+              </div>
             </div>
-          </div>
-        </el-progress>
-        <div class="shadow"></div>
+          </el-progress>
+          <div class="shadow"></div>
+        </div>
+        <div>
+          <el-progress
+            type="circle"
+            :percentage="100"
+            :width="circleWidth"
+            :status="IDMSAlive ? 'success':'exception'"
+          >
+            <div class="value-num-div">
+              <div class>IDMS</div>
+              <div
+                class="value-num"
+                v-bind:class="IDMSAlive?'Online':'Offline'"
+              >{{IDMSAlive?'ONLINE':'OFFLINE'}}</div>
+            </div>
+          </el-progress>
+          <div class="shadow"></div>
+        </div>
       </div>
-      <div>
-        <el-progress
-          type="circle"
-          :percentage="100"
-          :width="circleWidth"
-          :status="IDMSAlive ? 'success':'exception'"
-        >
-          <div class="sensor-num-div">
-            <div class>IDMS</div>
-            <div
-              class="sensor-num"
-              v-bind:class="IDMSAlive?'Online':'Offline'"
-            >{{IDMSAlive?'ONLINE':'OFFLINE'}}</div>
-          </div>
-        </el-progress>
-        <div class="shadow"></div>
+      <!-- Performance -->
+      <div v-else class="d-flex flex-row justify-content-center">
+        <div>
+          <el-progress
+            type="circle"
+            :percentage="PerformanceData.cpu"
+            :width="circleWidth"
+            status="primary"
+          >
+            <div class="value-num-div">
+              <div>CPU</div>
+              <div class="value-num connected-num">
+                <count-to :startVal="0" :endVal="PerformanceData.cpu" :duration="2100"></count-to>
+              </div>
+            </div>
+          </el-progress>
+          <div class="shadow"></div>
+        </div>
+        <div>
+          <el-progress
+            type="circle"
+            :percentage="PerformanceData.ram"
+            :width="circleWidth"
+            :status="IDMSAlive ? 'success':'exception'"
+          >
+            <div class="value-num-div">
+              <div class>RAM</div>
+              <div
+                class="value-num"
+                v-bind:class="IDMSAlive?'Online':'Offline'"
+              >{{PerformanceData.ram}}</div>
+            </div>
+          </el-progress>
+          <div class="shadow"></div>
+        </div>
       </div>
     </div>
     <div class="my-2">
-      <b-button v-bind:class="EnterButtonColorMode" class="w-100" @click="EnterEdgeHandle">Enter</b-button>
+      <div class="d-flex flex-row">
+        <b-button
+          v-bind:class="EnterButtonColorMode"
+          class="flex-fill"
+          @click="EnterEdgeHandle"
+        >Enter</b-button>
+
+        <!-- <b-button
+          v-bind:class="[EnterButtonColorMode,'bg-primary']"
+          @click="EnterEdgeHandle"
+        >Overview</b-button>
+        <b-button
+          v-bind:class="[EnterButtonColorMode,'bg-primary']"
+          @click="performance = !performance"
+        >Performance</b-button>-->
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import NetworkStatusVue from '../../components/NetworkStatus.vue';
+import { GetPCPerformance } from '@/APIHelpers/MicroServices/Performance.js'
 export default {
   components: {
     NetworkStatusVue,
@@ -77,18 +142,23 @@ export default {
     },
     EnterButtonColorMode() {
       return this.ColorMode == 'bg-dark' ? 'bg-dark' : 'bg-primary'
-
     }
   },
   data() {
     return {
+      DisplayMode: "Overview",
+      performance: false,
       loading: true,
       edgeStatusWebsocket: null,
-      circleWidth: 170,
+      circleWidth: 160,
       edgeStatusFromIDMS: {
         OnlineSensorNum: -1
       },
-      IDMSAlive: false
+      IDMSAlive: false,
+      PerformanceData: {
+        cpu: 0,
+        ram: 0
+      }
     }
   },
   methods: {
@@ -97,39 +167,53 @@ export default {
       localStorage.setItem('edgename', this.EdgeProp.Name.toLowerCase());
       this.$router.push(`/EdgeMain/${this.EdgeProp.EdgeIP}`);
       //   this.$router.push(`/EdgeMain`);
+    },
+    WebsocketIni() {
+      try {
+        this.edgeStatusWebsocket = new WebSocket(`ws://${this.EdgeProp.EdgeIP}:44332/EdgeStatus`);
+        this.edgeStatusWebsocket.onmessage = (evt) => {
+          this.edgeStatusFromIDMS = JSON.parse(evt.data);
+          this.IDMSAlive = true;
+          this.loading = false;
+        }
+        this.edgeStatusWebsocket.onclose = () => {
+          this.WebsocketClear();
+          this.WebsocketIni();
+          this.IDMSAlive = false;
+          this.loading = false;
+          console.info(this.EdgeProp.EdgeIP, 'edge ws close ');
+        }
+        this.edgeStatusWebsocket.onerror = (err) => {
+          this.WebsocketClear();
+          this.WebsocketIni();
+          this.IDMSAlive = false;
+          this.loading = false;
+          console.info(this.EdgeProp.EdgeIP, 'edge ws ', err);
+        }
+      } catch (error) {
+        console.info(this.EdgeProp.EdgeIP, 'edge ws ', error);
+        this.IDMSAlive = false;
+        this.loading = false;
+      }
+    },
+    WebsocketClear() {
+      if (this.edgeStatusWebsocket != null) {
+        this.edgeStatusWebsocket.onclose = null;
+        this.edgeStatusWebsocket.onerror = null;
+        this.edgeStatusWebsocket.close();
+        this.edgeStatusWebsocket = null;
+      }
     }
   },
   mounted() {
 
-    try {
-      this.edgeStatusWebsocket = new WebSocket(`ws://${this.EdgeProp.EdgeIP}:44332/EdgeStatus`);
-      this.edgeStatusWebsocket.onmessage = (evt) => {
-        this.edgeStatusFromIDMS = JSON.parse(evt.data);
-        this.IDMSAlive = true;
-        this.loading = false;
-      }
-      this.edgeStatusWebsocket.onclose = () => {
-        console.info('edge ws close ');
-        this.IDMSAlive = false;
-        this.loading = false;
-      }
-      this.edgeStatusWebsocket.onerror = (err) => {
-        this.IDMSAlive = false;
-        this.loading = false;
-        console.info('edge ws ', err);
+    setInterval(() => GetPCPerformance(this.EdgeProp.EdgeIP).then(ret => this.PerformanceData = ret), 1000)
 
-      }
-    } catch (error) {
-      console.info('edge ws ', error);
-      this.IDMSAlive = false;
-      this.loading = false;
-    }
+    this.WebsocketIni();
 
   },
   unmounted() {
-    this.edgeStatusWebsocket.onclose = null;
-    this.edgeStatusWebsocket.onerror = null;
-    this.edgeStatusWebsocket.close();
+    this.WebsocketClear();
   }
 }
 </script>
@@ -148,36 +232,38 @@ export default {
 }
 .edge-status .title {
   text-align: left;
+  padding: 0;
+  margin: 0;
 }
 .edge-status .el-progress {
   margin: 10px;
 
   text-shadow: 33px 1px 10px 2px rgb(10, 10, 10);
 }
-.edge-status:hover {
+/* .edge-status:hover {
   background-color: rgb(187, 214, 253);
   color: white;
   cursor: pointer;
-}
+} */
 
 .network-status-label {
   font-size: 8px;
   color: rgb(129, 129, 129);
 }
 
-.sensor-num-div {
+.value-num-div {
   color: grey;
 }
 
-.sensor-num-div .connected-num {
-  font-size: 58px;
+.value-num-div .connected-num {
+  /* font-size: 48px; */
   color: rgb(32, 160, 255);
   margin: 0;
 }
 
-.sensor-num {
-  font-size: 38px;
-  margin: 10px;
+.value-num {
+  font-size: 32px;
+  padding-top: 10px;
   font-weight: bold;
 }
 .Offline {
@@ -195,5 +281,11 @@ export default {
   position: relative;
   top: -18px;
   opacity: 0.7;
+}
+
+.show-types {
+  margin-top: -20px;
+  letter-spacing: normal;
+  text-align: left;
 }
 </style>

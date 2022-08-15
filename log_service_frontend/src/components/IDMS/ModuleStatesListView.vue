@@ -123,6 +123,11 @@ export default {
   border: 1px dashed grey;
   border-radius: 6px;
 }
+
+.module-ping:hover {
+  background-color: aliceblue;
+}
+
 .module-ping div {
   height: 20px;
   margin: 3px;
