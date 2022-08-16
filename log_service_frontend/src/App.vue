@@ -8,12 +8,22 @@
         </button>
         <div v-if="showNavbar" class="collapse navbar-collapse d-flex flex-row" id="navbar">
           <div class="navbar-nav flex-fill">
-            <a
+            <el-radio-group v-model="seletedRouteName">
+              <el-radio-button
+                class="mx-1"
+                v-for="rout in routes"
+                :key="rout.path"
+                @click="routerHandle(rout.path)"
+                :label="rout.name"
+              ></el-radio-button>
+            </el-radio-group>
+
+            <!-- <a ref=""
               class="mx-1"
               v-for="rout in routes"
               :key="rout.path"
               @click="routerHandle(rout.path)"
-            >{{rout.name}}</a>
+            >{{rout.name}}</a>-->
           </div>
 
           <div class="edge-info d-flex flex-row justify-cotent-end">
@@ -49,6 +59,7 @@ export default {
   },
   data() {
     return {
+      seletedRouteName: "診斷頁面",
       showNavbar: false,
       navstyle: 'bg-dark',
       breadcrumbItems: [
