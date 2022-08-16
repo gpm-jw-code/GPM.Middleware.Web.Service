@@ -9,6 +9,7 @@ import QueryPage from '@/components/IDMS/QueryPage.vue'
 import { configs } from '@/config'
 import EntryPage from '@/components/IDMS/EntryPage/EntryPage.vue'
 
+
 var gmm_mode_routes = [
   {
     path: '/',
@@ -32,6 +33,11 @@ var gpm_mode_routes = [
     path: '/EdgeMain/:ip',
     name: '診斷頁面',
     component: IDMS,
+  },
+  {
+    path: '/VibrationEnergy/:ip',
+    name: '振動能量',
+    component: import('@/components/IDMS/VbEnergyMonitor/VbEnergyView.vue'),
   },
   {
     path: '/EdgeMain/modulestates/:ip',

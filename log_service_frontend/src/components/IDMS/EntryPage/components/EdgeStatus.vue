@@ -158,7 +158,8 @@ export default {
       PerformanceData: {
         cpu: 0,
         ram: 0
-      }
+      },
+      PerformanceDataTimer: null
     }
   },
   methods: {
@@ -203,11 +204,12 @@ export default {
     }
   },
   mounted() {
-    setInterval(() => GetPCPerformance(this.EdgeProp.EdgeIP).then(ret => this.PerformanceData = ret), 1000)
+    this.PerformanceDataTimer = setInterval(() => GetPCPerformance(this.EdgeProp.EdgeIP).then(ret => this.PerformanceData = ret), 1000)
     this.WebsocketIni();
 
   },
   unmounted() {
+    clearInterval(this.PerformanceDataTimer);
     this.WebsocketClear();
   }
 }

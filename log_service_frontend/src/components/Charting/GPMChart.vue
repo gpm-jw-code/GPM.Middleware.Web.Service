@@ -3,34 +3,9 @@
     :ref="'gpm-chart-'+chart_id"
     class="gpm-chart"
     v-bind:style="chart_style"
-    v-loading="loading|outOfViewPort"
+    v-loading="loading||outOfViewPort"
     :id="id"
   >
-    <!-- <div class="d-flex theme">
-      <el-icon
-        v-show="!isDark"
-        @click="ThemeChange"
-        class="light-icon"
-        :color="currentTheme!='dark'? 'black':'white'"
-      >
-        <Sunny />
-      </el-icon>
-      <el-switch
-        active-color="rgb(19, 19, 19)"
-        inactive-color="rgb(226, 226, 226)"
-        v-model="isDark"
-        @change="ThemeChange"
-      />
-      <el-icon
-        v-show="isDark"
-        @click="ThemeChange"
-        class="dark-icon"
-        :color=" currentTheme!='dark'? 'white':'black'"
-      >
-        <Moon />
-      </el-icon>
-    </div>
-    -->
     <canvas class="h-100" @click="ClickChartHandel" :id="chart_id"></canvas>
   </div>
 </template>
@@ -176,6 +151,15 @@ export default {
     }
   },
   methods: {
+    IsOutOfViewPort() {
+      var target = document.querySelector(`#${this.id}`);
+      if (!target) {
+        return false;
+      }
+      var rect = target.getBoundingClientRect();
+      return rect.bottom > window.innerHeight || rect.top < 0;
+
+    },
     test() {
       this.chartInstance.setDatasetVisibility(1, false); // hides dataset at index 1
       this.chartInstance.update(); // chart now renders with dataset hidden
@@ -211,17 +195,17 @@ export default {
         options: this.options,
       });
 
-      let target = document.querySelector(`#${this.id}`);
-      this.outOfViewPort = target.getBoundingClientRect().top > window.innerHeight | target.getBoundingClientRect().top < 0;
+      this.outOfViewPort = this.IsOutOfViewPort();
       window.addEventListener('scroll', () => {
-        this.outOfViewPort = target.getBoundingClientRect().top > window.innerHeight | target.getBoundingClientRect().top < 0;
+        this.outOfViewPort = this.IsOutOfViewPort();
       })
 
       this.chartInstance.options.animation = false;
     },
 
     async UpdateChart(datavw, timeUnit = 'second', showLoading = false) {
-      if (this.outOfViewPort) {
+      if (this.IsOutOfViewPort()) {
+        console.log('no render');
         return;
       }
       try {
@@ -323,7 +307,8 @@ export default {
     },
     TimeWindowDom() {
       return document.getElementById("time-window");
-    }
+    },
+
   },
   mounted() {
     this.ChartInit();

@@ -196,6 +196,8 @@ export default {
       }
     },
     async RenderCharts() {
+
+
       if (this.pause)
         return;
 
