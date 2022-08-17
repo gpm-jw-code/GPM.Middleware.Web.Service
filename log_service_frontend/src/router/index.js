@@ -38,6 +38,18 @@ var gpm_mode_routes = [
     path: '/VibrationEnergy/:ip',
     name: '振動能量',
     component: import('@/components/IDMS/VbEnergyMonitor/VbEnergyView.vue'),
+    children:[
+      {
+        path: 'Dashboard',
+        name: 'Dashboard',
+        component: import('@/components/IDMS/VbEnergyMonitor/DashboardView.vue'),
+      },
+      {
+        path: 'ThresholdSetting',
+        name: 'ThresholdSetting',
+        component: import('@/components/IDMS/VbEnergyMonitor/ThresholdSetting.vue'),
+      }
+    ]
   },
   {
     path: '/EdgeMain/modulestates/:ip',

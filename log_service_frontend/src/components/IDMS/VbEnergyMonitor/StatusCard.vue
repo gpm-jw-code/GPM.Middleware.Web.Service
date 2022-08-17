@@ -1,39 +1,41 @@
 <template>
-  <div class="ve-module-status bg-dark d-flex flex-column">
-    <!-- 狀態TITLE -->
-    <div class="info d-flex flex-row px-2 py-2">
-      <div class="flex-fill d-flex justify-content-start">
-        <span>EQ :</span>
-        <span>{{veData.EqName}}</span>
-        <span>UNIT :</span>
-        <span>{{veData.UnitName}}</span>
-      </div>
-      <div class>
-        <span>{{ip}}</span>
-        <el-icon size="18px">
-          <CircleCheck v-if="Connected"></CircleCheck>
-          <Warning v-else></Warning>
-        </el-icon>
-      </div>
-    </div>
-    <!-- 三軸監控狀態ICON -->
-    <div class="d-flex flex-row justify-content-center py-2">
-      <div class="axis-status" v-for="(obj,axis) in veData.AxisStatus" :key="axis">
-        <span>{{axis}}</span>
-        <div class="icon" v-bind:class="obj.IsOutOfSPC? 've-warning':'ve-normal'">
-          <el-icon>
-            <CircleCheckFilled v-if="!obj.IsOutOfSPC"></CircleCheckFilled>
-            <WarningFilled v-else></WarningFilled>
+  <div class="ve-module-status d-flex flex-column px-1 py-1">
+    <div class="bg-dark">
+      <!-- 狀態TITLE -->
+      <div class="info d-flex flex-row px-2 py-2">
+        <div class="flex-fill d-flex justify-content-start">
+          <span>EQ :</span>
+          <span>{{veData.EqName}}</span>
+          <span>UNIT :</span>
+          <span>{{veData.UnitName}}</span>
+        </div>
+        <div class>
+          <span>{{ip}}</span>
+          <el-icon size="18px">
+            <CircleCheck v-if="Connected"></CircleCheck>
+            <Warning v-else></Warning>
           </el-icon>
-          <span class="ve-value">{{obj.veValue.toFixed(3)}}</span>
         </div>
       </div>
+      <!-- 三軸監控狀態ICON -->
+      <div class="d-flex flex-row justify-content-center py-2">
+        <div class="axis-status" v-for="(obj,axis) in veData.AxisStatus" :key="axis">
+          <span>{{axis}}</span>
+          <div class="icon" v-bind:class="obj.IsOutOfSPC? 've-warning':'ve-normal'">
+            <el-icon>
+              <CircleCheckFilled v-if="!obj.IsOutOfSPC"></CircleCheckFilled>
+              <WarningFilled v-else></WarningFilled>
+            </el-icon>
+            <span class="ve-value">{{obj.veValue.toFixed(3)}}</span>
+          </div>
+        </div>
+      </div>
+      <!-- ENTER Button -->
+      <div>
+        <b-button @click="EnterHandle" class="w-100" variant="dark">ENTER</b-button>
+      </div>
+      <DetailViewVue ref="detail_view" :edge_ip="edge_ip" :ip="ip"></DetailViewVue>
     </div>
-    <!-- ENTER Button -->
-    <div>
-      <b-button @click="EnterHandle" class="w-100" variant="dark">ENTER</b-button>
-    </div>
-    <DetailViewVue ref="detail_view" :edge_ip="edge_ip" :ip="ip"></DetailViewVue>
   </div>
 </template>
 <script>
