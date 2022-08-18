@@ -17,7 +17,7 @@ export default {
       show: false,
       website_ver: '',
       releaseList: [
-        '支援多模組遠端訓練'
+        'UI優化', '支援多模組遠端訓練', 'Alarm Form事件同步與查詢', 'Bug 修復'
       ]
     }
   },

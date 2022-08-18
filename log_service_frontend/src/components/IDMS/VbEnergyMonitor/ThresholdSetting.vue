@@ -2,7 +2,7 @@
 <template>
   <div class="d-flex flex-column h-100 w-100 bg-light">
     <div class="ve-threshold-table flex-fill">
-      <el-table :data="thresholdSettings" row-key="ModuleInfo.IP">
+      <el-table :data="thresholdSettings" row-key="ModuleInfo.IP" style="width:100%;padding:10px">
         <el-table-column label="V" fixed="left" width="40">
           <template #default="scope">
             <el-checkbox

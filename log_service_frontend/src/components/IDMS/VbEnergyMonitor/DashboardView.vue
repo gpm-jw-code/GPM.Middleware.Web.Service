@@ -48,10 +48,12 @@ export default {
     }
   },
   mounted() {
+    console.log('dashview mounted');
     this.WsIni();
   },
   created() {
     this.edge_ip = this.$route.params.ip
+    console.log('dashview created', this.edge_ip);
   },
   unmounted() {
     this.WsDestory();

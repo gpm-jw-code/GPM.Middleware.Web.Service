@@ -12,27 +12,27 @@
         </el-radio-group>
       </div>
     </el-affix>
-
+    <keep-alive>
+      <DashboardViewVue v-if="display=='Dashboard'"></DashboardViewVue>
+      <ThresholdSettingVue v-else></ThresholdSettingVue>
+    </keep-alive>
     <!-- vue3.0配置 Component是固定寫法-->
-    <router-view v-slot="{ Component }">
-      <!-- <keep-alive>
-        <component :is="Component" />
-      </keep-alive>-->
-      <component :is="Component" />
-    </router-view>
   </div>
 </template>
+
 <script>
+import DashboardViewVue from './DashboardView.vue';
+import ThresholdSettingVue from './ThresholdSetting.vue';
 export default {
+  components: {
+    DashboardViewVue, ThresholdSettingVue
+  },
   data() {
     return {
       display: 'Dashboard'
     }
   },
   mounted() {
-    setTimeout(() => {
-      this.$router.push({ name: 'Dashboard' });
-    }, 10)
   }
 }
 </script>

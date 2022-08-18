@@ -43,6 +43,9 @@
       <component :is="Component" />
     </div>
   </router-view>
+  <div class="idms-alarm-form-badge fixed-top" v-show="isNotEntryPAGE">
+    <NotificationIconVue ref="alarm_noti_icon" :edge_ip="EdgeIP"></NotificationIconVue>
+  </div>
   <ReleaseNote></ReleaseNote>
 </template>
 
@@ -53,21 +56,23 @@ import { watch } from 'vue'
 import { useRoute } from 'vue-router';
 import NetworkStatusVue from './components/IDMS/components/NetworkStatus.vue';
 import ReleaseNote from '@/components/IDMS/components/AppReleaseView/ReleaseNoteView.vue'
+import NotificationIconVue from './components/IDMS/AlarmForm/NotificationIcon.vue';
 export default {
   components: {
-    NetworkStatusVue, ReleaseNote
+    NetworkStatusVue, ReleaseNote, NotificationIconVue
   },
   data() {
     return {
       seletedRouteName: "診斷頁面",
       showNavbar: false,
-      navstyle: 'bg-dark',
+      navstyle: 'bg-primary',
       breadcrumbItems: [
         { text: 'SSM', href: '/' },
         { text: 'Log', href: '/log' },
         { text: 'Library' },],
       EdgeIP: "-",
       EdgeName: "-",
+      isNotEntryPAGE: false
     }
   },
   methods: {
@@ -91,12 +96,16 @@ export default {
     watch(() => route.name, (n, o) => {
       this.EdgeIP = localStorage.getItem('edgeip');
       this.EdgeName = localStorage.getItem('edgename');
-      var isNotEntryPAGE = this.showNavbar = n + '' !== 'EntryPage';
-      console.info(this.showNavbar, n, o)
+      this.isNotEntryPAGE = this.showNavbar = n + '' !== 'EntryPage';
 
-      if (!isNotEntryPAGE && o != undefined) {
+      console.info(this.showNavbar, n, o)
+      if (!this.isNotEntryPAGE && o != undefined) {
         this.navstyle = localStorage.getItem('entry-page-dark-mode') == 'true' ? 'bg-dark' : 'bg-primary';
         location.reload();
+      }
+
+      if (this.isNotEntryPAGE) {
+        this.$refs.alarm_noti_icon.WsIni();
       }
 
     })
@@ -176,5 +185,9 @@ nav a {
   color: rgb(173, 173, 173);
   font-size: smaller;
   letter-spacing: 1px;
+}
+
+.idms-alarm-form-badge {
+  z-index: 3442;
 }
 </style>

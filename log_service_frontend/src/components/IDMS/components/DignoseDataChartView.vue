@@ -78,6 +78,7 @@
           :title="`${data.EqName}-${data.UnitName}(${data.IP})`"
           :yAxisLabel="ylabel"
           :key="ylabel+ColsNumber"
+          :skipRenderIfOutOfViewPort="true"
         ></GPMChart>
       </div>
     </div>
@@ -99,6 +100,7 @@
         :title="`${zoom_data.EqName}-${zoom_data.UnitName}(${zoom_data.IP})`"
         :yAxisLabel="ylabel"
         :key="zoom_data.IP"
+        :skipRenderIfOutOfViewPort="false"
       ></GPMChart>
     </el-drawer>
   </div>

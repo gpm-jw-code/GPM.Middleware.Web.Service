@@ -1,5 +1,5 @@
 <template>
-  <el-drawer direction="btt" size="92%" v-model="show" @closed="CloseHandle" :show-close="false">
+  <el-drawer direction="btt" size="85%" v-model="show" @closed="CloseHandle" :show-close="false">
     <template #header="{ titleId}">
       <div :id="titleId" class="ve-detail-title d-flex flex-row">
         <div class="flex-fill">{{`振動能量-${veData.EqName}/${veData.UnitName}(${ip})`}}</div>

@@ -238,7 +238,7 @@ export default {
         xls.push(index + 1);
       }
 
-      this.chart.UpdateChart(xls, axisDatas, false, false);
+      this.chart.UpdateChart(xls, axisDatas, false);
       // console.info(this.chart)
 
     },

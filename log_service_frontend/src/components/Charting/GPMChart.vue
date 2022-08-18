@@ -3,7 +3,7 @@
     :ref="'gpm-chart-'+chart_id"
     class="gpm-chart"
     v-bind:style="chart_style"
-    v-loading="loading||outOfViewPort"
+    v-loading="loading"
     :id="id"
   >
     <canvas class="h-100" @click="ClickChartHandel" :id="chart_id"></canvas>
@@ -34,7 +34,12 @@ export default {
     xlabelUseTimeFormat: {
       type: Boolean,
       default: true
+    },
+    skipRenderIfOutOfViewPort: {
+      type: Boolean,
+      default: false
     }
+
   },
   data() {
     return {
@@ -204,7 +209,8 @@ export default {
     },
 
     async UpdateChart(datavw, timeUnit = 'second', showLoading = false) {
-      if (this.IsOutOfViewPort()) {
+
+      if (this.skipRenderIfOutOfViewPort && this.IsOutOfViewPort()) {
         console.log('no render');
         return;
       }
