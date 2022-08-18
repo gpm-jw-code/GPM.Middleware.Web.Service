@@ -55,7 +55,7 @@ export default {
   }
   to {
     top: 30vmin;
-    color: rgba(27, 42, 160, 1);
+    color: rgb(26, 45, 185, 1);
   }
 }
 </style>
