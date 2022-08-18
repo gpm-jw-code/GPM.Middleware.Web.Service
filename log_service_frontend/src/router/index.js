@@ -52,12 +52,12 @@ var gpm_mode_routes = [
     // ]
   },
   {
-    path: '/EdgeMain/modulestates/:ip',
+    path: '/modulestates/:ip',
     name: '感測器狀態',
     component: ModuleStatesListViewVue,
   },
   {
-    path: '/idms/query',
+    path: '/query',
     name: 'Query',
     component: QueryPage,
   },

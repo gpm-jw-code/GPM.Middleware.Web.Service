@@ -106,7 +106,7 @@ export default {
       rt_table_loading: true,
       query_table_loading: false,
       columnProps: [
-        { prop: 'time', label: '時間', fixed: 'left' },
+        { prop: 'time', label: '時間', fixed: 'left', width: '180' },
         { prop: 'deviceIP', label: 'Sensor IP', width: '220' },
         { prop: 'eqName', label: 'EQ', width: '220' },
         { prop: 'unitName', label: 'UNIT' },
