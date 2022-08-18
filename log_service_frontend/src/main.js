@@ -13,6 +13,7 @@ import countTo from 'vue3-count-to'
 import { configs } from './config'
 import Toaster from '@meforma/vue-toaster'
 import '@/styles/animations.css'
+import { createMetaManager } from "vue-meta";
 
 
 const app = createApp(App)
@@ -21,7 +22,6 @@ app.use(router)
 app.use(BootstrapVue3)
 app.use(countTo)
 app.use(Toaster)
-
 app.use(ElementPlus, { size: 'default', zIndex: 3000 })
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)

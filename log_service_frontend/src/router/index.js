@@ -24,6 +24,7 @@ var gmm_mode_routes = [
 ]
 
 var gpm_mode_routes = [
+  
   {
     path: '/',
     name: 'EntryPage',
@@ -60,7 +61,7 @@ var gpm_mode_routes = [
     path: '/query',
     name: 'Query',
     component: QueryPage,
-  },
+  }, 
 ]
 
 var dev_mode_routes = [

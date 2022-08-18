@@ -98,11 +98,14 @@ export default {
       this.newest_alarm = alarm;
       this.n_count = this.n_count + 1;
     },
-    WsIni() {
-      console.info('alarm noti ws ini');
+    WsIni(edge_ip) {
       if (this.alarm_websocket != null)
         return;
-      this.alarm_websocket = new WebSocket(`ws://${this.edge_ip}:44332/AlarmForm`);
+
+      var EdgeIP = localStorage.getItem('edgeip');
+
+      console.info('alarm noti ws ini:', EdgeIP);
+      this.alarm_websocket = new WebSocket(`ws://${EdgeIP}:44332/AlarmForm`);
       this.alarm_websocket.onmessage = (evt) => {
         var vm = JSON.parse(evt.data);
         if (vm.currentAlarm)

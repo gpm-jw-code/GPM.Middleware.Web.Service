@@ -91,13 +91,18 @@ export default {
     }
   },
   mounted() {
-    let route = useRoute();
+    window.addEventListener('unload', () => localStorage.setItem('idms-previous-route-name', this.seletedRouteName))
 
+    var previousRoutName = localStorage.getItem('idms-previous-route-name');
+    if (previousRoutName != undefined) {
+      this.seletedRouteName = previousRoutName;
+    }
+    let route = useRoute();
     watch(() => route.name, (n, o) => {
       this.EdgeIP = localStorage.getItem('edgeip');
       this.EdgeName = localStorage.getItem('edgename');
+      this.seletedRouteName = n;
       this.isNotEntryPAGE = this.showNavbar = n + '' !== 'EntryPage';
-
       console.info(this.showNavbar, n, o)
       if (!this.isNotEntryPAGE && o != undefined) {
         this.navstyle = localStorage.getItem('entry-page-dark-mode') == 'true' ? 'bg-dark' : 'bg-primary';
@@ -105,7 +110,7 @@ export default {
       }
 
       if (this.isNotEntryPAGE) {
-        this.$refs.alarm_noti_icon.WsIni();
+        this.$refs.alarm_noti_icon.WsIni(this.EdgeIP);
       }
 
     })
