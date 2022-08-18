@@ -24,10 +24,10 @@ export default {
 <style>
 .landing-view {
   color: white;
-  background-image: url("@/assets/IDMS.png");
+  /* background-image: url("@/assets/IDMS.png");
   background-repeat: no-repeat;
   background-position: center;
-  background-blend-mode: normal;
+  background-blend-mode: normal; */
   z-index: 3002;
   position: fixed;
   top: 0;

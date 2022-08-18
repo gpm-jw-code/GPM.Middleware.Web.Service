@@ -48,9 +48,9 @@
           <div class="flex-fill text-start">
             <h4 v-text="title"></h4>
           </div>
-          <div>
+          <span>
             <el-button icon="close" circle type="info" @click="show_form=false"></el-button>
-          </div>
+          </span>
         </div>
       </template>
       <div class="my-0 d-flex flex-column h-100">

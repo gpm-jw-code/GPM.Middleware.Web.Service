@@ -21,7 +21,7 @@
             <!-- <el-tag effect="dark" type="info">{{ RecentAlarm.eqName}}</el-tag>
             <el-tag effect="dark" type="info">{{ RecentAlarm.unitName}}</el-tag>-->
             <el-tag size="large" effect="dark" type="warning">{{ RecentAlarm.alarmType_display}}</el-tag>
-            <el-tag size="large" effect="dark" type="danger">{{ RecentAlarm.alarmDescription}}</el-tag>
+            <!-- <el-tag size="large" effect="dark" type="danger">{{ RecentAlarm.alarmDescription}}</el-tag> -->
           </div>
           <div v-else>(EMPTY)</div>
         </div>
@@ -39,7 +39,16 @@
         />
       </div>
 
-      <el-table :data="alarms" empty-text="尚未有警報" row-key="time" height="85%" style="; width: 100%">
+      <el-table
+        table-layout="auto"
+        border
+        stripe
+        :data="alarms"
+        empty-text="尚未有警報"
+        row-key="time"
+        height="85%"
+        style="; width: 100%"
+      >
         <el-table-column
           :formatter="ColumnValueFormat"
           v-for="column in columnProps"
@@ -49,7 +58,17 @@
           :width="column.width"
           :fixed="column.fixed"
           sortable
-        ></el-table-column>
+        >
+          <template #default="scope">
+            <el-tag
+              style="width:110px"
+              effect="dark"
+              type="warning"
+              v-if="column.prop=='alarmType_display'"
+            >{{scope.row[column.prop]}}</el-tag>
+            <div v-else>{{scope.row[column.prop]}}</div>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
     <!-- 查詢 -->
@@ -74,7 +93,14 @@
           @current-change="PageChangeHandle_Query"
         />
       </div>
-      <el-table :data="alarms_query_in_currentPage" empty-text="Empty-Result" row-key="time">
+      <el-table
+        border
+        stripe
+        table-layout="auto"
+        :data="alarms_query_in_currentPage"
+        empty-text="Empty-Result"
+        row-key="time"
+      >
         <el-table-column
           :formatter="ColumnValueFormat"
           v-for="column in columnProps"
@@ -83,7 +109,17 @@
           :prop="column.prop"
           :width="column.width"
           :fixed="column.fixed"
-        ></el-table-column>
+        >
+          <template #default="scope">
+            <el-tag
+              style="width:110px"
+              effect="dark"
+              type="warning"
+              v-if="column.prop=='alarmType_display'"
+            >{{scope.row[column.prop]}}</el-tag>
+            <div v-else>{{scope.row[column.prop]}}</div>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
   </div>
@@ -106,12 +142,12 @@ export default {
       rt_table_loading: true,
       query_table_loading: false,
       columnProps: [
-        { prop: 'time', label: '時間', fixed: 'left', width: '180' },
-        { prop: 'deviceIP', label: 'Sensor IP', width: '220' },
-        { prop: 'eqName', label: 'EQ', width: '220' },
+        { prop: 'time', label: '時間', fixed: 'left' },
+        { prop: 'deviceIP', label: 'Sensor IP' },
+        { prop: 'eqName', label: 'EQ' },
         { prop: 'unitName', label: 'UNIT' },
-        { prop: 'alarmType_display', label: '事件類型', width: '120' },
-        { prop: 'alarmDescription', label: 'Comment', width: '400', fixed: 'right' }
+        { prop: 'alarmType_display', label: '事件類型' },
+        { prop: 'alarmDescription', label: 'Comment', fixed: 'right' }
       ],
       alarmViewModel: {
         totalAlarm: -1,

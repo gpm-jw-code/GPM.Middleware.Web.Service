@@ -1,34 +1,45 @@
 <template>
   <div class="h-100 fade-in" v-loading="loading" v-bind:class="ColorMode">
-    <div class="w-100 d-flex flex-row justify-content-end">
-      <!-- <el-radio-group v-model="display_mode">
-        <el-radio-button label="dashboard">
-          <el-icon>
-            <Grid />
-          </el-icon>
-        </el-radio-button>
-        <el-radio-button label="list">
-          <el-icon>
-            <Expand />
-          </el-icon>
-        </el-radio-button>
-      </el-radio-group>-->
-      <el-switch
-        v-model="dark_mode"
-        active-text="Dark"
-        active-color="grey"
-        inactive-text="Light"
-        inactive-color="rgb(13, 110, 253)"
-        @change="SaveDarkModeToLocal"
-      ></el-switch>
+    <div class="mb-2 pb-2 border-bottom w-100 d-flex flex-row">
+      <div class="px-1">
+        <el-radio-group v-model="display_mode">
+          <el-radio-button size="small" label="dashboard">
+            <el-icon>
+              <Grid />
+            </el-icon>
+          </el-radio-button>
+          <el-radio-button size="small" label="list">
+            <el-icon>
+              <Expand />
+            </el-icon>
+          </el-radio-button>
+        </el-radio-group>
+      </div>
+      <div class="flex-fill text-end px-3">
+        <el-switch
+          v-model="dark_mode"
+          active-text="Dark"
+          active-color="grey"
+          inactive-text="Light"
+          inactive-color="rgb(13, 110, 253)"
+          @change="SaveDarkModeToLocal"
+        ></el-switch>
+      </div>
     </div>
     <LandingViewVue></LandingViewVue>
     <div v-show="display_mode=='list'">
       <el-table :data="Edges">
-        <el-table-column label="Edge 名稱" prop="Name"></el-table-column>
+        <!-- <el-table-column label="Edge 名稱" prop="Name"></el-table-column>
         <el-table-column label="Edge IP" prop="EdgeIP"></el-table-column>
         <el-table-column label="Edge IDMS 狀態" prop="EdgeIP"></el-table-column>
-        <el-table-column label="Edge IP" prop="EdgeIP"></el-table-column>
+        <el-table-column label="Edge IP" prop="EdgeIP"></el-table-column>-->
+        <EdgeStatusVue
+          v-for="edge in Edges"
+          :key="edge.EdgeIP"
+          :Mode="display_mode"
+          :ColorMode="ColorMode"
+          :EdgeProp="edge"
+        ></EdgeStatusVue>
       </el-table>
     </div>
     <div v-show="display_mode=='dashboard'" class="w-100 row g-0 mx-0 my-0">
@@ -38,7 +49,7 @@
         v-for="edge in Edges"
         :key="edge.EdgeIP"
       >
-        <EdgeStatusVue :ColorMode="ColorMode" :EdgeProp="edge"></EdgeStatusVue>
+        <EdgeStatusVue :Mode="display_mode" :ColorMode="ColorMode" :EdgeProp="edge"></EdgeStatusVue>
       </div>
     </div>
   </div>

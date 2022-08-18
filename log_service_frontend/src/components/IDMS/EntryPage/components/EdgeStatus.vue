@@ -1,112 +1,113 @@
 <template>
-  <div class="edge-status mx-1 my-1 d-flex flex-column h-100" v-loading="loading">
-    <div class="d-flex flex-row" v-bind:style="TitleColor">
-      <div class="title d-flex flex-column px-1">
-        <h3>{{EdgeProp.Name.toUpperCase()}}</h3>
-        <span>{{EdgeProp.EdgeIP}}</span>
+  <div>
+    <div class="edge-status mx-1 my-1 d-flex flex-column h-100" v-loading="loading">
+      <div class="d-flex flex-row border-bottom mb-4" v-bind:style="TitleColor">
+        <div class="title d-flex flex-column px-1">
+          <h3>{{EdgeProp.Name.toUpperCase()}}</h3>
+          <span>{{EdgeProp.EdgeIP}}</span>
+        </div>
+        <div class="flex-fill d-flex flex-row justify-content-end">
+          <span class="network-status-label py-1">網路狀態</span>
+          <NetworkStatusVue :ip="EdgeProp.EdgeIP" toolTipPosition="bottom"></NetworkStatusVue>
+        </div>
       </div>
-      <div class="flex-fill d-flex flex-row justify-content-end">
-        <span class="network-status-label py-1">網路狀態</span>
-        <NetworkStatusVue :ip="EdgeProp.EdgeIP" toolTipPosition="bottom"></NetworkStatusVue>
-      </div>
-    </div>
-    <el-divider></el-divider>
 
-    <div class="show-types">
-      <el-radio-group v-model="DisplayMode">
-        <el-radio-button label="Overview"></el-radio-button>
-        <el-radio-button label="Performance"></el-radio-button>
-      </el-radio-group>
-    </div>
-    <div class="d-flex flex-row justify-content-center flex-fill">
-      <!-- 感測器數量與IDMS運行狀態 -->
-      <div v-if="DisplayMode=='Overview'" class="d-flex flex-row justify-content-center">
-        <div>
-          <el-progress type="circle" :percentage="100" :width="circleWidth" status="primary">
-            <div class="value-num-div">
-              <div>感測器數量</div>
-              <div class="value-num connected-num">
-                <count-to
-                  :startVal="0"
-                  :endVal="edgeStatusFromIDMS.OnlineSensorNum"
-                  :duration="2100"
-                ></count-to>
+      <div class="show-types">
+        <el-radio-group v-model="DisplayMode">
+          <el-radio-button label="Overview"></el-radio-button>
+          <el-radio-button label="Performance"></el-radio-button>
+        </el-radio-group>
+      </div>
+      <div class="d-flex flex-row justify-content-center flex-fill">
+        <!-- 感測器數量與IDMS運行狀態 -->
+        <div v-if="DisplayMode=='Overview'" class="d-flex flex-row justify-content-center">
+          <div>
+            <el-progress type="circle" :percentage="100" :width="circleWidth" status="primary">
+              <div class="value-num-div">
+                <div>感測器數量</div>
+                <div class="value-num connected-num">
+                  <count-to
+                    :startVal="0"
+                    :endVal="edgeStatusFromIDMS.OnlineSensorNum"
+                    :duration="2100"
+                  ></count-to>
+                </div>
               </div>
-            </div>
-          </el-progress>
-          <div class="shadow"></div>
+            </el-progress>
+            <div class="shadow"></div>
+          </div>
+          <div>
+            <el-progress
+              type="circle"
+              :percentage="100"
+              :width="circleWidth"
+              :status="IDMSAlive ? 'success':'exception'"
+            >
+              <div class="value-num-div">
+                <div class>IDMS</div>
+                <div
+                  class="value-num"
+                  v-bind:class="IDMSAlive?'Online':'Offline'"
+                >{{IDMSAlive?'ONLINE':'OFFLINE'}}</div>
+              </div>
+            </el-progress>
+            <div class="shadow"></div>
+          </div>
         </div>
-        <div>
-          <el-progress
-            type="circle"
-            :percentage="100"
-            :width="circleWidth"
-            :status="IDMSAlive ? 'success':'exception'"
-          >
-            <div class="value-num-div">
-              <div class>IDMS</div>
-              <div
-                class="value-num"
-                v-bind:class="IDMSAlive?'Online':'Offline'"
-              >{{IDMSAlive?'ONLINE':'OFFLINE'}}</div>
-            </div>
-          </el-progress>
-          <div class="shadow"></div>
+        <!-- Performance -->
+        <div v-else class="d-flex flex-row justify-content-center">
+          <div>
+            <el-progress
+              type="circle"
+              :percentage="PerformanceData.cpu"
+              :width="circleWidth"
+              status="primary"
+            >
+              <div class="value-num-div">
+                <div>CPU</div>
+                <div class="value-num connected-num">
+                  <count-to :startVal="0" :endVal="PerformanceData.cpu" :duration="2100"></count-to>
+                </div>
+              </div>
+            </el-progress>
+            <div class="shadow"></div>
+          </div>
+          <div>
+            <el-progress
+              type="circle"
+              :percentage="PerformanceData.ram"
+              :width="circleWidth"
+              :status="IDMSAlive ? 'success':'exception'"
+            >
+              <div class="value-num-div">
+                <div class>RAM</div>
+                <div
+                  class="value-num"
+                  v-bind:class="IDMSAlive?'Online':'Offline'"
+                >{{PerformanceData.ram}}</div>
+              </div>
+            </el-progress>
+            <div class="shadow"></div>
+          </div>
         </div>
       </div>
-      <!-- Performance -->
-      <div v-else class="d-flex flex-row justify-content-center">
-        <div>
-          <el-progress
-            type="circle"
-            :percentage="PerformanceData.cpu"
-            :width="circleWidth"
-            status="primary"
-          >
-            <div class="value-num-div">
-              <div>CPU</div>
-              <div class="value-num connected-num">
-                <count-to :startVal="0" :endVal="PerformanceData.cpu" :duration="2100"></count-to>
-              </div>
-            </div>
-          </el-progress>
-          <div class="shadow"></div>
-        </div>
-        <div>
-          <el-progress
-            type="circle"
-            :percentage="PerformanceData.ram"
-            :width="circleWidth"
-            :status="IDMSAlive ? 'success':'exception'"
-          >
-            <div class="value-num-div">
-              <div class>RAM</div>
-              <div
-                class="value-num"
-                v-bind:class="IDMSAlive?'Online':'Offline'"
-              >{{PerformanceData.ram}}</div>
-            </div>
-          </el-progress>
-          <div class="shadow"></div>
-        </div>
-      </div>
-    </div>
-    <div class="my-2">
-      <div class="d-flex flex-row">
-        <b-button
-          v-bind:class="EnterButtonColorMode"
-          class="flex-fill"
-          @click="EnterEdgeHandle"
-        >Enter</b-button>
+      <div class="my-2">
+        <div class="d-flex flex-row">
+          <b-button
+            v-bind:class="EnterButtonColorMode"
+            class="flex-fill"
+            @click="EnterEdgeHandle"
+          >Enter</b-button>
 
-        <!-- <b-button
+          <!-- <b-button
           v-bind:class="[EnterButtonColorMode,'bg-primary']"
           @click="EnterEdgeHandle"
         >Overview</b-button>
         <b-button
           v-bind:class="[EnterButtonColorMode,'bg-primary']"
           @click="performance = !performance"
-        >Performance</b-button>-->
+          >Performance</b-button>-->
+        </div>
       </div>
     </div>
   </div>
@@ -134,6 +135,10 @@ export default {
     ColorMode: {
       type: String,
       default: 'bg-dark'
+    },
+    Mode: {
+      type: String,
+      default: 'list'
     }
   },
   computed: {
@@ -225,7 +230,8 @@ export default {
 }
 .edge-status span {
   letter-spacing: 0.11rem;
-  padding-top: 2px;
+  padding-top: 0px;
+  margin-top: -10px;
 }
 .edge-status .title {
   text-align: left;

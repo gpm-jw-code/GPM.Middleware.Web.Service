@@ -3,6 +3,7 @@
     <!-- 表格 -->
 
     <el-table
+      table-layout="auto"
       :default-sort="{ prop: 'EqName', order: 'ascending' }"
       :height="table_height"
       :data="DignoseDatasToShow"
@@ -33,8 +34,10 @@
       <el-table-column sortable prop="EqName" label="EQ Name"></el-table-column>
       <el-table-column sortable prop="UnitName" label="Unit Name"></el-table-column>
       <el-table-column sortable prop="HealthScore" label="Health Score"></el-table-column>
-      <el-table-column sortable prop="AlertIndex" label="Alert Index"></el-table-column>
-      <el-table-column sortable label="模組狀態">
+      <el-table-column sortable prop="AlertIndex" label="Alert Index">
+        <template #default="scope">{{scope.row.AlertIndex.toFixed(2)}}</template>
+      </el-table-column>
+      <el-table-column sortable label="模組連線狀態">
         <template #default="scope">
           <el-tag
             effect="dark"
@@ -62,13 +65,13 @@
           </div>
         </template>
         <template #default="props">
-          <div class="fade-in row dignose-detail-info d-flex flex-row">
-            <div class="col-md-9 row g-0 flex-fill">
-              <div class="d-flex col-md-3">
+          <div class="fade-in d-flex flex-row row dignose-detail-info">
+            <div class="col-sm-9 row g-0">
+              <div class="d-flex flex-row col-lg-2">
                 <div class="item-name">當前模型</div>
                 <div class>{{props.row.DignoseDetailData.currentModelName}}</div>
               </div>
-              <div class="d-flex col-md-3">
+              <div class="d-flex col-lg-2">
                 <div class="item-name warning-threshold-lab">Warning Threshold</div>
                 <div>
                   <el-input-number
@@ -81,7 +84,7 @@
                   ></el-input-number>
                 </div>
               </div>
-              <div class="d-flex col-md-3">
+              <div class="d-flex col-lg-2">
                 <div class="item-name alarm-threshold-lab">Alarm Threshold</div>
                 <div>
                   <el-input-number
@@ -99,18 +102,22 @@
                 <div>{{props.row.DignoseDetailData.isOutoutSPC}}</div>
               </div>-->
             </div>
-            <div class="row col-md-2 dig-actions">
-              <el-button class="col-sm-3" @click="ShowModelList(props.row.IP)">
-                <el-icon>
-                  <List />
-                </el-icon>模型列表
-              </el-button>
+            <div class="px-0 py-0 row g-0 col-md-2 dig-actions flex-fill">
+              <div class="col-md-3">
+                <el-button @click="ShowModelList(props.row.IP)">
+                  <el-icon>
+                    <List />
+                  </el-icon>模型列表
+                </el-button>
+              </div>
               <!-- <el-button>事件列表</el-button> -->
-              <el-button class="col-sm-3" @click="$refs.rawDataView.ShowRaw(edgeIP, props.row.IP)">
-                <el-icon>
-                  <TrendCharts />
-                </el-icon>Raw Data
-              </el-button>
+              <div class="col-md-3">
+                <el-button @click="$refs.rawDataView.ShowRaw(edgeIP, props.row.IP)">
+                  <el-icon>
+                    <TrendCharts />
+                  </el-icon>Raw Data
+                </el-button>
+              </div>
             </div>
           </div>
         </template>
@@ -247,8 +254,10 @@ export default {
 
     async TableRowClickHandle(row) {
       console.log(row)
-      this.HideAllExpand();
-      this.$refs.table.toggleRowExpansion(row, true);
+
+      // this.HideAllExpand();
+      // this.$refs.table.toggleRowExpansion(row, true);
+
       if (this.selectedDiagnoseData.IP != row.IP) {
 
         this.chart_loading = true;
@@ -467,7 +476,7 @@ export default {
   margin: 8px;
 }
 
-@media screen and (min-width: 700px) {
+@media screen and (max-width: 990px) {
   .item-name {
     width: 150px;
   }
@@ -479,7 +488,7 @@ export default {
 }
 
 .dignose-detail-info .item-name {
-  margin-right: 10px;
+  margin-right: 15px;
 }
 
 .btn-share-chart-show {
@@ -496,8 +505,9 @@ export default {
   width: 100%;
 }
 
-.dig-actions button {
-  width: 200px;
+.dig-actions div,
+.dig-actions .el-button {
+  width: 140px;
   margin: 0px;
 }
 
