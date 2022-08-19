@@ -201,7 +201,6 @@ export default {
       this.TimeWindowDom.addEventListener('mouseup', (e) => this.TimeWindowMouseUp(e))
       this.TimeWindowDom.addEventListener('mousemove', (e) => this.TimeWindowMouseMove(e))
 
-
       document.getElementById('preview_chart_' + this.chart_id).addEventListener('mouseup', (e) => this.TimeWindowMouseUp(e))
       document.getElementById('preview_chart_' + this.chart_id).addEventListener('mousemove', (e) => this.TimeWindowMouseMove(e))
       document.getElementById('preview_chart_' + this.chart_id).addEventListener('mousedown', (e) => {
@@ -242,7 +241,6 @@ export default {
     async UpdatePreviewChart(previewData) {
       this.time_window_style.visibility = 'visible';
       this.previewData = previewData
-      this.PreviewChartEventRegist();
       console.info('開始渲染');
 
       var _ds = previewData.datasets[0].data;
@@ -297,11 +295,12 @@ export default {
       this.lastOffsetOFTimeWindow = e.offsetX;
       this.time_window_style.backgroundColor = 'red';
     },
-    TimeWindowMouseUp() {
+    TimeWindowMouseUp(e) {
       this.isTimeWindowClickDown = false;
       this.time_window_style.backgroundColor = 'white';
 
       if (!this.isAdjustWindowSizeMode) {
+        console.info('mouse up so ', e);
         var _from = moment(this.preview_chartInstance.scales['x-axis-0'].getValueForPixel(this.time_window_left_property).toString()).format('yyyy/MM/DD HH:mm:ss');
         var _to = moment(this.preview_chartInstance.scales['x-axis-0'].getValueForPixel(this.time_window_left_property + this.time_window_width).toString()).format('yyyy/MM/DD HH:mm:ss');
         this.$emit("DateTimeIntervalOnchanged", { from: _from, to: _to });
@@ -328,6 +327,7 @@ export default {
   },
   mounted() {
     this.ChartInit();
+    this.PreviewChartEventRegist();
   },
   created() {
   }
