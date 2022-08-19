@@ -1,5 +1,6 @@
 <template>
   <div id="breadcrumb" sticky>
+    <el-backtop :right="30" :bottom="50" />
     <nav class="navbar navbar-expand-sm sticky" v-bind:class="navstyle">
       <div class="container-fluid">
         <a class="navbar-brand" style="position:relative;left:-30px" href="/">GPM</a>

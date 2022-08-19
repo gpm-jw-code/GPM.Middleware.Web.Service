@@ -1,11 +1,17 @@
 <template>
   <el-drawer v-model="show" direction="rtl" size="70%" :title="`模型列表 : ${EQ}/${UNIT}(${IP})`">
-    <div class="d-flex">
-      <div class="d-flex justify-content-start">
+    <template #header="{  titleId  }">
+      <div :id="titleId" style="margin-top:85px">
+        <h2>模型列表</h2>
+      </div>
+    </template>
+    <div class="d-flex flex-row border-bottom pb-2 mb-3">
+      <div class="flex-fill text-start">
         <el-button dark @click="Fetch()">重新整理</el-button>
       </div>
-      <div class="d-flex justify-content-flex-end ip-select">
-        <el-select v-model="IP" @change="Fetch()">
+      <div class="ip-select d-flex flex-row" style="width:370px">
+        <div class="py-1" style="width:25%">選擇模組</div>
+        <el-select class="w-100" v-model="IP" @change="Fetch()">
           <el-option
             v-for="item in module_infos"
             :key="item.IP"

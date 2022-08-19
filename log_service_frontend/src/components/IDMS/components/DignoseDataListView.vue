@@ -69,7 +69,9 @@
             <div class="col-sm-9 row g-0">
               <div class="d-flex flex-row col-lg-2">
                 <div class="item-name">當前模型</div>
-                <div class>{{props.row.DignoseDetailData.currentModelName}}</div>
+                <div>
+                  <u>{{props.row.DignoseDetailData.currentModelName}}</u>
+                </div>
               </div>
               <div class="d-flex col-lg-2">
                 <div class="item-name warning-threshold-lab">Warning Threshold</div>
@@ -131,13 +133,19 @@
     >
       <b-button
         class="btn-share-chart-show"
-        :variant=" share_chart_show? 'light': 'primary' "
+        :variant=" share_chart_show? 'dark': 'primary' "
         @click="share_chart_show=!share_chart_show"
       >
         <el-icon class="mx-2">
           <ArrowDownBold v-if="share_chart_show"></ArrowDownBold>
           <ArrowUpBold v-else></ArrowUpBold>
         </el-icon>即時圖表
+        <el-tag
+          round
+          effect="plain"
+          type="light"
+          v-if="bottom_title_append!=''"
+        >{{bottom_title_append}}</el-tag>
       </b-button>
     </div>
     <transition name="el-zoom-in-bottom">
@@ -167,6 +175,7 @@
             element-loading-background="rgba(122, 122, 122, 0.8)"
           >
             <GPMChartVue
+              v-if="selectedDiagnoseData.IP!=undefined"
               class="share-chart my-2"
               chart_id="share-chart"
               :key="selectedDiagnoseData.IP+chart_display_mode"
@@ -174,6 +183,7 @@
               :yAxisLabel="ylabel"
               ref="trendChart"
             ></GPMChartVue>
+            <div v-else class="w-100 h-100 px-5 py-5">點選表格以顯示趨勢圖表</div>
           </div>
         </div>
       </div>
@@ -212,7 +222,7 @@ export default {
       DignoseDatas: [],
       chart_display_mode: 'HS',
       search_str: '',
-      selectedDiagnoseData: { IP: '???' },
+      selectedDiagnoseData: { IP: undefined },
       renderingDiagnoseData: [],
       ThresholdSettings: {
         'ip': new clsTresholdSetting()
@@ -298,6 +308,8 @@ export default {
       }
     },
     RenderTrendChart(data) {
+      if (!this.share_chart_show)
+        return;
       try {
         this.renderingDiagnoseData = data;
         var timeUnit = this.chart_display_mode == 'HS' ? 'second' : this.chart_display_mode == 'AID' ? 'day' : 'hour';
@@ -358,7 +370,7 @@ export default {
       }
     },
     ChartTitle() {
-      if (!this.selectedDiagnoseData.EqName)
+      if (!this.selectedDiagnoseData.IP)
         return "點選表格以顯示趨勢圖表";
       return `${this.DisplayModeName}: ${this.selectedDiagnoseData.EqName}-${this.selectedDiagnoseData.UnitName} (${this.selectedDiagnoseData.IP})`;
     },
@@ -382,6 +394,9 @@ export default {
     table_height() {
       console.info(window.innerHeight);
       return this.share_chart_show ? window.innerHeight * 0.45 : window.innerHeight - 220;
+    },
+    bottom_title_append() {
+      return this.selectedDiagnoseData.IP == undefined ? '' : ` ${this.selectedDiagnoseData.EqName}-${this.selectedDiagnoseData.UnitName}(${this.selectedDiagnoseData.IP})`;
     }
 
   },

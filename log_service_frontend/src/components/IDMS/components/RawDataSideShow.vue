@@ -1,9 +1,9 @@
 <template>
   <el-drawer v-model="ShowDrawer" direction="btt" size="70%" :title="Title" @close="CloseHandle">
-    <div class="message d-flex flex-row w-100 px-1 mx-0 my-0 bg-light">
+    <div class="message d-flex flex-row w-100 px-1 mx-0 my-0 bg-light border-bottom">
       <el-tag effect="dark" :type="connected?'success':'danger'">{{connected?'已連線':'已斷線'}}</el-tag>
-      <div>
-        <el-select size="small" v-model="SensorIP" @change="ChangeIPHandle">
+      <div style="width:340px">
+        <el-select class="w-100" size="small" v-model="SensorIP" @change="ChangeIPHandle">
           <el-option
             v-for="module in ExistModuleList"
             :key="module.IP"
@@ -17,7 +17,7 @@
         <b-button v-else size="sm" pill class="bg-success" @click="pause=false">繼續</b-button>
       </div>
     </div>
-    <div class="row g-0 h-100 w-100 mx-0 my-0 pb-5 bg-light">
+    <div class="row g-0 h-100 w-100 mx-0 my-0 pb-5">
       <div class="col-md-6 h-100">
         <span class="raw-data-viewer">
           <el-icon>
@@ -204,12 +204,12 @@ export default {
     },
     Title() {
       if (this.ExistModuleList.length == 0)
-        return "";
+        return "REAL-TIME DATA";
       var module = this.ExistModuleList.find(mo => mo.IP == this.SensorIP);
       if (module) {
-        return `${module.EqName}-${module.UnitName}(${module.IP})`;
+        return `REAL-TIME DATA OF ${module.EqName}-${module.UnitName}(${module.IP})`;
       } else
-        return "";
+        return "REAL-TIME DATA";
     }
   }
 }
