@@ -377,6 +377,7 @@ export default {
       this.loading = false;
     },
     async GetSliceDataHandle(datetimeInterval = {}) {
+
       this.chart_loading = true;
       var data_ret = {};
 
