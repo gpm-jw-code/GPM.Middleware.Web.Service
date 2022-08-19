@@ -209,12 +209,12 @@ export default {
     }
   },
   mounted() {
-    this.PerformanceDataTimer = setInterval(() => GetPCPerformance(this.EdgeProp.EdgeIP).then(ret => this.PerformanceData = ret), 1000)
+    //this.PerformanceDataTimer = setInterval(() => GetPCPerformance(this.EdgeProp.EdgeIP).then(ret => this.PerformanceData = ret), 1000)
     this.WebsocketIni();
 
   },
   unmounted() {
-    clearInterval(this.PerformanceDataTimer);
+    //clearInterval(this.PerformanceDataTimer);
     this.WebsocketClear();
   }
 }

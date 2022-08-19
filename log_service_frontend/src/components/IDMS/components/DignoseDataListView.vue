@@ -290,7 +290,7 @@ export default {
       if (this.trendchart_ws != null) {
         this.trendchart_ws.onmessage = (evt) => {
           var data = JSON.parse(evt.data);
-          this.RenderTrendChart(data[0]);
+          this.RenderTrendChart(data);
 
         }
       } else {

@@ -2,8 +2,8 @@
   <div id="dignose-chart-view" v-loading="LOADING">
     <el-backtop :right="30" :bottom="50" />
 
-    <el-affix offset="70">
-      <div class="charting-options py-1 px-1 mx-2 d-flex bg-light">
+    <el-affix :offset="70" class="w-100">
+      <div class="charting-options w-100 py-1 px-1 mx-2 d-flex bg-light">
         <div class="d-flex justify-content-start w-100">
           <!-- <span>顯示</span> -->
           <el-radio-group v-model="display_mode" @change="FeatureTypeChangeHandle">

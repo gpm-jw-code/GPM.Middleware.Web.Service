@@ -1,10 +1,37 @@
 <template>
   <div class="fade-in bg-light">
+    <div class="d-flex flex-row justify-content-end">
+      <div>顯示行數:</div>
+      <div style="width:60px">
+        <el-select size="small" v-model="ColsNumber">
+          <el-option v-for="num in [1,2,3]" :key="num" :value="num" :label="num"></el-option>
+        </el-select>
+      </div>
+      <div style="width:220px">
+        <el-input
+          size="small"
+          v-model="search_str"
+          @input="ShowingDataDetermine"
+          placeholder="輸入內容查詢..."
+          clearable
+        >
+          <template #prepend>
+            <el-icon>
+              <Search />
+            </el-icon>
+          </template>
+          <!-- <template #append>
+            <el-button>Search</el-button>
+          </template>-->
+        </el-input>
+      </div>
+    </div>
+
     <div class="row g-1">
       <status-card-vue
         :edge_ip="edge_ip"
-        class="col-md-4"
-        v-for="(data,ip) in veData"
+        :class="column_class"
+        v-for="(data,ip) in ShowingData"
         :key="ip"
         :ip="ip"
         :veData="data"
@@ -23,12 +50,23 @@ export default {
       edge_ip: "",
       ws: null,
       wsConnecting: false,
-      veData: {}
+      veData: {},
+      ShowingData: {},
+      ColsNumber: 3,
+      search_str: ''
     }
+  },
+  computed: {
+    column_class() {
+      return `col-md-${12 / this.ColsNumber}`;
+    },
+
   },
   methods: {
     MessageDataHandle(vm) {
       this.veData = vm;
+      if (this.search_str == '')
+        this.ShowingData = this.veData;
     },
     WsIni() {
       this.ws = new WebSocket(`ws://${this.edge_ip}:44332/VibrationEnergy`);
@@ -45,6 +83,29 @@ export default {
         this.ws.onmessage = null;
         this.ws.onclose = null;
       }
+    },
+    RenderCharts() {
+
+    },
+    ShowingDataDetermine() {
+
+      setTimeout(() => {
+        if (this.search_str == '')
+          return this.veData;
+
+        var result = {};
+        Object.keys(this.veData).forEach(key => {
+          var ip = key.toUpperCase();
+          var eq = this.veData[key].EqName.toUpperCase();
+          var unit = this.veData[key].UnitName.toUpperCase();
+          var _search_str = this.search_str.toUpperCase();
+          if (ip.includes(_search_str) | eq.includes(_search_str) | unit.includes(_search_str)) {
+            result[key] = this.veData[key];
+          }
+        });
+        this.ShowingData = result;
+      }, 500);
+
     }
   },
   mounted() {

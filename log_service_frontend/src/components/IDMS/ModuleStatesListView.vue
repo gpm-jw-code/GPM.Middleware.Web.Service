@@ -1,11 +1,13 @@
 <template>
   <div class="fade-in">
-    <div class="px-2 py-2 w-100 d-flex flex-row justify-content-start border-bottom">
-      <el-radio-group v-model="mode">
-        <el-radio-button size="small" label="Network"></el-radio-button>
-        <el-radio-button size="small" label="Module"></el-radio-button>
-      </el-radio-group>
-    </div>
+    <el-affix class="w-100" :offset="75">
+      <div class="px-2 py-2 w-100 d-flex flex-row justify-content-start border-bottom">
+        <el-radio-group v-model="mode">
+          <el-radio-button size="small" label="Network"></el-radio-button>
+          <el-radio-button size="small" label="Module"></el-radio-button>
+        </el-radio-group>
+      </div>
+    </el-affix>
     <div v-if="mode=='Network' " class="w-100 d-flex flex-column justify-content-center">
       <h3>Network State</h3>
       <el-divider></el-divider>

@@ -124,7 +124,7 @@ export default {
 <style>
 .idms-alarm-notifi {
   position: absolute;
-  right: 200px;
+  right: 220px;
 }
 .idms-alarm-notifi .drawer-title {
   padding-top: 10px;
