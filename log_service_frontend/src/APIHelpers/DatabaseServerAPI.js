@@ -2,14 +2,20 @@ import axios from 'axios'
 import { configs } from '../config'
 axios.defaults.baseURL = configs.host
 
+/**取得版本號資訊 */
 export async function GetWebSiteVersion() {
   return await GetRequest('/api/Version/WebsiteVersion')
 }
 
-//https://localhost:7005/WeatherForecast
-export async function QueryTest() {
-  return await GetRequest('/WeatherForecast?id=123')
+/**取得Release Note */
+export async function GetReleaseNoteMD(){
+    var res = await axios.get('/api/version/releasenote').catch(er=>{
+        return '';
+    });
+    console.info(res);
+    return res.data;
 }
+
 
 export async function GetEdgeInformation() {
   return await GetRequest('/api/DB/GetEdgeInformation')

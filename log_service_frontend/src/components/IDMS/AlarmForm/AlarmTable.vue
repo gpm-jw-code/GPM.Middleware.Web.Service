@@ -152,14 +152,14 @@ export default {
       alarmViewModel: {
         totalAlarm: -1,
         totalPage: 0,
-        itemNumInPage: 11,
+        itemNumInPage: 15,
         currentAlarm: null,
         topAlarms: []
       },
       alarmViewModel_Query: {
         totalAlarm: -1,
         totalPage: 0,
-        itemNumInPage: 11,
+        itemNumInPage: 15,
         currentAlarm: {},
         topAlarms: []
       },

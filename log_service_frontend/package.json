@@ -17,6 +17,7 @@
     "chart.js": "^2.9.4",
     "core-js": "^3.8.3",
     "element-plus": "^2.2.9",
+    "marked": "^4.0.18",
     "moment": "^2.29.3",
     "node-sass": "^7.0.1",
     "register-service-worker": "^1.7.2",

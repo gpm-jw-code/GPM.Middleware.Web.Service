@@ -1,39 +1,36 @@
 <template>
-  <el-drawer v-model="show" direction="btt" size="30%">
+  <el-drawer v-model="show" direction="btt" size="50%">
     <div class="w-100 d-flex flex-column release-content">
-      <div>
-        <h3 class>{{ website_ver }} 版本說明</h3>
-      </div>
-      <div class="note" v-for="(i,index) in releaseList" :key="index">[{{index+1}}] {{ i }}</div>
+      <div class="note" v-html="release_note_md"></div>
+      <!-- <div class="note" v-for="(i,index) in releaseList" :key="index">[{{index+1}}] {{ i }}</div> -->
     </div>
   </el-drawer>
 </template>
 
 <script>
-import { GetWebSiteVersion } from '@/APIHelpers/DatabaseServerAPI.js'
+import { GetWebSiteVersion, GetReleaseNoteMD } from '@/APIHelpers/DatabaseServerAPI.js';
+import { marked } from 'marked';
 export default {
   data() {
     return {
       show: false,
       website_ver: '',
-      releaseList: [
-        'UI優化', '支援多模組遠端訓練', 'Alarm Form事件同步與查詢', 'Bug 修復'
-      ]
+      release_note_md: ''
     }
   },
-
   mounted() {
     setTimeout(async () => {
       var old_ver = localStorage.getItem('idms_website_version');
+      this.release_note_md = marked(await GetReleaseNoteMD());
       GetWebSiteVersion().then(version => {
         this.website_ver = version;
         this.show = old_ver != this.website_ver;
+        // this.show = true;
         localStorage.setItem('idms_website_version', this.website_ver)
       }).catch(e => {
         console.info('無法fetch網頁版本資訊');
         return;
       });
-
     }, 3000)
   }
 
