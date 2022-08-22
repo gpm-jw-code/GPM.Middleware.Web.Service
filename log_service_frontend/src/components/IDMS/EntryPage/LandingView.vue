@@ -1,5 +1,5 @@
 <template>
-  <div class="fade-out fade-in h-100 w-100 bg-dark landing-view" sticky>
+  <div class="fade-out fade-in h-100 w-100 bg-light landing-view" sticky>
     <div class="gpm-text w-100">GPM</div>
   </div>
 </template>
@@ -36,7 +36,7 @@ export default {
 .landing-view div {
   position: fixed;
   top: 30vmin;
-  font-size: 5rem;
+  font-size: 8rem;
   font-weight: bolder;
 }
 .gpm-text {
@@ -46,16 +46,17 @@ export default {
   animation-iteration-count: 1;
   animation-duration: 900ms;
   animation-fill-mode: forwards;
+  text-shadow: rgba(255, 255, 255, 0.582) 5px 5px 4px;
 }
 
 @keyframes jump {
   from {
-    top: 31vmin;
+    top: 30vmin;
     color: rgba(27, 42, 160, 0.1);
   }
   to {
-    top: 30vmin;
-    color: rgb(26, 45, 185, 1);
+    top: 35vmin;
+    color: rgb(37, 49, 221, 1);
   }
 }
 </style>

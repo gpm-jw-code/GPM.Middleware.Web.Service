@@ -2,10 +2,8 @@ import { configs } from '@/config'
 const ws_host = configs.idms_websocket_host
 
 export async function GetModuleInfos(edgeIP) {
-  var host = edgeIP == undefined ? ws_host : `ws://${edgeIP}:44332`
-
   return await new Promise((resolve, reject) => {
-    var ws = new WebSocket(`${host}/ModuleInfoGet`)
+    var ws = new WebSocket(`${configs.websocket_host}/ModuleInfoGet?edgeIP=${edgeIP}`)
     ws.onopen = () => ws.send('GetInfos')
     ws.onmessage = (evt) => {
       ws.close()
@@ -17,19 +15,19 @@ export async function GetModuleInfos(edgeIP) {
 
 export async function GetDignoseDataListWsInstance(edgeIP) {
   return await new Promise((resolve, reject) => {
-    var host = edgeIP == undefined ? ws_host : `ws://${edgeIP}:44332`
+    var host = configs.websocket_host;
     console.info('GetDignoseDataListWsInstance', edgeIP)
-    var ws = new WebSocket(`${host}/Dignose?type=list`)
+    var ws = new WebSocket(`${host}/Dignose?type=list&edgeIP=${edgeIP}`)
     ws.onopen = () => resolve(ws)
     ws.onerror = (er) => reject(er)
   })
 }
-export async function GetTrendchartWsInstance(edgeIP, ip, featureType = 'HS') {
-  var host = edgeIP == undefined ? ws_host : `ws://${edgeIP}:44332`
+export async function GetTrendchartWsInstance(edgeIP, sensorIP, featureType = 'HS') {
+  var host = configs.websocket_host;
   console.info('GetTrendchartWsInstance', edgeIP)
   return await new Promise((resolve, reject) => {
     var ws = new WebSocket(
-      `${host}/Dignose?type=chart&number=90&ip=${ip}&featureType=${featureType}`,
+      `${host}/Dignose?edgeIP=${edgeIP}&type=chart&number=90&sensorIP=${sensorIP}&chart_type=${featureType}`,
     )
     ws.onopen = () => resolve(ws)
     ws.onerror = () => reject(null)

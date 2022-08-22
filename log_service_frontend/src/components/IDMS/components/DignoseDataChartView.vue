@@ -197,6 +197,7 @@ export default {
       if (this.ws) {
         this.ws.close();
       }
+      // this.WsConnect();
     },
     async RenderCharts() {
 
@@ -227,7 +228,7 @@ export default {
       if (this.ws)
         this.ws.close();
 
-      this.ws = new WebSocket(`ws://${this.edgeIP}:44332/Dignose?type=chart&number=${this.MaxHSDisplayNum}&featureType=${this.featureType}`);
+      this.ws = new WebSocket(`${configs.websocket_host}/Dignose?edgeIP=${this.edgeIP}&type=chart&number=${this.MaxHSDisplayNum}&chart_type=${this.featureType}&sensorIP=ALL`);
       this.ws.onopen = () => {
         this.loading = false;
       }
@@ -235,6 +236,13 @@ export default {
         this.loading = false;
         this.DignoseDatas = JSON.parse(evt.data);
         this.RenderCharts();
+      }
+      this.ws.onerror = () => {
+        console.info('ws close');
+        this.loading = true;
+        this.ws.onmessage = null;
+        this.WsConnect();
+
       }
       this.ws.onclose = () => {
         console.info('ws close');

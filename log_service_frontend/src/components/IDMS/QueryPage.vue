@@ -2,7 +2,7 @@
   <div class="h-100 fade-in">
     <div class="d-flex flex-column" style=";height:100%">
       <!-- 選擇項目與時間 -->
-      <div v-loading="!ready" class="options">
+      <div v-loading="!ready" class="options border-bottom border-top pb-2 mt-1 mb-1">
         <div class="d-flex flex-row row settings">
           <div class="col-lg-2 d-flex">
             <b>EQ</b>
@@ -20,11 +20,11 @@
               <el-option
                 v-for="unit_obj in UNITS_IN_EQ"
                 :key="unit_obj.IP"
-                :label="`${unit_obj.UNIT}(${unit_obj.IP})`"
+                :label="`${unit_obj.UnitName}(${unit_obj.IP})`"
                 :value="unit_obj.IP"
               >
                 <div class="d-flex">
-                  <div v-text="unit_obj.UNIT" style="color:black"></div>
+                  <div v-text="unit_obj.UnitName" style="color:black"></div>
                   <div class="w-100" style="text-align:right; ">
                     <u>{{unit_obj.IP}}</u>
                   </div>
@@ -261,14 +261,14 @@ export default {
     EQList() {
       var eqls = [];
       this.ModuleList.forEach(module => {
-        if (!eqls.includes(module.EQ)) {
-          eqls.push(module.EQ);
+        if (!eqls.includes(module.EqName)) {
+          eqls.push(module.EqName);
         }
       })
       return eqls;
     },
     UNITS_IN_EQ() {
-      return this.ModuleList.filter(m => m.EQ == this.QueryOptions.SelectedEQ);
+      return this.ModuleList.filter(m => m.EqName == this.QueryOptions.SelectedEQ);
     },
     StartTime() {
       return moment(this.QueryOptions.TimeRange[0]).format('yyyy/MM/DD HH:mm:ss');
@@ -424,6 +424,9 @@ export default {
 }
 </script>
 <style>
+.options {
+  box-shadow: 4px 1px 10px 1px rgba(0, 0, 0, 0.644);
+}
 .settings b {
   font-size: small;
   width: 96px;

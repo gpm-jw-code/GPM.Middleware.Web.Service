@@ -41,6 +41,7 @@
 </template>
 <script>
 import StatusCardVue from './StatusCard.vue';
+import { configs } from '@/config';
 export default {
   components: {
     StatusCardVue
@@ -69,7 +70,7 @@ export default {
         this.ShowingData = this.veData;
     },
     WsIni() {
-      this.ws = new WebSocket(`ws://${this.edge_ip}:44332/VibrationEnergy`);
+      this.ws = new WebSocket(`${configs.websocket_host}/VibrationEnergy?edgeIP=${this.edge_ip}`);
       this.ws.onmessage = (evt) => this.MessageDataHandle(JSON.parse(evt.data));
       this.ws.onclose = () => this.WsRetry();
     },

@@ -15,7 +15,7 @@
           <el-option
             v-for="item in module_infos"
             :key="item.IP"
-            :label="`${item.EQ}/${item.UNIT}(${item.IP})`"
+            :label="`${item.EqName}/${item.UnitName}(${item.IP})`"
             :value="item.IP"
           ></el-option>
         </el-select>

@@ -9,7 +9,7 @@
         </button>
         <div v-if="showNavbar" class="collapse navbar-collapse d-flex flex-row" id="navbar">
           <div class="navbar-nav flex-fill">
-            <el-radio-group v-model="seletedRouteName">
+            <el-radio-group v-model="seletedRouteName" fill="rgb(0, 0, 178)">
               <el-radio-button
                 class="mx-1"
                 v-for="rout in routes"

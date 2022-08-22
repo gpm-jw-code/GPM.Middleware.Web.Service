@@ -9,6 +9,7 @@ import QueryPage from '@/components/IDMS/QueryPage.vue'
 import { configs } from '@/config'
 import EntryPage from '@/components/IDMS/EntryPage/EntryPage.vue'
 import VEPage from "@/components/IDMS/VbEnergyMonitor/VbEnergyView.vue"
+import ChatingPage from "@/views/ChatingView.vue"
 
 var gmm_mode_routes = [
   {
@@ -39,18 +40,6 @@ var gpm_mode_routes = [
     path: '/VibrationEnergy/:ip',
     name: '振動能量',
     component: VEPage,
-    // children:[
-    //   {
-    //     path: 'Dashboard',
-    //     name: 'Dashboard',
-    //     component: import('@/components/IDMS/VbEnergyMonitor/DashboardView.vue'),
-    //   },
-    //   {
-    //     path: 'ThresholdSetting',
-    //     name: 'ThresholdSetting',
-    //     component: import('@/components/IDMS/VbEnergyMonitor/ThresholdSetting.vue'),
-    //   }
-    // ]
   },
   {
     path: '/modulestates/:ip',
@@ -62,6 +51,11 @@ var gpm_mode_routes = [
     name: 'Query',
     component: QueryPage,
   }, 
+  {
+    path:'/chating',
+    name:'Support',
+    component:ChatingPage
+  }
 ]
 
 var dev_mode_routes = [

@@ -19,11 +19,14 @@
     </div>
     <div class="row g-0 h-100 w-100 mx-0 my-0 pb-5">
       <div class="col-md-6 h-100">
-        <span class="raw-data-viewer">
-          <el-icon>
+        <div class="w-100 d-flex flex-row">
+          <el-icon style="padding-top: 12px;font-size: 25px;">
             <TrendCharts />
-          </el-icon>G Value
-        </span>
+          </el-icon>
+          <span class="raw-data-viewer">
+            <div>G Value</div>
+          </span>
+        </div>
         <GPMChartVue
           ref="Raw_Data_Chart"
           class="h-100"
@@ -36,11 +39,14 @@
         ></GPMChartVue>
       </div>
       <div class="col-md-6 h-100">
-        <span class="raw-data-viewer">
-          <el-icon>
+        <div class="w-100 d-flex flex-row">
+          <el-icon style="padding-top: 12px;font-size: 25px;">
             <TrendCharts />
-          </el-icon>FFT
-        </span>
+          </el-icon>
+          <span class="raw-data-viewer">
+            <div>FFT</div>
+          </span>
+        </div>
         <GPMChartVue
           ref="Raw_Data_Chart_FFT"
           class="h-100"

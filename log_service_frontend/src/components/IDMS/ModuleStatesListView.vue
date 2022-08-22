@@ -96,7 +96,7 @@ export default {
   },
   methods: {
     WebSocketInitial() {
-      this.ws = new WebSocket(`ws://${this.EdgeIP}:44332/ModuleStates`);
+      this.ws = new WebSocket(`${configs.websocket_host}/ModuleInfoGet?edgeIP=${this.EdgeIP}`);
       this.ws.onmessage = (_ws) => {
         this.ModuleStatesData = JSON.parse(_ws.data);
       }

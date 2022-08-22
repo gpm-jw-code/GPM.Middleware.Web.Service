@@ -84,6 +84,7 @@
 </template>
 <script>
 import GPMChart from '@/components/Charting/GPMChart.vue'
+import { configs } from '@/config';
 export default {
   components: { GPMChart },
   props: {
@@ -187,7 +188,7 @@ export default {
       }, 50)
     },
     WsIni() {
-      this.ws = new WebSocket(`ws://${this.edge_ip}:44332/VibrationEnergy?ip=${this.ip}&type=charting`);
+      this.ws = new WebSocket(`${configs.websocket_host}/VibrationEnergy?edgeIP=${this.edge_ip}&sensorIP=${this.ip}&type=charting`);
       this.ws.onmessage = (evt) => this.WsDataHandle(JSON.parse(evt.data));
     },
     WsDataHandle(vm) {

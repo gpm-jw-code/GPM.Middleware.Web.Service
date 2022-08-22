@@ -12,30 +12,15 @@
         </div>
       </div>
 
-      <div class="show-types">
+      <!-- <div class="show-types">
         <el-radio-group v-model="DisplayMode">
           <el-radio-button label="Overview"></el-radio-button>
           <el-radio-button label="Performance"></el-radio-button>
         </el-radio-group>
-      </div>
+      </div>-->
       <div class="d-flex flex-row justify-content-center flex-fill">
         <!-- 感測器數量與IDMS運行狀態 -->
         <div v-if="DisplayMode=='Overview'" class="d-flex flex-row justify-content-center">
-          <div>
-            <el-progress type="circle" :percentage="100" :width="circleWidth" status="primary">
-              <div class="value-num-div">
-                <div>感測器數量</div>
-                <div class="value-num connected-num">
-                  <count-to
-                    :startVal="0"
-                    :endVal="edgeStatusFromIDMS.OnlineSensorNum"
-                    :duration="2100"
-                  ></count-to>
-                </div>
-              </div>
-            </el-progress>
-            <div class="shadow"></div>
-          </div>
           <div>
             <el-progress
               type="circle"
@@ -53,6 +38,65 @@
             </el-progress>
             <div class="shadow"></div>
           </div>
+          <div>
+            <el-progress type="circle" :percentage="100" :width="circleWidth" status="primary">
+              <div class="value-num-div">
+                <div>感測器數量</div>
+                <div class="value-num connected-num">
+                  <count-to
+                    :startVal="edgeStatusFromIDMS_old.OnlineSensorNum==-1? 0:edgeStatusFromIDMS_old.OnlineSensorNum"
+                    :endVal="edgeStatusFromIDMS.OnlineSensorNum"
+                    :duration="2100"
+                  ></count-to>
+                </div>
+              </div>
+            </el-progress>
+            <div class="shadow"></div>
+          </div>
+          <div>
+            <el-progress
+              type="circle"
+              :percentage="edgeStatusFromIDMS.Health"
+              :width="circleWidth"
+              :status="health_state"
+            >
+              <div class="value-num-div">
+                <div>
+                  健康度
+                  <el-popover width="300" placement="top-start" content="表示所有監測點中其健康分數高於Alarm閥值的比率">
+                    <template #reference>
+                      <el-icon class="mb-2" color="rgb(204, 204, 204)">
+                        <InfoFilled></InfoFilled>
+                      </el-icon>
+                    </template>
+                  </el-popover>
+                </div>
+                <div class="value-num" v-bind:class="'health-'+health_state">
+                  <count-to
+                    :startVal="edgeStatusFromIDMS_old.Health"
+                    :endVal="edgeStatusFromIDMS.Health"
+                    :duration="2100"
+                  ></count-to>
+                </div>
+              </div>
+            </el-progress>
+            <div class="shadow"></div>
+          </div>
+          <!-- <div>
+            <el-progress type="circle" :percentage="100" :width="circleWidth" status="primary">
+              <div class="value-num-div">
+                <div>健康度</div>
+                <div class="value-num connected-num">
+                  <count-to
+                    :startVal="0"
+                    :endVal="edgeStatusFromIDMS.OnlineSensorNum"
+                    :duration="2100"
+                  ></count-to>
+                </div>
+              </div>
+            </el-progress>
+            <div class="shadow"></div>
+          </div>-->
         </div>
         <!-- Performance -->
         <div v-else class="d-flex flex-row justify-content-center">
@@ -91,6 +135,7 @@
           </div>
         </div>
       </div>
+      <div class="edge-state-timestamp w-100 text-start">{{TIME_STAMP}}</div>
       <div class="my-2">
         <div class="d-flex flex-row">
           <b-button
@@ -116,6 +161,8 @@
 <script>
 import NetworkStatusVue from '../../components/NetworkStatus.vue';
 import { GetPCPerformance } from '@/APIHelpers/MicroServices/Performance.js'
+import { configs } from '@/config';
+import moment from 'moment';
 export default {
   components: {
     NetworkStatusVue,
@@ -147,6 +194,12 @@ export default {
     },
     EnterButtonColorMode() {
       return this.ColorMode == 'bg-dark' ? 'bg-dark' : 'bg-primary'
+    },
+    health_state() {
+      return this.edgeStatusFromIDMS.Health > 80 ? 'success' : (this.edgeStatusFromIDMS.Health <= 50 ? 'exception' : 'warning')
+    },
+    TIME_STAMP() {
+      return moment(this.edgeStatusFromIDMS.TimeStamp).format('yyyy-MM-DD HH:mm:ss');
     }
   },
   data() {
@@ -156,8 +209,14 @@ export default {
       loading: true,
       edgeStatusWebsocket: null,
       circleWidth: 160,
+      edgeStatusFromIDMS_old: {
+        OnlineSensorNum: -1,
+        Health: 30
+      },
       edgeStatusFromIDMS: {
-        OnlineSensorNum: -1
+        OnlineSensorNum: -1,
+        Health: 30,
+        TimeStamp: '2022/04/18'
       },
       IDMSAlive: false,
       PerformanceData: {
@@ -176,11 +235,13 @@ export default {
     },
     WebsocketIni() {
       try {
-        this.edgeStatusWebsocket = new WebSocket(`ws://${this.EdgeProp.EdgeIP}:44332/EdgeStatus`);
+        this.edgeStatusWebsocket = new WebSocket(`${configs.websocket_host}/EdgeStatus?edgeIP=${this.EdgeProp.EdgeIP}`);
         this.edgeStatusWebsocket.onmessage = (evt) => {
           this.edgeStatusFromIDMS = JSON.parse(evt.data);
+          this.edgeStatusFromIDMS.Health = this.edgeStatusFromIDMS.Health == undefined ? 100 : this.edgeStatusFromIDMS.Health;
           this.IDMSAlive = true;
           this.loading = false;
+          this.edgeStatusFromIDMS_old = JSON.parse(JSON.stringify(this.edgeStatusFromIDMS));
         }
         this.edgeStatusWebsocket.onclose = () => {
           this.WebsocketClear();
@@ -290,5 +351,22 @@ export default {
   margin-top: -20px;
   letter-spacing: normal;
   text-align: left;
+}
+
+.health-success {
+  color: rgb(19, 206, 102);
+}
+
+.health-warning {
+  color: rgb(230, 162, 60);
+}
+
+.health-exception {
+  color: rgb(245, 108, 108);
+}
+
+.edge-state-timestamp {
+  color: grey;
+  font-size: 12px;
 }
 </style>
