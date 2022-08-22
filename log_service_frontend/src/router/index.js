@@ -9,7 +9,6 @@ import QueryPage from '@/components/IDMS/QueryPage.vue'
 import { configs } from '@/config'
 import EntryPage from '@/components/IDMS/EntryPage/EntryPage.vue'
 import VEPage from "@/components/IDMS/VbEnergyMonitor/VbEnergyView.vue"
-import ChatingPage from "@/views/ChatingView.vue"
 
 var gmm_mode_routes = [
   {
@@ -50,11 +49,6 @@ var gpm_mode_routes = [
     path: '/query',
     name: 'Query',
     component: QueryPage,
-  }, 
-  {
-    path:'/chating',
-    name:'Support',
-    component:ChatingPage
   }
 ]
 

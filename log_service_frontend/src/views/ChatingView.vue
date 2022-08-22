@@ -9,7 +9,9 @@
       </div>
       <div v-else class="bg-dark" id="messages-content">
         <div v-for="msgObj in allMsgObjList" :key="msgObj.time">
+          <div class="system-message" v-if="msgObj.isInfoMessage">{{msgObj.message}}</div>
           <div
+            v-else
             v-bind:class="msgObj.dir=='rev'? 'rev-message d-flex flow-row justify-content-start':'send-message d-flex flow-row justify-content-end'"
             :key="msgObj.time"
           >
@@ -28,10 +30,10 @@
         </div>
       </div>
       <div
-        v-show="roomEntered"
-        class="bg-light padding w-100"
-        style="height:50px ;position:fixed;bottom:0"
-      >
+        v-show="Unread && roomEntered"
+        style="height:50px;bottom:50px;background-color: black; opacity: .6;"
+      >未讀訊息>></div>
+      <div v-show="roomEntered" class="bg-light padding w-100" style="height:50px ;bottom:0">
         <div class="d-flex flex-row">
           <div>
             <b-button id="sendButton" @click="SendMessageHandle" variant="danger">離開</b-button>
@@ -55,6 +57,7 @@
 
 <script>
 import { configs } from '@/config';
+import { FLOWBASEANNOTATION_TYPES } from '@babel/types';
 import moment from 'moment'
 export default {
   data() {
@@ -62,6 +65,7 @@ export default {
       userNameInput: undefined,
       user_input_name: "",
       roomEntered: false,
+      Unread: false,
       messageInput: '',
       ws: null,
       revObjList: [],
@@ -70,13 +74,15 @@ export default {
   },
   methods: {
     EnterRoomHandle() {
-      this.userNameInput = this.user_input_name;
+      this.userNameInput = this.user_input_name == '' ? 'anonymous-' + Date.now() : this.user_input_name;
       this.ws = new WebSocket(`${configs.websocket_host}/chat?name=${this.userNameInput}`);
       this.ws.onmessage = (event) => {
         var msgObj = JSON.parse(event.data);
         msgObj.dir = 'rev';
         this.allMsgObjList.push(msgObj);
         this.ScrollToBottom();
+
+        this.$emit('msgOnRecieved', {});
 
       }
       this.ws.onopen = () => {
@@ -94,11 +100,22 @@ export default {
     },
     ScrollToBottom() {
       var element = document.getElementById("messages-content");
-      element.scrollTop = element.scrollHeight + 100;
+      element.scrollTop = element.scrollHeight;
       console.info(element.scrollTop);
+    },
+    ShowUnReadIndicator() {
+      var element = document.getElementById("messages-content");
+      if (element) {
+        console.info(element);
+        console.info(element.scrollTop, element.scrollHeight);
+        this.Unread = element.scrollTop != element.scrollHeight
+      }
+      else
+        this.Unread = false;
     }
   },
   mounted() {
+
   }
 }
 </script>
@@ -127,7 +144,11 @@ export default {
 .send-message .msg {
   background-color: rgb(34, 110, 15);
 }
-
+#messages-content .system-message {
+  background-color: rgb(48, 48, 48);
+  color: rgb(177, 177, 177);
+  padding: 10px;
+}
 #messages-content .msg {
   padding: 10px;
   border-radius: 13px;
@@ -147,7 +168,7 @@ export default {
 
 .rev-message .sender {
   text-align: left;
-  padding-left: 5px;
+  padding-left: 10px;
 }
 
 .send-message .sender {

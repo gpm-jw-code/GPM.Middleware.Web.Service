@@ -1,6 +1,7 @@
 <template>
   <div id="breadcrumb" sticky>
     <el-backtop :right="30" :bottom="50" />
+    <!-- <el-backtop :right="30" :bottom="100" :visibility-height="-1" /> -->
     <nav class="navbar navbar-expand-sm sticky" v-bind:class="navstyle">
       <div class="container-fluid">
         <a class="navbar-brand" style="position:relative;left:-30px" href="/">GPM</a>
@@ -29,7 +30,7 @@
 
           <div class="edge-info d-flex flex-row justify-cotent-end">
             <div>
-              <div class="name mx-2">{{EdgeName.toUpperCase()}}</div>
+              <div class="name mx-2">{{ EdgeName? EdgeName.toUpperCase():''}}</div>
               <div class="ip mx-2">{{EdgeIP}}</div>
             </div>
             <NetworkStatusVue class="px-0 py-0 mx-0 my-0" :ip="EdgeIP" toolTipPosition="bottom"></NetworkStatusVue>
@@ -48,6 +49,7 @@
     <NotificationIconVue ref="alarm_noti_icon" :edge_ip="EdgeIP"></NotificationIconVue>
   </div>
   <ReleaseNote></ReleaseNote>
+  <ChatIconVue></ChatIconVue>
 </template>
 
 <script>
@@ -58,9 +60,10 @@ import { useRoute } from 'vue-router';
 import NetworkStatusVue from './components/IDMS/components/NetworkStatus.vue';
 import ReleaseNote from '@/components/IDMS/components/AppReleaseView/ReleaseNoteView.vue'
 import NotificationIconVue from './components/IDMS/AlarmForm/NotificationIcon.vue';
+import ChatIconVue from './components/Chat/ChatIcon.vue';
 export default {
   components: {
-    NetworkStatusVue, ReleaseNote, NotificationIconVue
+    NetworkStatusVue, ReleaseNote, NotificationIconVue, ChatIconVue
   },
   data() {
     return {
@@ -95,11 +98,12 @@ export default {
     window.addEventListener('unload', () => localStorage.setItem('idms-previous-route-name', this.seletedRouteName))
 
     var previousRoutName = localStorage.getItem('idms-previous-route-name');
-    if (previousRoutName != undefined) {
+    if (previousRoutName != undefined && previousRoutName != null) {
       this.seletedRouteName = previousRoutName;
     }
     let route = useRoute();
     watch(() => route.name, (n, o) => {
+      console.info('route change', n, o);
       this.EdgeIP = localStorage.getItem('edgeip');
       this.EdgeName = localStorage.getItem('edgename');
       this.seletedRouteName = n;

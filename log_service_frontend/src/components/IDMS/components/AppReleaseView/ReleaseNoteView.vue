@@ -21,7 +21,10 @@ export default {
   mounted() {
     setTimeout(async () => {
       var old_ver = localStorage.getItem('idms_website_version');
-      this.release_note_md = marked(await GetReleaseNoteMD());
+      var releaseMD = await GetReleaseNoteMD();
+      if (releaseMD) {
+        this.release_note_md = marked(releaseMD);
+      }
       GetWebSiteVersion().then(version => {
         this.website_ver = version;
         this.show = old_ver != this.website_ver;
