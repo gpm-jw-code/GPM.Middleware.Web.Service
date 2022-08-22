@@ -136,7 +136,8 @@ export default {
 }
 
 #messages-content .time {
-  padding-top: 19px;
+  padding-top: 28px;
+  font-size: 9px;
   color: grey;
 }
 
