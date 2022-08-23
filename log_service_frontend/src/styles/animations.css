@@ -2,7 +2,7 @@
 -webkit-animation: fade-in;
 animation: fade-in 1s;
 animation-fill-mode: forwards;
-animation-duration: .3s;
+animation-duration: 1s;
 visibility: hidden;
 }
 

@@ -4,8 +4,9 @@
     <!-- <el-backtop :right="30" :bottom="100" :visibility-height="-1" /> -->
     <nav v-if="!showNavbar" class="navbar navbar-expand-lg bg-primary">
       <a class="navbar-brand" href="/">
-        <span style="font-size:35px">GPM</span>
+        <span style="font-size:30px">GPM</span>
       </a>
+      <div class="navbar-brand">EDGES VIEW</div>
     </nav>
     <nav v-else class="navbar navbar-expand-lg bg-primary">
       <a class="navbar-brand" href="/">
@@ -22,7 +23,7 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item" v-for="rout in routes" :key="rout.path">
-            <a class="nav-link" @click="routerHandle(rout.path)">{{rout.name}}</a>
+            <a class="nav-link" active @click="routerHandle(rout.path)">{{rout.name}}</a>
           </li>
         </ul>
       </div>
