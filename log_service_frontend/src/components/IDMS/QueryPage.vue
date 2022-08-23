@@ -48,7 +48,7 @@
               ></el-option>
             </el-select>
           </div>
-          <div class="col-lg-2 d-flex">
+          <!-- <div class="col-lg-2 d-flex">
             <b>類型</b>
             <el-select
               class="w-100"
@@ -73,12 +73,12 @@
                 :value="item "
               ></el-option>
             </el-select>
-          </div>
+          </div>-->
           <!-- 用來填空的^_^ -->
           <div v-if="selectedTabpage!='eventTabpage'" class="col-lg-2 flex-fill"></div>
-          <div class="col-lg-2">
+          <!-- <div class="col-lg-2">
             <b-button class="w-100 bg-danger">清除</b-button>
-          </div>
+          </div>-->
         </div>
         <div class="d-flex flex-row row settings">
           <div class="col-lg-4 d-flex">
@@ -108,7 +108,7 @@
 
       <!-- <el-divider></el-divider> -->
       <!-- TABPAGE 控制 -->
-      <div class="px-1 py-0">
+      <!-- <div class="px-1 py-0">
         <el-tabs type="card" class="flex-fill" v-model="selectedTabpage">
           <el-tab-pane
             v-for="item in TypeItems"
@@ -118,7 +118,7 @@
             class="d-flex flex-column"
           ></el-tab-pane>
         </el-tabs>
-      </div>
+      </div>-->
       <!-- 結果與圖表 -->
       <div
         class="result-content d-flex flex-column flex-fill w-100 h-100"
@@ -132,13 +132,16 @@
           element-loading-background="rgba(122, 122, 122, 0.8)"
         >
           <div class="d-flex result-message font-red">{{ServerResponseData.message}}</div>
-          <GPMPreviewChart
+          <!-- <GPMPreviewChart
             ref="preview_chart"
             title="Preview"
             :yAxisLabel="Ylabel"
             xAxisLabel
             @DateTimeIntervalOnchanged="GetSliceDataHandle"
-          ></GPMPreviewChart>
+          ></GPMPreviewChart>-->
+          <div class style="position:absolute;left:15px;top:15px;cursor:pointer">
+            <i @click="showAxisSetting=true" class="bi bi-sliders2-vertical"></i>
+          </div>
           <GPMChart
             v-loading="chart_loading"
             element-loading-text="數據載入中...若響應速度過慢,可以試試調整窗大小。"
@@ -166,7 +169,7 @@
           ></EventQueryResultView>
         </div>
       </div>
-
+      <!-- 
       <div class="info-footer d-flex flex-row shadow-sm px-2" style="height:25px">
         <div class="flex-fill text-left" style="font-size:9px">{{ServerResponseData.QueryID}}</div>
         <div style="font-size:16px">
@@ -174,18 +177,60 @@
             <setting></setting>
           </el-icon>
         </div>
-      </div>
+      </div>-->
     </div>
-    <el-drawer v-model="showSettingPnl" title="SETTING" :size="IsMobileScreen?'100%':'50%'">
+
+    <!-- <el-drawer v-model="showSettingPnl" title="SETTING" :size="IsMobileScreen?'100%':'50%'">
       <DatabaseSetting></DatabaseSetting>
+    </el-drawer>-->
+
+    <el-drawer
+      v-model="showAxisSetting"
+      direction="btt"
+      size="40%"
+      :show-close="false"
+      z-index="5000"
+    >
+      <template #header="{titleID}">
+        <div :id="titleID" class="border-bottom">
+          <h4>圖表設定</h4>
+        </div>
+      </template>
+      <div class="h-100" style="position:absolute;top:60px">
+        <el-tabs v-model="SelectedQueryItem" class="demo-tabs" @tab-click="handleClick">
+          <el-tab-pane
+            v-for="setting in CustomChartSetting"
+            :key="setting.item"
+            :label="setting.item"
+            :name="setting.item"
+          >
+            <div class="chart-settings">
+              <div class="d-flex flex-row">
+                <div>Y軸</div>
+                <div>Max</div>
+                <div>
+                  <b-form-input v-model.number="setting.ymax" type="number" :step="0.1"></b-form-input>
+                </div>
+                <div>Min</div>
+                <div>
+                  <b-form-input v-model.number="setting.ymin" type="number" :step="0.1"></b-form-input>
+                </div>
+                <div>
+                  <b-button size="md" @click="ChartYLimitsApplyHandle">Apply</b-button>
+                </div>
+              </div>
+            </div>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
     </el-drawer>
   </div>
 </template>
 <script>
 import { GetModuleInfos } from '@/APIHelpers/IDMSAPIs'
 import GPMChart from '@/components/Charting/GPMChart.vue'
-import GPMPreviewChart from '@/components/Charting/GPMPreviewChart.vue'
-import DatabaseSetting from './components/DatabaseSetting'
+// import GPMPreviewChart from '@/components/Charting/GPMPreviewChart.vue'
+// import DatabaseSetting from './components/DatabaseSetting'
 import EventQueryResultView from './components/EventQueryResultView'
 import moment from 'moment';
 // import { QueryHealthScore, QueryAlertIndex } from '@/APIHelpers/DatabaseServerAPI';
@@ -197,7 +242,7 @@ import {
 
 export default {
   components: {
-    GPMChart, GPMPreviewChart, DatabaseSetting, EventQueryResultView
+    GPMChart, EventQueryResultView
   },
   data() {
     return {
@@ -215,11 +260,12 @@ export default {
         SelectedEvent: '',
         TimeRange: []
       },
+      SelectedQueryItem: '',
       // QueryItems: ['Raw Data', 'Health Score', 'Alert Index', '振動能量', 'Physical Quanity', 'Sideband Severity', 'FrequencyDoubling Severity'],
       QueryItems: [
         {
           label: 'Health Score',
-          eventOptions: ['Out Of Threshold']
+          eventOptions: ['Out Of Threshold'],
         },
         {
           label: 'Raw Data',
@@ -227,7 +273,11 @@ export default {
         },
         {
           label: 'Alert Index',
-          eventOptions: []
+          eventOptions: [],
+          YAxisSetting: {
+            max: 100,
+            min: 0
+          }
         },
         {
           label: '振動能量',
@@ -247,6 +297,7 @@ export default {
       loading: false,
       chart_loading: false,
       showSettingPnl: false,
+      showAxisSetting: false,
       chart_key: '',
       ServerResponseData: {
         count: 0,
@@ -258,6 +309,46 @@ export default {
       },
       FetchDataStartTime: null,
       FetchDataFinishTime: null,
+      CustomChartSetting:
+        [
+          {
+            item: 'Health Score',
+            ymax: 100,
+            ymin: 0
+          },
+          {
+            item: 'Raw Data',
+            ymax: 100,
+            ymin: 0
+          },
+          {
+            item: 'Alert Index',
+            ymax: 100,
+            ymin: 0
+          },
+          {
+            item: '振動能量',
+            ymax: 100,
+            ymin: 0
+          },
+          {
+            item: 'Physical Quanity',
+            ymax: 100,
+            ymin: 0
+          },
+          {
+            item: 'Sideband Severity',
+            ymax: 100,
+            ymin: 0
+          },
+          {
+            item: 'FrequencyDoubling Severity',
+            ymax: 100,
+            ymin: 0
+          }
+        ]
+
+
     }
   },
   computed: {
@@ -293,6 +384,9 @@ export default {
     },
     EventQueryOptions() {
       return this.QueryItems.find(i => i.label == this.QueryOptions.SelectedQueryItem).eventOptions;
+    },
+    ChartTitle() {
+      return `${this.QueryOptions.SelectedQueryItem}:${this.QueryOptions.SelectedEQ}/${this.QueryOptions.SelectedUNIT}`;
     }
   },
   methods: {
@@ -310,41 +404,45 @@ export default {
     QueryItemChangeHandle(item) {
       if (item == 'Raw Data')
         alert("資料量龐大會有點慢")
+      this.SelectedQueryItem = item;
     },
     async QueryHandle() {
-
+      this.$refs.query_chart.UpdateTitle(this.ChartTitle);
+      this.loading = true;
       this.SaveQueryOptionsToLocalStorage();
-      if (this.selectedTabpage == 'dataTabpage') {
-        this.loading = true;
-        this.FetchDataStartTime = Date.now();
-        let chart_pixel = this.$refs.query_chart.GetPixel();
+      setTimeout(() => {
+        if (this.selectedTabpage == 'dataTabpage') {
+          this.FetchDataStartTime = Date.now();
+          let chart_pixel = this.$refs.query_chart.GetPixel();
+          new Promise(() => {
+            this.$refs.query_chart.Clear();
+            if (this.QueryOptions.SelectedQueryItem == 'Health Score')
+              QueryHealthScore(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
+            else if (this.QueryOptions.SelectedQueryItem == 'Alert Index')
+              QueryAlertIndex(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
+            else if (this.QueryOptions.SelectedQueryItem == '振動能量')
+              QueryVibrationEnergy(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
+            else if (this.QueryOptions.SelectedQueryItem == 'Raw Data') {
+              QueryVibration_raw_data(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
+            }
+            else if (this.QueryOptions.SelectedQueryItem == 'Physical Quanity') {
+              QueryPhysical_quantity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
+            }
+            else if (this.QueryOptions.SelectedQueryItem == 'Sideband Severity') {
+              QuerySideBandSeverity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
+            }
+            else if (this.QueryOptions.SelectedQueryItem == 'FrequencyDoubling Severity') {
+              QueryFrequency_doublingSeverity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
+            }
+            else
+              this.loading = false;
+          })
+        }
+        else {
+          this.$refs.Event_QueryHelper.QueryHandle();
+        }
+      }, 100);
 
-        new Promise(() => {
-          this.$refs.query_chart.Clear();
-          if (this.QueryOptions.SelectedQueryItem == 'Health Score')
-            QueryHealthScore(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
-          else if (this.QueryOptions.SelectedQueryItem == 'Alert Index')
-            QueryAlertIndex(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
-          else if (this.QueryOptions.SelectedQueryItem == '振動能量')
-            QueryVibrationEnergy(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
-          else if (this.QueryOptions.SelectedQueryItem == 'Raw Data') {
-            QueryVibration_raw_data(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
-          }
-          else if (this.QueryOptions.SelectedQueryItem == 'Physical Quanity') {
-            QueryPhysical_quantity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
-          }
-          else if (this.QueryOptions.SelectedQueryItem == 'Sideband Severity') {
-            QuerySideBandSeverity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
-          }
-          else if (this.QueryOptions.SelectedQueryItem == 'FrequencyDoubling Severity') {
-            QueryFrequency_doublingSeverity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
-          }
-          else
-            this.loading = false;
-        })
-      } else {
-        this.$refs.Event_QueryHelper.QueryHandle();
-      }
 
     },
     SaveQueryOptionsToLocalStorage() {
@@ -357,6 +455,8 @@ export default {
         edgeOptions[this.edge_name] = this.QueryOptions;
       }
       localStorage.setItem('query-options-by-edge', JSON.stringify(edgeOptions));
+      localStorage.setItem('query-chart-setting', JSON.stringify(this.CustomChartSetting));
+
     },
     ReadQueryOptionsFromLocalStorage() {
       var jsonStr = localStorage.getItem('query-options-by-edge');
@@ -369,21 +469,28 @@ export default {
           this.QueryOptions.SelectedEQ = ''
           this.QueryOptions.SelectedUNIT = ''
         }
+
+        this.SelectedQueryItem = this.QueryOptions.SelectedQueryItem;
       }
+      var jsonStr_CustomChart = localStorage.getItem('query-chart-setting');
+      if (jsonStr_CustomChart) {
+        this.CustomChartSetting = JSON.parse(jsonStr_CustomChart);
+        this.SetChartYLimits();
+      }
+
     },
     async RenderChart(data) {
       this.FetchDataFinishTime = Date.now();
       var timeEscapse = moment(this.FetchDataFinishTime - this.FetchDataStartTime).seconds();
       console.info('Fetch Data 花費 :', timeEscapse, `${data.labels.length}筆`);
-      this.$toast.success('Done', { position: 'top-right', duration: 1000 });
+      this.$toast.success('Done', { position: 'top-right', duration: 2000 });
       this.ServerResponseData = data;
-      if (data.isPreview) {
-        this.RenderPreviewChart(data);
-      }
-      else {
-        this.$refs.preview_chart.HidePreviewChart();
-        this.RenderFullChart(data);
-      }
+      // if (data.isPreview) {
+      //   this.RenderPreviewChart(data);
+      // }
+      // else {
+      // }
+      this.RenderFullChart(data);
       this.loading = false;
     },
     async GetSliceDataHandle(datetimeInterval = {}) {
@@ -403,6 +510,7 @@ export default {
     async RenderFullChart(data, showloading = false) {
       await new Promise((resolve) => {
         this.$refs.query_chart.UpdateChart(data, showloading);
+        this.SetChartYLimits();
         resolve();
       })
     },
@@ -413,6 +521,24 @@ export default {
         this.$refs.preview_chart.ShowPreviewChart();
         resolve();
       })
+    },
+    ChartYLimitsApplyHandle() {
+      var setting = this.CustomChartSetting.find(vm => vm.item == this.QueryOptions.SelectedQueryItem);
+      var max = setting.ymax;
+      var min = setting.ymin;
+      if (this.SelectedQueryItem == this.QueryOptions.SelectedQueryItem)
+        this.$refs.query_chart.SetYAxisLimits(max, min);
+      else {
+        this.$toast.success('下次查詢時將會生效', { position: 'bottom-right', duration: 2000 });
+      }
+      this.SaveQueryOptionsToLocalStorage();
+    },
+    SetChartYLimits() {
+      var setting = this.CustomChartSetting.find(vm => vm.item == this.QueryOptions.SelectedQueryItem);
+      var max = setting.ymax;
+      var min = setting.ymin;
+      this.$refs.query_chart.SetYAxisLimits(max, min);
+
     },
   },
   async mounted() {
@@ -427,7 +553,7 @@ export default {
 
     this.FetchModuleList().then(() => {
       this.ReadQueryOptionsFromLocalStorage();
-
+      this.$refs.query_chart.UpdateTitle(this.ChartTitle);
     });
     this.DatabaseList = await GetDatabaseList();
   }
@@ -466,5 +592,10 @@ export default {
   color: red;
   padding-left: 9px;
   font-weight: bold;
+}
+
+.chart-settings div div {
+  margin: 10px;
+  height: 40px;
 }
 </style>

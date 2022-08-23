@@ -46,7 +46,7 @@ export default {
       loading: false,
       Rendering: false,
       chart_style: {
-        backgroundColor: '#202020',
+        backgroundColor: '#313131',
         border: '1px solid grey',
         margin: '3px',
         borderRadius: '4px'
@@ -75,7 +75,7 @@ export default {
         title: {
           display: true,
           text: this.title,
-          fontSize: 14,
+          fontSize: 12,
           fontColor: 'white'
         },
         scales: {
@@ -218,7 +218,6 @@ export default {
         // this.Clear();
         if (showLoading)
           this.loading = true;
-
         await this.RenderData(datavw, timeUnit);
         setTimeout(() => {
           this.loading = false;
@@ -226,6 +225,18 @@ export default {
       } catch (error) {
         return "err";
       }
+    },
+    UpdateTitle(title) {
+      console.info('title', title);
+      if (title) {
+        this.chartInstance.options.title.text = title;
+        this.chartInstance.update();
+      }
+    },
+    SetYAxisLimits(max, min) {
+      this.chartInstance.options.scales.yAxes[0].ticks.max = max;
+      this.chartInstance.options.scales.yAxes[0].ticks.min = min;
+      this.chartInstance.update();
     },
     FeedData(time = [], dataSets = [{ label: '', data: -1, borderColor: 'blue', borderWidth: 1 }]) {
       if (dataSets.length == 0)

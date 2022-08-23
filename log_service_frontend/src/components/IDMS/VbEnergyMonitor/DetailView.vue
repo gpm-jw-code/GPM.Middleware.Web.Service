@@ -225,7 +225,7 @@ export default {
   font-weight: bold;
 }
 .axis-title {
-  font-size: 20px;
+  font-size: 14px;
   background-color: rgb(56, 56, 56);
   color: white;
   font-weight: bold;
@@ -240,7 +240,7 @@ export default {
 .threshold-setting {
   height: 30px;
   color: white;
-  font-size: medium;
+  font-size: 12px;
   border: 1px dashed #33485d;
   padding: 4px;
 }
