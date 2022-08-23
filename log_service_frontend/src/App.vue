@@ -21,7 +21,7 @@
         <i class="bi bi-list"></i>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
+        <ul class="fade-in navbar-nav">
           <li class="nav-item" v-for="rout in routes" :key="rout.path">
             <a class="nav-link" active @click="routerHandle(rout.path)">{{rout.name}}</a>
           </li>
@@ -69,8 +69,8 @@ export default {
   },
   methods: {
     routerHandle(path) {
-      console.info(this.$refs['toggle_button']);
-      this.$refs['toggle_button'].click();
+      if (window.innerWidth < 900)
+        this.$refs['toggle_button'].click();
       this.EdgeIP = localStorage.getItem('edgeip');
       console.info(path)
       this.$router.push(`${path.replace(':ip', this.EdgeIP)}`);
