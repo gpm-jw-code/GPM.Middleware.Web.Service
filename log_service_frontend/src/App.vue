@@ -1,6 +1,6 @@
 <template>
   <div id="breadcrumb" sticky>
-    <el-backtop :right="30" :bottom="50" />
+    <el-backtop :right="30" :bottom="150" />
     <!-- <el-backtop :right="30" :bottom="100" :visibility-height="-1" /> -->
     <nav v-if="!showNavbar" class="navbar navbar-expand-lg bg-primary">
       <a class="navbar-brand" href="/">
@@ -58,10 +58,6 @@ export default {
       seletedRouteName: "診斷頁面",
       showNavbar: false,
       navstyle: 'bg-primary',
-      breadcrumbItems: [
-        { text: 'SSM', href: '/' },
-        { text: 'Log', href: '/log' },
-        { text: 'Library' },],
       EdgeIP: "-",
       EdgeName: "-",
       isNotEntryPAGE: false

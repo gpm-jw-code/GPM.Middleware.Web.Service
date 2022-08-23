@@ -129,7 +129,7 @@ export default {
 <style>
 .idms-alarm-notifi {
   position: fixed;
-  bottom: 150px;
+  bottom: 100px;
   right: 30px;
 }
 .idms-alarm-notifi .drawer-title {

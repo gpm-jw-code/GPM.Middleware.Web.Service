@@ -45,7 +45,7 @@ export default {
 <style>
 .chat-icon {
   position: fixed;
-  bottom: 100px;
+  bottom: 50px;
   right: 30px;
   z-index: 3100;
   color: white;
