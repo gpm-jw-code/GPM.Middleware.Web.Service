@@ -1,8 +1,8 @@
 <template>
-  <div class="idms-alarm-notifi px-3 py-3">
+  <div class="idms-alarm-notifi">
     <el-badge :hidden="n_count==0" type="danger" :value="n_count">
       <el-button size="large" circle @click="show_form=!show_form;n_count=0">
-        <el-popover trigger="hover" placement="bottom-start" :width="newest_alarm!=null?500:300">
+        <el-popover trigger="hover" placement="top-start" :width="newest_alarm!=null?500:300">
           <template #reference>
             <el-icon size="40px" :color="n_count==0?'grey' :'red'">
               <WarningFilled />
@@ -47,7 +47,7 @@
     </el-badge>
     <el-drawer direction="ltr" size="90%" v-model="show_form" :show-close="false">
       <!-- Header -->
-      <template #header="{   titleId }">
+      <template #header="{titleId }">
         <div :id="titleId" class="drawer-title d-flex flex-row border-bottom">
           <div class="flex-fill text-start">
             <h4 v-text="title"></h4>
@@ -128,11 +128,12 @@ export default {
 
 <style>
 .idms-alarm-notifi {
-  position: absolute;
-  right: 220px;
+  position: fixed;
+  bottom: 150px;
+  right: 30px;
 }
 .idms-alarm-notifi .drawer-title {
-  padding-top: 10px;
+  padding-top: 60px;
 }
 .popover-content {
   letter-spacing: 2px;

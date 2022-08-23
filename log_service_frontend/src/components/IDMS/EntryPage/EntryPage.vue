@@ -45,7 +45,7 @@
     <div v-show="display_mode=='dashboard'" class="w-100 row g-0 mx-0 my-0">
       <div
         class="edge-container px-1 py-1 my-1"
-        v-bind:class="[Edges.length==1?' col-md-12':' col-md-6',ColorMode]"
+        v-bind:class="[Edges.length==1?' col-lg-12':' col-lg-6',ColorMode]"
         v-for="edge in Edges"
         :key="edge.EdgeIP"
       >

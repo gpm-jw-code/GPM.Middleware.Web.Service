@@ -2,40 +2,29 @@
   <div id="breadcrumb" sticky>
     <el-backtop :right="30" :bottom="50" />
     <!-- <el-backtop :right="30" :bottom="100" :visibility-height="-1" /> -->
-    <nav class="navbar navbar-expand-sm sticky" v-bind:class="navstyle">
-      <div class="container-fluid">
-        <a class="navbar-brand" style="position:relative;left:-30px" href="/">GPM</a>
-        <button class="navbar-toggler" type="button" v-b-toggle="'navbar'">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div v-if="showNavbar" class="collapse navbar-collapse d-flex flex-row" id="navbar">
-          <div class="navbar-nav flex-fill">
-            <el-radio-group v-model="seletedRouteName" fill="rgb(0, 0, 178)">
-              <el-radio-button
-                class="mx-1"
-                v-for="rout in routes"
-                :key="rout.path"
-                @click="routerHandle(rout.path)"
-                :label="rout.name"
-              ></el-radio-button>
-            </el-radio-group>
-
-            <!-- <a ref=""
-              class="mx-1"
-              v-for="rout in routes"
-              :key="rout.path"
-              @click="routerHandle(rout.path)"
-            >{{rout.name}}</a>-->
-          </div>
-
-          <div class="edge-info d-flex flex-row justify-cotent-end">
-            <div>
-              <div class="name mx-2">{{ EdgeName? EdgeName.toUpperCase():''}}</div>
-              <div class="ip mx-2">{{EdgeIP}}</div>
-            </div>
-            <NetworkStatusVue class="px-0 py-0 mx-0 my-0" :ip="EdgeIP" toolTipPosition="bottom"></NetworkStatusVue>
-          </div>
-        </div>
+    <nav v-if="!showNavbar" class="navbar navbar-expand-lg bg-primary">
+      <a class="navbar-brand" href="/">
+        <span style="font-size:35px">GPM</span>
+      </a>
+    </nav>
+    <nav v-else class="navbar navbar-expand-lg bg-primary">
+      <a class="navbar-brand" href="/">
+        <span style="font-size:30px">GPM</span>
+      </a>
+      <el-popover :content="EdgeIP">
+        <template #reference>
+          <div class="navbar-brand">{{ EdgeName? EdgeName.toUpperCase():''}}</div>
+        </template>
+      </el-popover>
+      <button class="navbar-toggler bg-primary" v-b-toggle.navbarNav ref="toggle_button">
+        <i class="bi bi-list"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item" v-for="rout in routes" :key="rout.path">
+            <a class="nav-link" @click="routerHandle(rout.path)">{{rout.name}}</a>
+          </li>
+        </ul>
       </div>
     </nav>
   </div>
@@ -45,9 +34,7 @@
       <component :is="Component" />
     </div>
   </router-view>
-  <div class="idms-alarm-form-badge fixed-top" v-show="isNotEntryPAGE">
-    <NotificationIconVue ref="alarm_noti_icon" :edge_ip="EdgeIP"></NotificationIconVue>
-  </div>
+  <NotificationIconVue v-show="isNotEntryPAGE" ref="alarm_noti_icon" :edge_ip="EdgeIP"></NotificationIconVue>
   <ReleaseNote></ReleaseNote>
   <ChatIconVue></ChatIconVue>
 </template>
@@ -81,6 +68,8 @@ export default {
   },
   methods: {
     routerHandle(path) {
+      console.info(this.$refs['toggle_button']);
+      this.$refs['toggle_button'].click();
       this.EdgeIP = localStorage.getItem('edgeip');
       console.info(path)
       this.$router.push(`${path.replace(':ip', this.EdgeIP)}`);
@@ -135,42 +124,26 @@ export default {
   color: #2c3e50;
   height: 100%;
 }
+
+nav {
+  padding: 10px;
+}
+
+.nav-link,
+.navbar-brand {
+  color: white;
+  cursor: pointer;
+}
+
+.nav-link:active {
+  color: black;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
   height: 100%;
-}
-nav {
-  padding-top: 30px;
-  padding-bottom: 30px;
-  padding-left: 30px;
-}
-
-nav a {
-  cursor: pointer;
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
-
-.navbar-brand {
-  font-size: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: white;
-  font-size: large;
-  padding-top: 13px;
-}
-nav a {
-  color: rgb(214, 214, 214);
-  margin-right: 10px;
-  text-decoration: none;
-  padding-top: 15px;
 }
 
 #breadcrumb {

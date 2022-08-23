@@ -263,7 +263,7 @@ export default {
 <style>
 .mode-selector {
   position: absolute;
-  top: 29px;
+  top: 78px;
   right: 70px;
 }
 
