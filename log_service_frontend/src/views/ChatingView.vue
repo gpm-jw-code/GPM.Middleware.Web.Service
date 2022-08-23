@@ -36,18 +36,13 @@
       <div v-show="roomEntered" class="bg-light padding w-100" style="height:50px ;bottom:0">
         <div class="d-flex flex-row">
           <div>
-            <b-button id="sendButton" @click="SendMessageHandle" variant="danger">離開</b-button>
+            <b-button id="sendButton" variant="danger">離開</b-button>
           </div>
           <div class="flex-fill">
-            <b-form-input v-model="messageInput" type="text"></b-form-input>
+            <b-form-input v-model="messageInput" @keydown.enter="SendMessageHandle" type="text"></b-form-input>
           </div>
           <div>
-            <b-button
-              id="sendButton"
-              :disable="messageInput==''"
-              @keydown.enter.prevent="SendMessageHandle"
-              @click="SendMessageHandle"
-            >Send</b-button>
+            <b-button id="sendButton" :disable="messageInput==''" @click="SendMessageHandle">Send</b-button>
           </div>
         </div>
       </div>
@@ -89,6 +84,9 @@ export default {
         this.roomEntered = true;
       }
     },
+    SendMessageKeyDownHandle(event) {
+      console.info(event);
+    },
     SendMessageHandle() {
       if (this.messageInput == '')
         return;
@@ -97,6 +95,7 @@ export default {
       this.ScrollToBottom();
       sendObj.dir = 'send';
       this.allMsgObjList.push(sendObj);
+      this.messageInput = '';
     },
     ScrollToBottom() {
       var element = document.getElementById("messages-content");
