@@ -84,9 +84,6 @@ export default {
         this.roomEntered = true;
       }
     },
-    SendMessageKeyDownHandle(event) {
-      console.info(event);
-    },
     SendMessageHandle() {
       if (this.messageInput == '')
         return;
@@ -129,6 +126,8 @@ export default {
 #messages-content {
   overflow-y: scroll;
   height: 800px;
+  padding: 10px;
+  border-radius: 8px;
 }
 
 .send-message,

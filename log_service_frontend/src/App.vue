@@ -198,6 +198,6 @@ nav a {
 }
 
 .idms-alarm-form-badge {
-  z-index: 3442;
+  z-index: 3009;
 }
 </style>
