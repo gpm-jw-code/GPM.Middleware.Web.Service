@@ -294,7 +294,11 @@ export default {
         })
       }
     },
-
+    GetPixel() {
+      var element = document.getElementById(this.chart_id);
+      console.info('pixel', element.clientWidth);
+      return element.clientWidth;
+    }
   },
   computed: {
     id() {

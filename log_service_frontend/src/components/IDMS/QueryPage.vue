@@ -20,12 +20,13 @@
               <el-option
                 v-for="unit_obj in UNITS_IN_EQ"
                 :key="unit_obj.IP"
-                :label="`${unit_obj.UnitName}(${unit_obj.IP})`"
+                :label="`${unit_obj.UNIT}(${unit_obj.IP})`"
                 :value="unit_obj.IP"
               >
                 <div class="d-flex">
                   <div v-text="unit_obj.UnitName" style="color:black"></div>
                   <div class="w-100" style="text-align:right; ">
+                    {{unit_obj.UNIT}}
                     <u>{{unit_obj.IP}}</u>
                   </div>
                 </div>
@@ -254,21 +255,23 @@ export default {
         timeList: [],
         valueList: [],
         QueryID: '-'
-      }
+      },
+      FetchDataStartTime: null,
+      FetchDataFinishTime: null,
     }
   },
   computed: {
     EQList() {
       var eqls = [];
       this.ModuleList.forEach(module => {
-        if (!eqls.includes(module.EqName)) {
-          eqls.push(module.EqName);
+        if (!eqls.includes(module.EQ)) {
+          eqls.push(module.EQ);
         }
       })
       return eqls;
     },
     UNITS_IN_EQ() {
-      return this.ModuleList.filter(m => m.EqName == this.QueryOptions.SelectedEQ);
+      return this.ModuleList.filter(m => m.EQ == this.QueryOptions.SelectedEQ);
     },
     StartTime() {
       return moment(this.QueryOptions.TimeRange[0]).format('yyyy/MM/DD HH:mm:ss');
@@ -295,11 +298,12 @@ export default {
   methods: {
     async FetchModuleList() {
 
-      this.ModuleList = await GetModuleInfos(this.edge_ip).catch(async (er) => {
-        console.info('IDMS websocket連接失敗,從資料庫調取模組資訊', er);
-        var _ModuleList = await GetModuleInfoStoredInDB(); //從IDMS拿不到資訊就從資料庫拿
-        return _ModuleList;
-      });
+      // this.ModuleList = await GetModuleInfos(this.edge_ip).catch(async (er) => {
+      //   console.info('IDMS websocket連接失敗,從資料庫調取模組資訊', er);
+      //   var _ModuleList = await GetModuleInfoStoredInDB(); //從IDMS拿不到資訊就從資料庫拿
+      //   return _ModuleList;
+      // });
+      this.ModuleList = await GetModuleInfoStoredInDB(this.edge_name); //從IDMS拿不到資訊就從資料庫拿
       this.ready = true;
       console.info(this.ModuleList);
     },
@@ -312,25 +316,28 @@ export default {
       this.SaveQueryOptionsToLocalStorage();
       if (this.selectedTabpage == 'dataTabpage') {
         this.loading = true;
+        this.FetchDataStartTime = Date.now();
+        let chart_pixel = this.$refs.query_chart.GetPixel();
+
         new Promise(() => {
           this.$refs.query_chart.Clear();
           if (this.QueryOptions.SelectedQueryItem == 'Health Score')
-            QueryHealthScore(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+            QueryHealthScore(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
           else if (this.QueryOptions.SelectedQueryItem == 'Alert Index')
-            QueryAlertIndex(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+            QueryAlertIndex(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
           else if (this.QueryOptions.SelectedQueryItem == '振動能量')
-            QueryVibrationEnergy(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+            QueryVibrationEnergy(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
           else if (this.QueryOptions.SelectedQueryItem == 'Raw Data') {
-            QueryVibration_raw_data(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+            QueryVibration_raw_data(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
           }
           else if (this.QueryOptions.SelectedQueryItem == 'Physical Quanity') {
-            QueryPhysical_quantity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+            QueryPhysical_quantity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
           }
           else if (this.QueryOptions.SelectedQueryItem == 'Sideband Severity') {
-            QuerySideBandSeverity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+            QuerySideBandSeverity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
           }
           else if (this.QueryOptions.SelectedQueryItem == 'FrequencyDoubling Severity') {
-            QueryFrequency_doublingSeverity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime).then(res => { this.RenderChart(res); });
+            QueryFrequency_doublingSeverity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
           }
           else
             this.loading = false;
@@ -365,6 +372,9 @@ export default {
       }
     },
     async RenderChart(data) {
+      this.FetchDataFinishTime = Date.now();
+      var timeEscapse = moment(this.FetchDataFinishTime - this.FetchDataStartTime).seconds();
+      console.info('Fetch Data 花費 :', timeEscapse, `${data.labels.length}筆`);
       this.$toast.success('Done', { position: 'top-right', duration: 1000 });
       this.ServerResponseData = data;
       if (data.isPreview) {

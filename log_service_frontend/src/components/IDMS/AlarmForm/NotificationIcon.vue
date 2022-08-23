@@ -10,7 +10,11 @@
           </template>
           <template #default>
             <div v-if="newest_alarm!=null" class="popover-content">
-              <h4>最近一次警報</h4>
+              <div class="border-bottom my-2">
+                <h4>
+                  <i class="bi bi-exclamation-triangle-fill"></i> 最近一次警報
+                </h4>
+              </div>
               <div class="d-flex flex-row">
                 <span>時間</span>
                 {{newest_alarm.time}}
@@ -137,8 +141,6 @@ export default {
   margin-left: 5px;
 }
 .popover-content h4 {
-  margin-bottom: 10px;
-  text-decoration: underline;
   color: rgb(253, 0, 0);
 }
 

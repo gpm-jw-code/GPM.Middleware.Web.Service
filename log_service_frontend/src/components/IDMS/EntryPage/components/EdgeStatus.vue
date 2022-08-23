@@ -1,13 +1,16 @@
 <template>
   <div>
-    <div class="edge-status mx-1 my-1 d-flex flex-column h-100" v-loading="loading">
+    <div class="edge-status mx-1 my-1 d-flex flex-column h-100">
       <div class="d-flex flex-row border-bottom mb-4" v-bind:style="TitleColor">
         <div class="title d-flex flex-column px-1">
-          <h3>{{EdgeProp.Name.toUpperCase()}}</h3>
+          <h3>
+            <i class="bi bi-diagram-2"></i>
+            {{EdgeProp.Name.toUpperCase()}}
+          </h3>
           <span>{{EdgeProp.EdgeIP}}</span>
         </div>
         <div class="flex-fill d-flex flex-row justify-content-end">
-          <span class="network-status-label py-1">網路狀態</span>
+          <span class="network-status-label py-3">網路狀態</span>
           <NetworkStatusVue :ip="EdgeProp.EdgeIP" toolTipPosition="bottom"></NetworkStatusVue>
         </div>
       </div>
@@ -18,7 +21,7 @@
           <el-radio-button label="Performance"></el-radio-button>
         </el-radio-group>
       </div>-->
-      <div class="d-flex flex-row justify-content-center flex-fill">
+      <div class="d-flex flex-row justify-content-center flex-fill" v-loading="loading">
         <!-- 感測器數量與IDMS運行狀態 -->
         <div v-if="DisplayMode=='Overview'" class="d-flex flex-row justify-content-center">
           <div>
@@ -135,7 +138,16 @@
           </div>
         </div>
       </div>
-      <div class="edge-state-timestamp w-100 text-start">{{TIME_STAMP}}</div>
+      <div class="d-flex flex-row">
+        <div class="edge-state-timestamp w-100 text-start">
+          <i class="bi bi-caret-down"></i>
+          {{TIME_STAMP}}
+        </div>
+        <div class="edge-state-timestamp w-100 text-end">
+          <i class="bi bi-server"></i>
+          資料庫使用: {{EdgeProp.DbDickUsage}}
+        </div>
+      </div>
       <div class="my-2">
         <div class="d-flex flex-row">
           <b-button
@@ -175,7 +187,8 @@ export default {
           Name: 'Line-2',
           EdgeIP: "127.0.0.1",
           SensorNum: 10,
-          Status: 'Offline'
+          Status: 'Offline',
+          DbDickUsage: '?'
         }
       }
     },

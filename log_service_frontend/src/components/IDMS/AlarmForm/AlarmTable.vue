@@ -10,7 +10,9 @@
     <div class="h-100" v-if="mode=='Real Time'" v-loading="rt_table_loading">
       <div class="w-100 d-flex flex-row border-bottom py-3" style="height:80px">
         <div class="newest-alarm-info row w-100">
-          <h4 class="col-md-2">最近一次警報</h4>
+          <h4 class="col-md-2">
+            <i class="bi bi-exclamation-triangle-fill"></i> 最近一次警報
+          </h4>
           <div class="col-md-10 text-start" v-if="RecentAlarm">
             <el-tag size="large" effect="dark" type="danger">{{ RecentAlarm.time}}</el-tag>
             <el-tag

@@ -26,28 +26,28 @@ export async function GetDatabaseList() {
   return await GetRequest('/api/PostgrelDB/Databases')
 }
 /**從資料庫中撈取儲存的模組資訊 */
-export async function GetModuleInfoStoredInDB() {
-  return await GetRequest('/api/Query/ModuleInfos')
+export async function GetModuleInfoStoredInDB(edgename) {
+  return await GetRequest(`/api/Query/ModuleInfos?dbName=${edgename}`)
 }
-export async function QueryVibrationEnergy(edgename, ip, startT, endT) {
+export async function QueryVibrationEnergy(edgename, ip, startT, endT, chart_pixel) {
   return await GetRequest(
-    `/api/DB/VibrationEnergy?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/VibrationEnergy?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}&chart_pixel=${chart_pixel}`,
   )
 }
-export async function QueryHealthScore(edgename, ip, startT, endT) {
+export async function QueryHealthScore(edgename, ip, startT, endT,chart_pixel) {
   return await GetRequest(
-    `/api/DB/HealthScore?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/HealthScore?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}&chart_pixel=${chart_pixel}`,
   )
 }
-export async function QueryAlertIndex(edgename, ip, startT, endT) {
+export async function QueryAlertIndex(edgename, ip, startT, endT, chart_pixel) {
   return await GetRequest(
-    `/api/DB/AlertIndex?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/AlertIndex?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}&chart_pixel=${chart_pixel}`,
   )
 }
 
-export async function QueryVibration_raw_data(edgename, ip, startT, endT) {
+export async function QueryVibration_raw_data(edgename, ip, startT, endT, chart_pixel) {
   return await GetRequest(
-    `/api/DB/vibration_raw_data?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/vibration_raw_data?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}&chart_pixel=${chart_pixel}`,
   )
 }
 
@@ -56,21 +56,21 @@ export async function QueryVibration_raw_data_with_QueryID(
   ip,
   startT,
   endT,
-  queryID,
+  queryID, chart_pixel
 ) {
   return await GetRequest(
-    `/api/DB/vibration_raw_data_with_QueryID?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}&queryID=${queryID}`,
+    `/api/DB/vibration_raw_data_with_QueryID?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}&queryID=${queryID}&chart_pixel=${chart_pixel}`,
   )
 }
 
-export async function QueryPhysical_quantity(edgename, ip, startT, endT) {
+export async function QueryPhysical_quantity(edgename, ip, startT, endT, chart_pixel) {
   return await GetRequest(
-    `/api/DB/Physical_quantity?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/Physical_quantity?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}&chart_pixel=${chart_pixel}`,
   )
 }
-export async function QuerySideBandSeverity(edgename, ip, startT, endT) {
+export async function QuerySideBandSeverity(edgename, ip, startT, endT, chart_pixel) {
   return await GetRequest(
-    `/api/DB/SideBandSeverity?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/SideBandSeverity?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}&chart_pixel=${chart_pixel}`,
   )
 }
 
@@ -79,10 +79,10 @@ export async function QueryFrequency_doublingSeverity(
   edgename,
   ip,
   startT,
-  endT,
+  endT, chart_pixel
 ) {
   return await GetRequest(
-    `/api/DB/Frequency_doublingSeverity?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}`,
+    `/api/DB/Frequency_doublingSeverity?edgename=${edgename}&ip=${ip}&from=${startT}&to=${endT}&chart_pixel=${chart_pixel}`,
   )
 }
 

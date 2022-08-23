@@ -49,7 +49,7 @@ export default {
     return {
       loading: false,
       Rendering: false,
-      PreviewShow: true,
+      PreviewShow: false,
       chart_style: {
         backgroundColor: '#202020',
         border: '1px solid grey',
