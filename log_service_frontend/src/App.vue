@@ -14,7 +14,13 @@
       </a>
       <el-popover :content="EdgeIP">
         <template #reference>
-          <div class="navbar-brand">{{ EdgeName? EdgeName.toUpperCase():''}}</div>
+          <div class="navbar-brand">
+            <el-tag
+              @click="routerHandle('/EdgeMain/:ip')"
+              size="large"
+              effect="dark"
+            >{{ EdgeName? EdgeName.toUpperCase():''}}</el-tag>
+          </div>
         </template>
       </el-popover>
       <button class="navbar-toggler bg-primary" v-b-toggle.navbarNav ref="toggle_button">
@@ -23,7 +29,11 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="fade-in navbar-nav">
           <li class="nav-item" v-for="rout in routes" :key="rout.path">
-            <a class="nav-link" active @click="routerHandle(rout.path)">{{rout.name}}</a>
+            <a
+              class="nav-link"
+              v-bind:class="rout.name ==seletedRouteName?  'route-link-selected':'route-link-unselected'"
+              @click="routerHandle(rout.path)"
+            >{{rout.name}}</a>
           </li>
         </ul>
       </div>
@@ -60,7 +70,10 @@ export default {
       navstyle: 'bg-primary',
       EdgeIP: "-",
       EdgeName: "-",
-      isNotEntryPAGE: false
+      isNotEntryPAGE: false,
+      dynamic_underline_style: {
+        width: '3rem'
+      }
     }
   },
   methods: {
@@ -130,10 +143,15 @@ nav {
 .navbar-brand {
   color: white;
   cursor: pointer;
+  border-bottom: none;
+  padding-bottom: 0px;
 }
-
-.nav-link:active {
-  color: black;
+.nav-link {
+  margin-top: 4px;
+}
+.nav-link:hover {
+  color: white;
+  border-bottom: 0.1rem solid white;
 }
 
 html,
@@ -169,5 +187,16 @@ body {
 
 .idms-alarm-form-badge {
   z-index: 3009;
+}
+.route-link-selected {
+  border-bottom: 0.2rem double white;
+}
+.nav-link-underline {
+  position: absolute;
+  bottom: 21px;
+  padding-left: 12px;
+  margin: -2px 8px;
+  background-color: white;
+  height: 0.1rem;
 }
 </style>

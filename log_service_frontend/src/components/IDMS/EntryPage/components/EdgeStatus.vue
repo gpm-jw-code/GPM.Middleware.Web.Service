@@ -213,6 +213,9 @@ export default {
     },
     TIME_STAMP() {
       return moment(this.edgeStatusFromIDMS.TimeStamp).format('yyyy-MM-DD HH:mm:ss');
+    },
+    circleWidth() {
+      return window.innerWidth < 500 ? 100 : 160;
     }
   },
   data() {
@@ -221,7 +224,6 @@ export default {
       performance: false,
       loading: true,
       edgeStatusWebsocket: null,
-      circleWidth: 160,
       edgeStatusFromIDMS_old: {
         OnlineSensorNum: -1,
         Health: 30
@@ -285,7 +287,6 @@ export default {
   mounted() {
     //this.PerformanceDataTimer = setInterval(() => GetPCPerformance(this.EdgeProp.EdgeIP).then(ret => this.PerformanceData = ret), 1000)
     this.WebsocketIni();
-
   },
   unmounted() {
     //clearInterval(this.PerformanceDataTimer);
@@ -349,6 +350,13 @@ export default {
 
 .Online {
   color: rgb(19, 206, 102);
+}
+
+@media screen and (max-width: 500px) {
+  .Online,
+  .Offline {
+    font-size: 1.2rem;
+  }
 }
 
 .shadow {

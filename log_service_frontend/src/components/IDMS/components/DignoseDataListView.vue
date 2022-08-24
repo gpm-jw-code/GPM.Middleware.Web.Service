@@ -1,5 +1,18 @@
 <template>
   <div class="dignose-list-view px-2">
+    <div class="my-2 d-flex flex-row">
+      <el-input size="small" v-model="search_str" placeholder="輸入內容查詢..." clearable>
+        <template #prepend>
+          <el-icon>
+            <Search />
+          </el-icon>
+        </template>
+        <!-- <template #append>
+            <el-button>Search</el-button>
+        </template>-->
+      </el-input>
+      <el-button size="small" @click="TableExpandHandle">{{ this.expandAll?'全部收合' :'全部展開'}}</el-button>
+    </div>
     <!-- 表格 -->
 
     <el-table
@@ -16,11 +29,11 @@
       row-key="IP"
       ref="table"
     >
-      <el-table-column fixed="left" width="40">
+      <!-- <el-table-column fixed="left" width="10">
         <template #default="scope">
           <div class="py-1">
             <el-icon
-              :size="20"
+              :size="10"
               color="rgb(64, 158, 255)"
               v-show="scope.row.IP==selectedDiagnoseData.IP"
             >
@@ -28,7 +41,7 @@
             </el-icon>
           </div>
         </template>
-      </el-table-column>
+      </el-table-column>-->
 
       <el-table-column sortable fixed="left" prop="IP" label="IP" width="140"></el-table-column>
       <el-table-column sortable prop="EqName" label="EQ Name"></el-table-column>
@@ -48,22 +61,7 @@
         </template>
       </el-table-column>
 
-      <el-table-column type="expand" fixed="right" width="283px">
-        <template #header>
-          <div class="d-flex flex-row">
-            <el-input size="small" v-model="search_str" placeholder="輸入內容查詢..." clearable>
-              <template #prepend>
-                <el-icon>
-                  <Search />
-                </el-icon>
-              </template>
-              <!-- <template #append>
-            <el-button>Search</el-button>
-              </template>-->
-            </el-input>
-            <el-button size="small" @click="TableExpandHandle">{{ this.expandAll?'全部收合' :'全部展開'}}</el-button>
-          </div>
-        </template>
+      <el-table-column type="expand" fixed="right" width="12px">
         <template #default="props">
           <div class="fade-in d-flex flex-row row dignose-detail-info">
             <div class="col-sm-9 row g-0">

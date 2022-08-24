@@ -1,51 +1,54 @@
 <template>
   <div id="dignose-chart-view" v-loading="LOADING">
     <el-affix :offset="56" class="w-100">
-      <div class="charting-options w-100 py-1 px-1 mx-2 d-flex bg-light">
-        <div class="d-flex justify-content-start w-100">
-          <!-- <span>顯示</span> -->
-          <el-radio-group v-model="display_mode" @change="FeatureTypeChangeHandle">
-            <el-radio-button
-              size="small"
-              v-for="mode in display_modes"
-              :key="mode.value"
-              :label="mode.label"
-            ></el-radio-button>
-          </el-radio-group>
+      <div class="charting-options w-100 py-1 px-1 mx-2 d-flex bg-light row">
+        <div class="col-md-6">
+          <div class="d-flex justify-content-start w-100">
+            <!-- <span>顯示</span> -->
+            <el-radio-group v-model="display_mode" @change="FeatureTypeChangeHandle">
+              <el-radio-button
+                size="small"
+                v-for="mode in display_modes"
+                :key="mode.value"
+                :label="mode.label"
+              ></el-radio-button>
+            </el-radio-group>
+          </div>
         </div>
-
-        <div class="d-flex justify-content-end w-70">
-          <div style="width:300px;font-size:12px">Column Number</div>
-          <el-select size="small" v-model="ColsNumber" @change="RenderCharts">
-            <el-option v-for="num in [1,2,3]" :key="num" :value="num" :label="num"></el-option>
-          </el-select>
-          <el-input size="small" v-model="search_str" placeholder="輸入內容查詢..." clearable>
-            <template #prepend>
-              <el-icon>
-                <Search />
-              </el-icon>
-            </template>
-            <!-- <template #append>
+        <div class="col-md-6 text-start">
+          <div class="d-flex justify-content-end w-70">
+            <div style="width:150px;font-size:12px">Column Number</div>
+            <el-select size="normal" v-model="ColsNumber" @change="RenderCharts">
+              <el-option v-for="num in [1,2,3]" :key="num" :value="num" :label="num"></el-option>
+            </el-select>
+            <el-input size="small" v-model="search_str" placeholder="輸入內容查詢..." clearable>
+              <template #prepend>
+                <el-icon>
+                  <Search />
+                </el-icon>
+              </template>
+              <!-- <template #append>
             <el-button>Search</el-button>
-            </template>-->
-          </el-input>
-        </div>
+              </template>-->
+            </el-input>
+          </div>
 
-        <div v-if="false" class="d-flex justify-content-start w-100">
-          <el-icon class="my-2" @click="settinglock=!settinglock">
-            <Lock v-if="!settinglock" />
-            <Unlock v-else />
-          </el-icon>
+          <div v-if="false" class="d-flex justify-content-start w-100">
+            <el-icon class="my-2" @click="settinglock=!settinglock">
+              <Lock v-if="!settinglock" />
+              <Unlock v-else />
+            </el-icon>
 
-          <span>顯示資料筆數(診斷分數)</span>
-          <div>
-            <el-input-number
-              :disabled="settinglock"
-              @change="HSDisplayNumChangedHandel"
-              v-model="MaxHSDisplayNum"
-              size="small"
-              number
-            ></el-input-number>
+            <span>顯示資料筆數(診斷分數)</span>
+            <div>
+              <el-input-number
+                :disabled="settinglock"
+                @change="HSDisplayNumChangedHandel"
+                v-model="MaxHSDisplayNum"
+                size="small"
+                number
+              ></el-input-number>
+            </div>
           </div>
         </div>
       </div>

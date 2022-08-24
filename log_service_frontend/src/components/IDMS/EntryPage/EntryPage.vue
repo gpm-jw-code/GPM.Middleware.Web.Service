@@ -26,7 +26,7 @@
         ></el-switch>
       </div>
     </div>
-    <LandingViewVue></LandingViewVue>
+    <!-- <LandingViewVue></LandingViewVue> -->
     <div v-show="display_mode=='list'">
       <el-table :data="Edges">
         <!-- <el-table-column label="Edge 名稱" prop="Name"></el-table-column>
@@ -56,13 +56,13 @@
 </template>
 
 <script>
-import LandingViewVue from './LandingView.vue';
+// import LandingViewVue from './LandingView.vue';
 import EdgeStatusVue from './components/EdgeStatus.vue';
 import { GetEdgeInformation } from '@/APIHelpers/DatabaseServerAPI'
 export default {
 
   components: {
-    EdgeStatusVue, LandingViewVue
+    EdgeStatusVue,
   },
   mounted() {
     console.info('mounted ebtg');

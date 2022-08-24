@@ -6,30 +6,34 @@
         <el-button size="large" plain icon="close" circle @click="show=false"></el-button>
       </div>
     </template>
-    <div class="h-100 w-100" v-loading="!wsDataRecieved">
+    <div class="h-100 w-100 ve-detail-content" v-loading="!wsDataRecieved">
       <div
         class="axis-infos d-flex flex-column"
         v-for="(data , axis) in veData.AxisStatus"
         :key="axis"
       >
         <div class="axis-title d-flex justify-content-start w-100 px-3">{{axis}} 軸向</div>
-        <div class="content d-flex flex-row justify-content-start h-100 row">
+        <div class="content d-flex flex-row justify-content-start h-100">
           <div
-            class="value-display d-flex flex-column col-md-3 bg-dark"
-            v-bind:style="{ color: data.IsOutOfSPC? 'red':'rgb(0, 255, 0)'  }"
+            class="value-thres-container d-flex flex-column bg-dark"
+            v-bind:class="data.IsOutOfSPC? 'value-red':'value-green'"
           >
-            <div class="flex-fill">{{data.veValue.toFixed(3)}}</div>
+            <div class="value-display">{{data.veValue.toFixed(3)}}</div>
             <!-- 閥值 -->
-            <div class="threshold-setting w-100">
-              <div class="d-flex flex-row">
-                <div v-if="ThresholdSettinglock[axis]">
+            <div class="threshold-setting border-top w-100">
+              <div class="row w-100">
+                <div v-if="ThresholdSettinglock[axis]" class="col-sm-9 text-start">
                   <span>UCL</span>
                   <input disabled :value="data.ucl" type="number" step="0.01" />
                   <span>LCL</span>
                   <input disabled :value="data.lcl" type="number" step="0.01" />
                 </div>
                 <!-- 設定中顯示 -->
-                <div class="setting-mode" v-else v-loading="ThresholdSetting[axis].loading">
+                <div
+                  class="col-sm-8 setting-mode text-start"
+                  v-else
+                  v-loading="ThresholdSetting[axis].loading"
+                >
                   <span>UCL</span>
                   <input
                     class="setting-input"
@@ -50,16 +54,19 @@
                   />
                 </div>
                 <el-button
+                  class="col-sm-3"
                   size="small"
                   v-show="ThresholdSettinglock[axis]"
                   @click="UnlockClickHandle(axis)"
                 >Unlock</el-button>
                 <el-button
+                  class="col-sm-2"
                   size="small"
                   v-show="!ThresholdSettinglock[axis]"
                   @click="SettingThersHoldHandle(axis)"
                 >儲存</el-button>
                 <el-button
+                  class="col-sm-2"
                   size="small"
                   v-show="!ThresholdSettinglock[axis]"
                   @click="ThresholdSettinglock[axis]=true"
@@ -241,12 +248,11 @@ export default {
   height: 30px;
   color: white;
   font-size: 12px;
-  border: 1px dashed #33485d;
   padding: 4px;
 }
 
 .threshold-setting input {
-  width: 89px;
+  width: 73px;
   height: 25px;
   margin: auto 4px;
   text-align: center;
@@ -275,5 +281,54 @@ export default {
 
 .vechart {
   height: 95%;
+}
+
+.value-thres-container {
+  width: 23rem;
+}
+
+.value-red {
+  color: red;
+}
+.value-green {
+  color: rgb(0, 255, 0);
+}
+.ve-detail-content {
+  overflow-y: scroll;
+}
+@media screen and (max-width: 700px) {
+  .threshold-setting {
+    padding: 0;
+  }
+  .threshold-setting .row {
+    margin-left: -9px;
+  }
+  .ve-detail-title {
+    font-size: 14px;
+  }
+  .value-display {
+    font-size: 33px;
+    padding: 0px;
+  }
+  .value-thres-container {
+    width: 6rem;
+  }
+  .threshold-setting .el-button {
+    margin: 11px;
+    width: 88px;
+  }
+  .threshold-setting input {
+    width: 81px;
+  }
+  .ve-detail-content {
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 4rem;
+  }
+
+  .axis-title {
+    background-color: rgb(13, 110, 253);
+  }
 }
 </style>

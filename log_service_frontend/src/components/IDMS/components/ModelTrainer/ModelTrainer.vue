@@ -1,9 +1,17 @@
 <template>
-  <el-drawer @closed="CloseHandle" v-model="Show" direction="rtl" size="60%" title="Model Training">
-    <!-- Information? -->
-
+  <el-drawer
+    @closed="CloseHandle"
+    v-model="Show"
+    direction="rtl"
+    :size="drawer_size"
+    title="Model Training"
+    :z-index="4100"
+  >
+    <template #header="{classid}">
+      <div :id="classid" class="w-100" style="z-index=8000;margin-top:120px;height:20px"></div>
+    </template>
     <!-- Main-Content -->
-    <div class="d-flex flex-column">
+    <div class="d-flex flex-column main-content">
       <div class="training-content flex-fill d-flex flex-column justify-content-start">
         <div class="step-content justify-content-start">
           <h5>選擇模組</h5>
@@ -118,6 +126,9 @@ export default {
         ModelName: this.ModelName,
         RecordPeriod: this.RecordPeriod
       }
+    },
+    drawer_size() {
+      return window.innerWidth < 500 ? '100%' : '60%';
     }
   },
   methods: {
@@ -215,5 +226,15 @@ export default {
   background-color: rgb(0, 64, 64);
   color: rgb(0, 192, 0);
   border-radius: 8px;
+}
+.model-trainer .el-drawer__header {
+  background-color: green;
+}
+.main-content {
+  position: absolute;
+  top: 90px;
+  height: 90%;
+  left: 7px;
+  right: 7px;
 }
 </style>
