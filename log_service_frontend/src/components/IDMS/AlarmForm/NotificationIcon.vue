@@ -2,7 +2,12 @@
   <div class="idms-alarm-notifi">
     <el-badge :hidden="n_count==0" type="danger" :value="n_count">
       <el-button size="large" circle @click="show_form=!show_form;n_count=0">
-        <el-popover trigger="hover" placement="top-start" :width="newest_alarm!=null?500:300">
+        <el-popover
+          :disabled="popOverDisable"
+          trigger="hover"
+          placement="top-start"
+          :width="newest_alarm!=null?500:300"
+        >
           <template #reference>
             <el-icon size="40px" :color="n_count==0?'grey' :'red'">
               <WarningFilled />
@@ -45,7 +50,7 @@
         </el-popover>
       </el-button>
     </el-badge>
-    <el-drawer direction="ltr" size="90%" v-model="show_form" :show-close="false">
+    <el-drawer direction="ltr" size="100%" v-model="show_form" :show-close="false">
       <!-- Header -->
       <template #header="{titleId }">
         <div :id="titleId" class="drawer-title d-flex flex-row border-bottom">
@@ -85,6 +90,9 @@ export default {
   computed: {
     popoverText() {
       return `${this.newest_alarm.time}`;
+    },
+    popOverDisable() {
+      return window.innerWidth < 500;
     }
   },
   data() {

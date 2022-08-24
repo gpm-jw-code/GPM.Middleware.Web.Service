@@ -266,10 +266,12 @@ export default {
       this.RenderData();
     },
     Clear() {
-      this.datasetsVisible = [];
-      this.chartInstance.data.datasets = [];
-      this.chartInstance.data.labels = [];
-      this.chartInstance.update();
+      new Promise(resolve => {
+        this.datasetsVisible = [];
+        this.chartInstance.data.datasets = [];
+        this.chartInstance.data.labels = [];
+        this.chartInstance.update();
+      })
     },
 
     async RenderData(datavw, timeUnit = 'second') {

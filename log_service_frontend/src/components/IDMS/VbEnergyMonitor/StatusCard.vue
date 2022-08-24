@@ -21,12 +21,15 @@
       <div class="d-flex flex-row justify-content-center py-2">
         <div class="axis-status" v-for="(obj,axis) in veData.AxisStatus" :key="axis">
           <span>{{axis}}</span>
-          <div class="icon" v-bind:class="obj.IsOutOfSPC? 've-warning':'ve-normal'">
+          <div
+            class="icon d-flex flex-column"
+            v-bind:class="obj.IsOutOfSPC? 've-warning':'ve-normal'"
+          >
             <el-icon>
               <CircleCheckFilled v-if="!obj.IsOutOfSPC"></CircleCheckFilled>
               <WarningFilled v-else></WarningFilled>
             </el-icon>
-            <span class="ve-value">{{obj.veValue.toFixed(3)}}</span>
+            <span class="my-5 ve-value">{{obj.veValue.toFixed(3)}}</span>
           </div>
         </div>
       </div>
@@ -111,7 +114,7 @@ export default {
 .axis-status span {
   font-size: large;
   color: white;
-  padding-top: 30px;
+  padding-top: 5px;
 }
 .axis-status div {
   padding: 0;

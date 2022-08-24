@@ -7,8 +7,8 @@
         </el-icon>
       </el-button>
     </el-badge>
-    <el-drawer direction="rtl" size="50%" v-model="show_chat_room" title="Chat Room">
-      <div style="height:70%">
+    <el-drawer direction="rtl" :size="drawer_size" v-model="show_chat_room" title="Chat Room">
+      <div style="position: absolute;right: 12px;left: 12px;top: 53px;">
         <ChatingViewVue ref="chat_room" @msgOnRecieved="MsgRevHandle"></ChatingViewVue>
       </div>
     </el-drawer>
@@ -25,6 +25,11 @@ export default {
     return {
       show_chat_room: false,
       unReadMsgNum: 0
+    }
+  },
+  computed: {
+    drawer_size() {
+      return window.innerWidth < 500 ? '100%' : '50%';
     }
   },
   methods: {

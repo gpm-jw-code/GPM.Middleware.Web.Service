@@ -192,11 +192,12 @@
       z-index="5000"
     >
       <template #header="{titleID}">
-        <div :id="titleID" class="border-bottom">
-          <h4>圖表設定</h4>
+        <div :id="titleID" class="border-bottom d-flex flex-row">
+          <h4 class="flex-fill">圖表設定</h4>
+          <el-button class size="small" circle icon="close" @click="showAxisSetting=false"></el-button>
         </div>
       </template>
-      <div class="h-100" style="position:absolute;top:60px">
+      <div class="h-100" style="position:absolute;top:60px;right: 12px;left:  12px;">
         <el-tabs v-model="SelectedQueryItem" class="demo-tabs" @tab-click="handleClick">
           <el-tab-pane
             v-for="setting in CustomChartSetting"
@@ -529,7 +530,7 @@ export default {
       if (this.SelectedQueryItem == this.QueryOptions.SelectedQueryItem)
         this.$refs.query_chart.SetYAxisLimits(max, min);
       else {
-        this.$toast.success('下次查詢時將會生效', { position: 'bottom-right', duration: 2000 });
+        this.$toast.success('下次查詢時將會生效', { position: 'bottom', duration: 1000 });
       }
       this.SaveQueryOptionsToLocalStorage();
     },

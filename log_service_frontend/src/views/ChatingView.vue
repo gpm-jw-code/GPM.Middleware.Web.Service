@@ -7,7 +7,7 @@
           <b-button class="w-100" variant="primary" @click="EnterRoomHandle">Enter</b-button>
         </div>
       </div>
-      <div v-else class="bg-dark" id="messages-content">
+      <div v-else class="bg-dark" id="messages-content" v-bind:style="msg_container_style">
         <div v-for="msgObj in allMsgObjList" :key="msgObj.time">
           <div class="system-message" v-if="msgObj.isInfoMessage">{{msgObj.message}}</div>
           <div
@@ -65,6 +65,11 @@ export default {
       ws: null,
       revObjList: [],
       sendObjList: [], allMsgObjList: []
+    }
+  },
+  computed: {
+    msg_container_style() {
+      return { height: `${(window.innerHeight - 100)}px` }
     }
   },
   methods: {
@@ -125,9 +130,8 @@ export default {
 
 #messages-content {
   overflow-y: scroll;
-  height: 800px;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 30px 10px;
+  border-radius: 3px;
 }
 
 .send-message,
