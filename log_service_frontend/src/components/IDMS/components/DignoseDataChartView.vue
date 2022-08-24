@@ -1,6 +1,6 @@
 <template>
   <div id="dignose-chart-view" v-loading="LOADING">
-    <el-affix :offset="56" class="w-100">
+    <el-affix :offset="65" class="w-100">
       <div class="charting-options w-100 py-1 px-1 mx-2 d-flex bg-light row">
         <div class="col-md-6">
           <div class="d-flex justify-content-start w-100">

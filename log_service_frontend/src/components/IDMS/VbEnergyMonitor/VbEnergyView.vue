@@ -1,6 +1,6 @@
 <template>
   <div class="fade-in bg-light h-100" style="z-index:3006">
-    <el-affix :offset="56">
+    <el-affix :offset="65">
       <div class="d-flex flex-row justify-content-start px-2 py-2" sticky>
         <el-radio-group v-model="display">
           <el-radio-button size="small" label="Dashboard"></el-radio-button>
