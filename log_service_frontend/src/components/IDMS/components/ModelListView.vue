@@ -21,7 +21,7 @@
         </el-select>
       </div>
     </div>
-    <el-table :data="modelData" v-loading="loading">
+    <el-table :data="modelData" v-loading="loading" :size="tableSize">
       <el-table-column prop="Recipe_ID" label="模型名稱" fixed="left" width="160px" sortable></el-table-column>
       <el-table-column prop="Model_Start_Time" label="開始時間" sortable></el-table-column>
       <el-table-column prop="Model_End_Time" label="結束時間"></el-table-column>
@@ -64,6 +64,11 @@ export default {
       edgeIP: '12.2.2.2'
     }
   },
+  computed: {
+    tableSize() {
+      return window.innerWidth < 500 ? 'small' : 'default';
+    }
+  },
   methods: {
     ShowModelList(edgeIP, ip) {
       this.show = true;
@@ -101,6 +106,7 @@ export default {
   },
   mounted() {
   }
+
 }
 </script>
 

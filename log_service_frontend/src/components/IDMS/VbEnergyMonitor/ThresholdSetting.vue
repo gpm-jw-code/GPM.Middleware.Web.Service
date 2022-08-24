@@ -7,6 +7,7 @@
         :height="tableHeight"
         row-key="ModuleInfo.IP"
         @selection-change="SelectedHandle"
+        :size="tableSize"
       >
         <el-table-column label="V" fixed="left" width="40" type="selection">
           <!-- <template #default="scope">
@@ -200,6 +201,9 @@ export default {
   computed: {
     tableHeight() {
       return window.innerHeight - (this.show_bottom_tool ? 300 : 127);
+    },
+    tableSize() {
+      return window.innerWidth < 500 ? 'small' : 'default';
     }
   },
   unmounted() {

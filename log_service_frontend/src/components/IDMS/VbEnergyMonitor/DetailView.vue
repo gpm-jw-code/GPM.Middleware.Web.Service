@@ -35,22 +35,18 @@
                   v-loading="ThresholdSetting[axis].loading"
                 >
                   <span>UCL</span>
-                  <input
+                  <b-form-input
                     class="setting-input"
-                    :value="ThresholdSetting[axis].ucl"
+                    v-model.number="ThresholdSetting[axis].ucl"
                     type="number"
                     step="0.01"
-                    @change="(e)=>{ThresholdSetting[axis].ucl = e.target.value}"
-                    @keyup="(e)=>{ThresholdSetting[axis].ucl = e.target.value}"
                   />
                   <span>LCL</span>
-                  <input
+                  <b-form-input
                     class="setting-input"
-                    :value="ThresholdSetting[axis].lcl"
+                    v-model.number="ThresholdSetting[axis].lcl"
                     type="number"
                     step="0.01"
-                    @change="(e)=>{ThresholdSetting[axis].lcl = e.target.value}"
-                    @keyup="(e)=>{ThresholdSetting[axis].lcl = e.target.value}"
                   />
                 </div>
                 <el-button
@@ -233,7 +229,7 @@ export default {
 }
 .axis-title {
   font-size: 14px;
-  background-color: rgb(56, 56, 56);
+  background-color: rgb(24, 57, 107);
   color: white;
   font-weight: bold;
 }
@@ -251,11 +247,13 @@ export default {
   padding: 4px;
 }
 
-.threshold-setting input {
+.threshold-setting input,
+.threshold-setting setting-input {
   width: 73px;
   height: 25px;
   margin: auto 4px;
   text-align: center;
+  display: inline;
 }
 .threshold-setting input:disabled {
   background-color: #33485d;

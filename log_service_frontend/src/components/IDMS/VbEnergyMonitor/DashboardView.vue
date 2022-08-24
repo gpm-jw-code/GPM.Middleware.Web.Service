@@ -59,7 +59,7 @@ export default {
   },
   computed: {
     column_class() {
-      return `col-md-${12 / this.ColsNumber}`;
+      return `col-lg-${12 / this.ColsNumber}`;
     },
 
   },

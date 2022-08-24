@@ -18,7 +18,7 @@
         <div class="col-md-6 text-start">
           <div class="d-flex justify-content-end w-70">
             <div style="width:150px;font-size:12px">Column Number</div>
-            <el-select size="normal" v-model="ColsNumber" @change="RenderCharts">
+            <el-select size="default" v-model="ColsNumber" @change="RenderCharts">
               <el-option v-for="num in [1,2,3]" :key="num" :value="num" :label="num"></el-option>
             </el-select>
             <el-input size="small" v-model="search_str" placeholder="輸入內容查詢..." clearable>

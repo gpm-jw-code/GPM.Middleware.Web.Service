@@ -16,8 +16,8 @@
     <!-- 表格 -->
 
     <el-table
-      table-layout="auto"
       :default-sort="{ prop: 'EqName', order: 'ascending' }"
+      table-layout="auto"
       :height="table_height"
       :data="DignoseDatasToShow"
       v-loading="loading"
@@ -28,6 +28,7 @@
       :row-class-name="tableRowClassName"
       row-key="IP"
       ref="table"
+      :size="tableSize"
     >
       <!-- <el-table-column fixed="left" width="10">
         <template #default="scope">
@@ -395,8 +396,10 @@ export default {
     },
     bottom_title_append() {
       return this.selectedDiagnoseData.IP == undefined ? '' : ` ${this.selectedDiagnoseData.EqName}-${this.selectedDiagnoseData.UnitName}(${this.selectedDiagnoseData.IP})`;
+    },
+    tableSize() {
+      return window.innerWidth < 500 ? 'small' : 'default';
     }
-
   },
   props: {
     edgeIP: {

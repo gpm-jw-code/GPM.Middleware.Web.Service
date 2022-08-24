@@ -26,7 +26,7 @@
     <div v-if="mode=='Module'">
       <h3>Module State</h3>
       <el-divider></el-divider>
-      <el-table stripe :data="ModuleStatesData" row-key="IP">
+      <el-table stripe :data="ModuleStatesData" row-key="IP" :size="tableSize">
         <el-table-column width="44" fixed="left">
           <template #default="scope">
             <el-icon
@@ -103,6 +103,10 @@ export default {
       this.ws.onclose = () => {
         this.WebSocketInitial();
       }
+    }
+  }, computed: {
+    tableSize() {
+      return window.innerWidth < 500 ? 'small' : 'default';
     }
   },
   created() {
