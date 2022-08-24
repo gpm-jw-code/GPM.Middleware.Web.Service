@@ -1,27 +1,39 @@
 <template>
-  <div id="Admin">
-    <div class="breadcrumb" sticky>
-      <nav class="navbar navbar-expand-lg bg-primary">
-        <a class="navbar-brand" href="/">
+  <div id="admin">
+    <div id="breadcrumb" sticky>
+      <nav class="navbar navbar-expand-lg bg-dark">
+        <a class="navbar-brand">
           <span style="font-size:30px">GPM</span>
+          <span class="mx-3" style="font-size:20px">ADMIN</span>
         </a>
-        <button class="navbar-toggler bg-primary" v-b-toggle.navbarNav ref="toggle_button">
+        <button class="navbar-toggler bg-light" v-b-toggle.navbarNav ref="toggle_button">
           <i class="bi bi-list"></i>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="fade-in navbar-nav">
+          <ul class="navbar-nav">
             <li class="nav-item">
-              <a>a1</a>
+              <a href="/" class="nav-link">IDMS</a>
+            </li>
+            <li class="nav-item">
+              <a>
+                <router-link class="nav-link" to="/">OV</router-link>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a>
+                <router-link class="nav-link" to="/2">OV</router-link>
+              </a>
             </li>
           </ul>
         </div>
       </nav>
     </div>
-    <h1>ADMIN PAGE RENDER SUCCESS!</h1>
     <!-- <router-view /> -->
     <router-view v-slot="{ Component }">
       <div class="router-view-content">
-        <component :is="Component" />
+        <keep-alive>
+          <component :is="Component" />
+        </keep-alive>
       </div>
     </router-view>
   </div>
@@ -46,8 +58,8 @@ export default {
 
 </script>
 
-<style>
-#Admin {
+<style scoped>
+#admin {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -68,6 +80,7 @@ nav {
   border-bottom: none;
   padding-bottom: 0px;
 }
+
 .nav-link {
   margin-top: 4px;
 }
@@ -77,39 +90,23 @@ nav {
 }
 
 html,
-body {
+body,
+.router-view-content {
   margin: 0;
   padding: 0;
-  height: 100%;
+  height: 100vh;
+  background-color: #000000;
 }
 
-.breadcrumb {
+#breadcrumb {
   position: fixed;
   width: 100%;
   z-index: 3001;
 }
 .router-view-content {
-  height: 100%;
   padding-top: 75px;
 }
 
-.edge-info {
-  color: white;
-  font-size: larger;
-  font-weight: bold;
-  letter-spacing: 2px;
-  text-align: left;
-}
-
-.edge-info .ip {
-  color: rgb(173, 173, 173);
-  font-size: smaller;
-  letter-spacing: 1px;
-}
-
-.idms-alarm-form-badge {
-  z-index: 3009;
-}
 .route-link-selected {
   border-bottom: 0.2rem double white;
 }
