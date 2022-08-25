@@ -26,24 +26,12 @@
       @expand-change="ExpandHandle"
       @row-dblclick="RowDoubleClickHandle"
       :row-class-name="tableRowClassName"
+      :header-cell-style="headerStyle"
+      :cell-style="cellStyle"
       row-key="IP"
       ref="table"
       :size="tableSize"
     >
-      <!-- <el-table-column fixed="left" width="10">
-        <template #default="scope">
-          <div class="py-1">
-            <el-icon
-              :size="10"
-              color="rgb(64, 158, 255)"
-              v-show="scope.row.IP==selectedDiagnoseData.IP"
-            >
-              <CaretRight />
-            </el-icon>
-          </div>
-        </template>
-      </el-table-column>-->
-
       <el-table-column sortable fixed="left" prop="IP" label="IP" width="140"></el-table-column>
       <el-table-column sortable prop="EqName" label="EQ Name"></el-table-column>
       <el-table-column sortable prop="UnitName" label="Unit Name"></el-table-column>
@@ -150,7 +138,7 @@
     <transition name="el-zoom-in-bottom">
       <div
         v-show="share_chart_show"
-        class="share-chart-container fixed-in-bottom"
+        class="share-chart-container fixed-in-bottom border-top"
         v-bind:style="current_share_chart_style"
         v-loading="loading"
       >
@@ -234,7 +222,11 @@ export default {
         warning: { backgroundColor: '#e5bc41', border: '1px solid white' },
         danger: { backgroundColor: 'rgb(217, 94, 94)', border: '1px solid white' }
       },
-
+      headerStyle: {
+        backgroundColor: 'rgb(222, 232, 247)',
+      },
+      cellStyle: {
+      }
 
     }
   },
@@ -443,7 +435,7 @@ export default {
   color: gold;
   height: 320px;
   /* margin: 10px; */
-  /* box-shadow: 12px 2px 32px 10px black; */
+  box-shadow: 6px 1px 32px 2px black;
   border-radius: 4px;
   border: black 1px solid;
   z-index: 3000;

@@ -131,16 +131,9 @@
           element-loading-text="數據載入中...若響應速度過慢,可以試試將查詢時間區間縮短。"
           element-loading-background="rgba(122, 122, 122, 0.8)"
         >
-          <div class="d-flex result-message font-red">{{ServerResponseData.message}}</div>
-          <!-- <GPMPreviewChart
-            ref="preview_chart"
-            title="Preview"
-            :yAxisLabel="Ylabel"
-            xAxisLabel
-            @DateTimeIntervalOnchanged="GetSliceDataHandle"
-          ></GPMPreviewChart>-->
-          <div class style="position:absolute;left:15px;top:15px;cursor:pointer">
+          <div class="d-flex flex-row" style="position:absolute;left:15px;top:15px;cursor:pointer">
             <i @click="showAxisSetting=true" class="bi bi-sliders2-vertical"></i>
+            <div class="d-flex result-message font-red">{{ServerResponseData.message}}</div>
           </div>
           <GPMChart
             v-loading="chart_loading"
@@ -189,7 +182,7 @@
       direction="btt"
       size="40%"
       :show-close="false"
-      z-index="5000"
+      :z-index="5000"
     >
       <template #header="{titleID}">
         <div :id="titleID" class="border-bottom d-flex flex-row">
@@ -198,7 +191,7 @@
         </div>
       </template>
       <div class="h-100" style="position:absolute;top:60px;right: 12px;left:  12px;">
-        <el-tabs v-model="SelectedQueryItem" class="demo-tabs" @tab-click="handleClick">
+        <el-tabs v-model="SelectedQueryItem" class="demo-tabs">
           <el-tab-pane
             v-for="setting in CustomChartSetting"
             :key="setting.item"
@@ -210,16 +203,36 @@
                 <div>
                   <el-tag size="large" class="item-name">Y軸</el-tag>
                 </div>
+                <div>
+                  <el-checkbox
+                    v-model="setting.yAutoScale"
+                    @change="AutoScaleHandle(setting)"
+                  >Auto Scale</el-checkbox>
+                </div>
                 <div>Max</div>
                 <div>
-                  <b-form-input v-model.number="setting.ymax" type="number" :step="0.1"></b-form-input>
+                  <b-form-input
+                    :disabled="setting.yAutoScale"
+                    v-model.number="setting.ymax"
+                    type="number"
+                    :step="0.1"
+                  ></b-form-input>
                 </div>
                 <div>Min</div>
                 <div>
-                  <b-form-input v-model.number="setting.ymin" type="number" :step="0.1"></b-form-input>
+                  <b-form-input
+                    :disabled="setting.yAutoScale"
+                    v-model.number="setting.ymin"
+                    type="number"
+                    :step="0.1"
+                  ></b-form-input>
                 </div>
                 <div>
-                  <b-button size="md" @click="ChartYLimitsApplyHandle">Apply</b-button>
+                  <b-button
+                    :disabled="setting.yAutoScale"
+                    size="md"
+                    @click="ChartYLimitsApplyHandle"
+                  >Apply</b-button>
                 </div>
               </div>
               <div class="d-flex flex-row sub-setting">
@@ -339,7 +352,10 @@ export default {
           ymin: 0,
           customSetting: {
 
-          }
+          },
+          ymaxOfAllData: 100,
+          yminOfAllData: 0,
+          yAutoScale: false
         },
         {
           item: 'Raw Data',
@@ -347,7 +363,10 @@ export default {
           ymin: 0,
           customSetting: {
 
-          }
+          },
+          ymaxOfAllData: 100,
+          yminOfAllData: 0,
+          yAutoScale: false
         },
         {
           item: 'Alert Index',
@@ -355,7 +374,10 @@ export default {
           ymin: 0,
           customSetting: {
 
-          }
+          },
+          ymaxOfAllData: 100,
+          yminOfAllData: 0,
+          yAutoScale: false
         },
         {
           item: '振動能量',
@@ -363,7 +385,10 @@ export default {
           ymin: 0,
           customSetting: {
 
-          }
+          },
+          ymaxOfAllData: 100,
+          yminOfAllData: 0,
+          yAutoScale: false
         },
         {
           item: 'Physical Quanity',
@@ -371,7 +396,10 @@ export default {
           ymin: 0,
           customSetting: {
 
-          }
+          },
+          ymaxOfAllData: 100,
+          yminOfAllData: 0,
+          yAutoScale: false
         },
         {
           item: 'Sideband Severity',
@@ -379,7 +407,10 @@ export default {
           ymin: 0,
           customSetting: {
 
-          }
+          },
+          ymaxOfAllData: 100,
+          yminOfAllData: 0,
+          yAutoScale: false
         },
         {
           item: 'FrequencyDoubling Severity',
@@ -387,7 +418,10 @@ export default {
           ymin: 0,
           customSetting: {
 
-          }
+          },
+          ymaxOfAllData: 100,
+          yminOfAllData: 0,
+          yAutoScale: false
         }
       ]
 
@@ -526,6 +560,11 @@ export default {
 
     },
     async RenderChart(data) {
+      this.ServerResponseData = data;
+      if (this.ServerResponseData.message) {//表示有錯誤
+        this.loading = false;
+        return;
+      }
       this.FetchDataFinishTime = Date.now();
       // var timeEscapse = moment(this.FetchDataFinishTime - this.FetchDataStartTime).seconds();
       // console.info('Fetch Data 花費 :', timeEscapse, `${data.labels.length}筆`);
@@ -535,12 +574,17 @@ export default {
       this.SyncStyleSetting(data);
       this.RenderFullChart(data);
       this.loading = false;
+      console.info(this.CustomChartSetting);
     },
     ColorChangeHandle(setting, key, borderColor) {
       console.info(setting, key, borderColor);
     },
     SyncStyleSetting(data) {
       var setting = this.CustomChartSetting.find(vm => vm.item == this.QueryOptions.SelectedQueryItem);
+      //暫存數據最大最小值 用來做auto scale調整
+      setting.ymaxOfAllData = data.ymaxOfAllData;
+      setting.yminOfAllData = data.yminOfAllData;
+
       setting.customSetting = {};
       data.datasets.forEach(dataset => {
         setting.customSetting[dataset.label] = {
@@ -587,6 +631,19 @@ export default {
         resolve();
       })
     },
+    AutoScaleHandle(settings) {
+      if (settings.item == this.QueryOptions.SelectedQueryItem) {
+        if (settings.yAutoScale) {
+          this.$refs.query_chart.SetYAxisLimits(settings.ymaxOfAllData, settings.yminOfAllData);
+        } else {
+          this.$refs.query_chart.SetYAxisLimits(settings.ymax, settings.ymin);
+        }
+      }
+      else
+        this.$toast.success('下次查詢時將會生效', { position: 'bottom', duration: 1000 });
+      this.SaveQueryOptionsToLocalStorage();
+
+    },
     ChartYLimitsApplyHandle() {
       var setting = this.CustomChartSetting.find(vm => vm.item == this.QueryOptions.SelectedQueryItem);
       var max = setting.ymax;
@@ -600,9 +657,10 @@ export default {
     },
     SetChartYLimits() {
       var setting = this.CustomChartSetting.find(vm => vm.item == this.QueryOptions.SelectedQueryItem);
-      var max = setting.ymax;
-      var min = setting.ymin;
-      this.$refs.query_chart.SetYAxisLimits(max, min);
+      this.AutoScaleHandle(setting);
+      // var max = setting.ymax;
+      // var min = setting.ymin;
+      // this.$refs.query_chart.SetYAxisLimits(max, min);
 
     },
     GetCustomSetting() {

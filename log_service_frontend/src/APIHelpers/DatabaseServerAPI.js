@@ -137,14 +137,15 @@ async function GetRequest(api = '') {
       .get(api,{headers:{
          Authorization:`Bearer thisis_thoken`
       }})
+      .then((res) => {
+        resolve(res.data)
+      })
       .catch((e) => {
         console.info(e)
         resolve({
           message: e.message,
         })
       })
-      .then((res) => {
-        resolve(res.data)
-      })
+     
   })
 }
