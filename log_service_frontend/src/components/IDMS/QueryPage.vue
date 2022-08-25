@@ -257,6 +257,7 @@ import EventQueryResultView from './components/EventQueryResultView'
 import moment from 'moment';
 // import { QueryHealthScore, QueryAlertIndex } from '@/APIHelpers/DatabaseServerAPI';
 import {
+  GetEdgeNameByIP,
   GetModuleInfoStoredInDB, QueryVibrationEnergy, QueryVibration_raw_data,
   QueryHealthScore, QueryAlertIndex, QueryPhysical_quantity, QuerySideBandSeverity, QueryFrequency_doublingSeverity,
   QuerySplice, GetDatabaseList, QueryVibration_raw_data_with_QueryID
@@ -615,14 +616,18 @@ export default {
     }
   },
   async mounted() {
-    this.edge_ip = this.$route.query.ip;
-    this.edge_name = this.$route.query.edgename;
-
-    this.FetchModuleList().then(() => {
-      this.ReadQueryOptionsFromLocalStorage();
-      this.$refs.query_chart.UpdateTitle(this.ChartTitle);
-    });
-    this.DatabaseList = await GetDatabaseList();
+    setTimeout(async () => {
+      this.edge_ip = this.$route.query.ip;
+      if (this.$route.query.edgename == undefined) {
+        this.edge_name = await GetEdgeNameByIP(this.edge_ip)
+      } else
+        this.edge_name = this.$route.query.edgename;
+      this.FetchModuleList().then(() => {
+        this.ReadQueryOptionsFromLocalStorage();
+        this.$refs.query_chart.UpdateTitle(this.ChartTitle);
+      });
+      this.DatabaseList = await GetDatabaseList();
+    }, 10);
   }
 }
 </script>

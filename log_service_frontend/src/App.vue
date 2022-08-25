@@ -16,7 +16,7 @@
         <template #reference>
           <div class="navbar-brand">
             <el-tag
-              @click="routerHandle('/EdgeMain/:ip')"
+              @click="routerHandle('/EdgeMain')"
               size="large"
               effect="dark"
             >{{ EdgeName? EdgeName.toUpperCase():''}}</el-tag>
@@ -59,6 +59,7 @@ import NetworkStatusVue from './components/IDMS/components/NetworkStatus.vue';
 import ReleaseNote from '@/components/IDMS/components/AppReleaseView/ReleaseNoteView.vue'
 import NotificationIconVue from './components/IDMS/AlarmForm/NotificationIcon.vue';
 import ChatIconVue from './components/Chat/ChatIcon.vue';
+import { GetEdgeNameByIP } from './APIHelpers/DatabaseServerAPI';
 export default {
   components: {
     NetworkStatusVue, ReleaseNote, NotificationIconVue, ChatIconVue
@@ -113,7 +114,10 @@ export default {
       if (this.isNotEntryPAGE) {
         console.info('ROUTE PARAM', route.query);
         this.EdgeIP = route.query.ip;
-        this.EdgeName = route.query.edgename;
+        if (route.query.edgename == undefined) {
+          GetEdgeNameByIP(this.EdgeIP).then(edgeName => this.EdgeName = edgeName)
+        } else
+          this.EdgeName = route.query.edgename;
         this.$refs.alarm_noti_icon.WsIni(this.EdgeIP);
       }
 

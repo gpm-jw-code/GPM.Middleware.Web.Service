@@ -126,11 +126,17 @@ export async function GetEdgeWSDataRevState(withData=false){
   return await GetRequest('/api/edge/EdgesWSDataState');
 }
 
+/**取得IP對應的Edge名稱 */
+export async function GetEdgeNameByIP(ip){
+  return await GetRequest(`/api/edge/edgename?ip=${ip}`);
+}
 
 async function GetRequest(api = '') {
   return new Promise((resolve) => {
     axios
-      .get(api)
+      .get(api,{headers:{
+         Authorization:`Bearer thisis_thoken`
+      }})
       .catch((e) => {
         console.info(e)
         resolve({
