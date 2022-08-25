@@ -195,7 +195,7 @@ export default {
     }
   },
   mounted() {
-    this.edge_ip = this.$route.params.ip;
+    this.edge_ip = this.$route.query.ip;
     this.WsIni();
   },
   computed: {

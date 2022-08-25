@@ -80,9 +80,9 @@ export default {
     routerHandle(path) {
       if (window.innerWidth < 900)
         this.$refs['toggle_button'].click();
-      this.EdgeIP = localStorage.getItem('edgeip');
       console.info(path)
-      this.$router.push(`${path.replace(':ip', this.EdgeIP)}`);
+      var query = path != '/' ? { ip: this.EdgeIP, edgename: this.EdgeName } : {};
+      this.$router.push({ path: path, query: query });
     },
   },
   computed: {
@@ -95,16 +95,13 @@ export default {
   },
   mounted() {
     window.addEventListener('unload', () => localStorage.setItem('idms-previous-route-name', this.seletedRouteName))
-
     var previousRoutName = localStorage.getItem('idms-previous-route-name');
     if (previousRoutName != undefined && previousRoutName != null) {
       this.seletedRouteName = previousRoutName;
     }
     let route = useRoute();
+
     watch(() => route.name, (n, o) => {
-      console.info('route change', n, o);
-      this.EdgeIP = localStorage.getItem('edgeip');
-      this.EdgeName = localStorage.getItem('edgename');
       this.seletedRouteName = n;
       this.isNotEntryPAGE = this.showNavbar = n + '' !== 'EntryPage';
       console.info(this.showNavbar, n, o)
@@ -114,6 +111,9 @@ export default {
       }
 
       if (this.isNotEntryPAGE) {
+        console.info('ROUTE PARAM', route.query);
+        this.EdgeIP = route.query.ip;
+        this.EdgeName = route.query.edgename;
         this.$refs.alarm_noti_icon.WsIni(this.EdgeIP);
       }
 

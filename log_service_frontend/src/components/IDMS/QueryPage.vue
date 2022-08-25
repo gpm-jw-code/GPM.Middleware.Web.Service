@@ -205,9 +205,11 @@
             :label="setting.item"
             :name="setting.item"
           >
-            <div class="chart-settings">
-              <div class="d-flex flex-row">
-                <div>Y軸</div>
+            <div class="chart-settings d-flex flex-column">
+              <div class="d-flex flex-row sub-setting">
+                <div>
+                  <el-tag size="large" class="item-name">Y軸</el-tag>
+                </div>
                 <div>Max</div>
                 <div>
                   <b-form-input v-model.number="setting.ymax" type="number" :step="0.1"></b-form-input>
@@ -218,6 +220,25 @@
                 </div>
                 <div>
                   <b-button size="md" @click="ChartYLimitsApplyHandle">Apply</b-button>
+                </div>
+              </div>
+              <div class="d-flex flex-row sub-setting">
+                <div>
+                  <el-tag size="large" class="item-name">Colors</el-tag>
+                </div>
+                <div
+                  class="d-flex flex-row mx-0 my-0 px-0 py-0"
+                  v-for="(val,key) in setting.customSetting"
+                  :key="key"
+                >
+                  <div>{{key}}</div>
+                  <div class="mx-0 my-0 px-0 pb-2">
+                    <el-color-picker
+                      color-format="rgb"
+                      v-model="val.borderColor"
+                      @active-change="ColorChangeHandle(setting,key,val.borderColor)"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -310,44 +331,64 @@ export default {
       },
       FetchDataStartTime: null,
       FetchDataFinishTime: null,
-      CustomChartSetting:
-        [
-          {
-            item: 'Health Score',
-            ymax: 100,
-            ymin: 0
-          },
-          {
-            item: 'Raw Data',
-            ymax: 100,
-            ymin: 0
-          },
-          {
-            item: 'Alert Index',
-            ymax: 100,
-            ymin: 0
-          },
-          {
-            item: '振動能量',
-            ymax: 100,
-            ymin: 0
-          },
-          {
-            item: 'Physical Quanity',
-            ymax: 100,
-            ymin: 0
-          },
-          {
-            item: 'Sideband Severity',
-            ymax: 100,
-            ymin: 0
-          },
-          {
-            item: 'FrequencyDoubling Severity',
-            ymax: 100,
-            ymin: 0
+      CustomChartSetting: [
+        {
+          item: 'Health Score',
+          ymax: 100,
+          ymin: 0,
+          customSetting: {
+
           }
-        ]
+        },
+        {
+          item: 'Raw Data',
+          ymax: 100,
+          ymin: 0,
+          customSetting: {
+
+          }
+        },
+        {
+          item: 'Alert Index',
+          ymax: 100,
+          ymin: 0,
+          customSetting: {
+
+          }
+        },
+        {
+          item: '振動能量',
+          ymax: 100,
+          ymin: 0,
+          customSetting: {
+
+          }
+        },
+        {
+          item: 'Physical Quanity',
+          ymax: 100,
+          ymin: 0,
+          customSetting: {
+
+          }
+        },
+        {
+          item: 'Sideband Severity',
+          ymax: 100,
+          ymin: 0,
+          customSetting: {
+
+          }
+        },
+        {
+          item: 'FrequencyDoubling Severity',
+          ymax: 100,
+          ymin: 0,
+          customSetting: {
+
+          }
+        }
+      ]
 
 
     }
@@ -417,23 +458,26 @@ export default {
           let chart_pixel = this.$refs.query_chart.GetPixel();
           new Promise(() => {
             this.$refs.query_chart.Clear();
+
+            let customSetting = this.GetCustomSetting();
+
             if (this.QueryOptions.SelectedQueryItem == 'Health Score')
-              QueryHealthScore(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
+              QueryHealthScore(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel, customSetting).then(res => { this.RenderChart(res); });
             else if (this.QueryOptions.SelectedQueryItem == 'Alert Index')
-              QueryAlertIndex(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
+              QueryAlertIndex(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel, customSetting).then(res => { this.RenderChart(res); });
             else if (this.QueryOptions.SelectedQueryItem == '振動能量')
-              QueryVibrationEnergy(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
+              QueryVibrationEnergy(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel, customSetting).then(res => { this.RenderChart(res); });
             else if (this.QueryOptions.SelectedQueryItem == 'Raw Data') {
-              QueryVibration_raw_data(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
+              QueryVibration_raw_data(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel, customSetting).then(res => { this.RenderChart(res); });
             }
             else if (this.QueryOptions.SelectedQueryItem == 'Physical Quanity') {
-              QueryPhysical_quantity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
+              QueryPhysical_quantity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel, customSetting).then(res => { this.RenderChart(res); });
             }
             else if (this.QueryOptions.SelectedQueryItem == 'Sideband Severity') {
-              QuerySideBandSeverity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
+              QuerySideBandSeverity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel, customSetting).then(res => { this.RenderChart(res); });
             }
             else if (this.QueryOptions.SelectedQueryItem == 'FrequencyDoubling Severity') {
-              QueryFrequency_doublingSeverity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel).then(res => { this.RenderChart(res); });
+              QueryFrequency_doublingSeverity(this.edge_name, this.QueryOptions.SelectedUNIT, this.StartTime, this.EndTime, chart_pixel, customSetting).then(res => { this.RenderChart(res); });
             }
             else
               this.loading = false;
@@ -482,17 +526,34 @@ export default {
     },
     async RenderChart(data) {
       this.FetchDataFinishTime = Date.now();
-      var timeEscapse = moment(this.FetchDataFinishTime - this.FetchDataStartTime).seconds();
-      console.info('Fetch Data 花費 :', timeEscapse, `${data.labels.length}筆`);
+      // var timeEscapse = moment(this.FetchDataFinishTime - this.FetchDataStartTime).seconds();
+      // console.info('Fetch Data 花費 :', timeEscapse, `${data.labels.length}筆`);
       this.$toast.success('Done', { position: 'top-right', duration: 2000 });
       this.ServerResponseData = data;
-      // if (data.isPreview) {
-      //   this.RenderPreviewChart(data);
-      // }
-      // else {
-      // }
+      //把style設定存起來
+      this.SyncStyleSetting(data);
       this.RenderFullChart(data);
       this.loading = false;
+    },
+    ColorChangeHandle(setting, key, borderColor) {
+      console.info(setting, key, borderColor);
+    },
+    SyncStyleSetting(data) {
+      var setting = this.CustomChartSetting.find(vm => vm.item == this.QueryOptions.SelectedQueryItem);
+      setting.customSetting = {};
+      data.datasets.forEach(dataset => {
+        setting.customSetting[dataset.label] = {
+          backgroundColor: dataset.backgroundColor,
+          borderColor: dataset.borderColor,
+          borderWidth: dataset.borderWidth,
+          fill: dataset.fill,
+          label: dataset.label,
+          lineTension: dataset.lineTension,
+          pointRadius: dataset.pointRadius,
+          pointStyle: dataset.pointStyle,
+        }
+      })
+      this.SaveQueryOptionsToLocalStorage();
     },
     async GetSliceDataHandle(datetimeInterval = {}) {
 
@@ -511,11 +572,13 @@ export default {
     async RenderFullChart(data, showloading = false) {
       await new Promise((resolve) => {
         this.$refs.query_chart.UpdateChart(data, showloading);
-        this.SetChartYLimits();
+        this.CustomStyleSetting();
         resolve();
       })
     },
-
+    CustomStyleSetting() {
+      this.SetChartYLimits();
+    },
     async RenderPreviewChart(previewData) {
       await new Promise((resolve) => {
         this.$refs.preview_chart.UpdatePreviewChart(previewData);
@@ -541,16 +604,19 @@ export default {
       this.$refs.query_chart.SetYAxisLimits(max, min);
 
     },
+    GetCustomSetting() {
+      var setting = this.CustomChartSetting.find(vm => vm.item == this.QueryOptions.SelectedQueryItem);
+      if (setting.customSetting == undefined) {
+        setting.customSetting = {};
+      }
+      let json = JSON.stringify(setting.customSetting);
+      console.info(setting, json);
+      return JSON.stringify(setting.customSetting);
+    }
   },
   async mounted() {
-
-    var edge_ip = localStorage.getItem('edgeip');
-    var edge_name = localStorage.getItem('edgename');
-
-
-    console.log(edge_ip, edge_name);
-    this.edge_ip = edge_ip;
-    this.edge_name = edge_name;
+    this.edge_ip = this.$route.query.ip;
+    this.edge_name = this.$route.query.edgename;
 
     this.FetchModuleList().then(() => {
       this.ReadQueryOptionsFromLocalStorage();
@@ -594,9 +660,15 @@ export default {
   padding-left: 9px;
   font-weight: bold;
 }
-
+.chart-settings .sub-setting {
+  border-bottom: 0.1rem solid rgb(219, 219, 219);
+}
 .chart-settings div div {
   margin: 10px;
   height: 40px;
+}
+.chart-settings .item-name {
+  width: 70px;
+  text-align: left;
 }
 </style>

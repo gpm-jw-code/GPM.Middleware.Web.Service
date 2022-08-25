@@ -111,7 +111,7 @@ export default {
   },
   created() {
     console.info('fssssff', this.$route.params.ip)
-    this.EdgeIP = this.$route.params.ip;
+    this.EdgeIP = this.$route.query.ip;
   }
 }
 </script>

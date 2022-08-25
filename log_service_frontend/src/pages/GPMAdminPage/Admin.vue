@@ -36,12 +36,18 @@
         </keep-alive>
       </div>
     </router-view>
+    <ChatIconVue></ChatIconVue>
   </div>
 </template>
 
+
 <script>
+
+import ChatIconVue from '@/components/Chat/ChatIcon.vue';
+
 export default {
   components: {
+    ChatIconVue
   },
   data() {
     return {

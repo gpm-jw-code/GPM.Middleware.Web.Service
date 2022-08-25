@@ -243,9 +243,9 @@ export default {
   },
   methods: {
     EnterEdgeHandle() {
-      localStorage.setItem('edgeip', this.EdgeProp.EdgeIP);
-      localStorage.setItem('edgename', this.EdgeProp.Name.toLowerCase());
-      this.$router.push(`/EdgeMain/${this.EdgeProp.EdgeIP}`);
+
+      // this.$router.push(`/EdgeMain/${this.EdgeProp.EdgeIP}`);
+      this.$router.push({ path: '/EdgeMain', query: { ip: this.EdgeProp.EdgeIP, edgename: this.EdgeProp.Name } });
       //   this.$router.push(`/EdgeMain`);
     },
     WebsocketIni() {

@@ -114,7 +114,7 @@ export default {
     this.WsIni();
   },
   created() {
-    this.edge_ip = this.$route.params.ip
+    this.edge_ip = this.$route.query.ip
     console.log('dashview created', this.edge_ip);
   },
   unmounted() {

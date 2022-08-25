@@ -113,11 +113,10 @@ export default {
     WsIni(edge_ip) {
       if (this.alarm_websocket != null)
         return;
-      var EdgeIP = localStorage.getItem('edgeip');
+      var EdgeIP = edge_ip;
       if (EdgeIP == null)
         return;
       console.info('alarm noti ws ini:', EdgeIP);
-
       this.alarm_websocket = new WebSocket(`ws://${EdgeIP}:44332/AlarmForm`);
       this.alarm_websocket.onmessage = (evt) => {
         var vm = JSON.parse(evt.data);

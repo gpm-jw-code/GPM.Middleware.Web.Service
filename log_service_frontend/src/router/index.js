@@ -31,17 +31,17 @@ var gpm_mode_routes = [
     component: EntryPage,
   },
   {
-    path: '/EdgeMain/:ip',
+    path: '/EdgeMain',
     name: '診斷頁面',
     component: IDMS,
   },
   {
-    path: '/VibrationEnergy/:ip',
+    path: '/ve',
     name: '振動能量',
     component: VEPage,
   },
   {
-    path: '/modulestates/:ip',
+    path: '/modulestates',
     name: '感測器狀態',
     component: ModuleStatesListViewVue,
   },

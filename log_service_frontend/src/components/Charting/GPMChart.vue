@@ -46,7 +46,7 @@ export default {
       loading: false,
       Rendering: false,
       chart_style: {
-        backgroundColor: '#313131',
+        backgroundColor: '#000000',
         border: '1px solid grey',
         margin: '3px',
         borderRadius: '4px'

@@ -44,9 +44,8 @@ export default {
   mounted() {
   },
   created() {
-    console.info('fff', this.$route.params.ip)
-    this.EdgeIP = this.$route.params.ip;
-    localStorage.setItem('edgeip', this.EdgeIP);
+    console.info('fff', this.$route.query.ip)
+    this.EdgeIP = this.$route.query.ip;
   }
 }
 
